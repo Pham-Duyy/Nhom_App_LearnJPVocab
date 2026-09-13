@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 void main() => runApp(const CalmDayApp());
 
 class CalmDayApp extends StatelessWidget {
-  const CalmDayApp({super.key});
+  const CalmDayApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,12 +11,12 @@ class CalmDayApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Ngày nhẹ nhàng',
       theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF5B7C6C),
-          brightness: Brightness.light,
-        ),
+        primaryColor: const Color(0xFF5B7C6C),
         scaffoldBackgroundColor: const Color(0xFFF8FAF7),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF5B7C6C),
+          secondary: Color(0xFF35614C),
+        ),
       ),
       home: const HomePage(),
     );
@@ -24,7 +24,7 @@ class CalmDayApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -32,8 +32,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<_Task> _tasks = [
-    _Task('Uống một ly nước', 'Bắt đầu ngày mới thật chậm rãi', true),
-    _Task('Hoàn thành một việc quan trọng', 'Chỉ cần một bước nhỏ', false),
+    _Task(
+      'Uống một ly nước', 
+      'Bắt đầu ngày mới thật chậm rãi',
+      true),
+    
+    _Task(
+      'Hoàn thành một việc quan trọng', 
+      'Chỉ cần một bước nhỏ',
+      false),
+    
     _Task(
       'Dành 10 phút cho bản thân',
       'Đi bộ, đọc sách hoặc hít thở sâu',
@@ -69,10 +77,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: const [
                           Text(
                             'Ngày nhẹ nhàng',
                             style: TextStyle(
