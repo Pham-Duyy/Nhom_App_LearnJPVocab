@@ -1,32 +1,20 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:myapp/main.dart';
 
 void main() {
-  testWidgets('displays and updates today\'s tasks', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const CalmDayApp());
+  testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
+    await tester.pumpWidget(const ChibaKanjiApp());
 
-    expect(find.text('Ngày nhẹ nhàng'), findsOneWidget);
-    expect(find.text('1/3 việc đã hoàn thành'), findsOneWidget);
-    expect(find.byType(CheckboxListTile), findsNWidgets(3));
-    expect(
-      find.text('Không cần vội. Một việc hoàn thành cũng là tiến bộ.'),
-      findsOneWidget,
-    );
+    expect(find.text('Chào Duy!'), findsOneWidget);
+    expect(find.text('9 từ vựng'), findsOneWidget);
+    expect(find.text('Đến giờ ôn rồi!'), findsOneWidget);
 
-    await tester.tap(find.text('Hoàn thành một việc quan trọng'));
+    await tester.tap(find.text('Học mới'));
     await tester.pump();
 
-    expect(find.text('2/3 việc đã hoàn thành'), findsOneWidget);
+    expect(
+      find.text('Màn hình Học mới sẽ được hoàn thiện tiếp.'),
+      findsOneWidget,
+    );
   });
 }
