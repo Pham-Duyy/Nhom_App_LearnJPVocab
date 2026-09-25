@@ -5,6 +5,7 @@ import 'package:chibakanji/providers/app_providers.dart';
 void main() {
   testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
     await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+    await tester.pumpAndSettle();
 
     expect(find.text('Chào Duy!'), findsOneWidget);
     expect(find.text('9 từ vựng'), findsOneWidget);

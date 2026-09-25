@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../data/mock/mock_learning_data.dart';
 import '../repositories/mock/mock_category_repository.dart';
 import '../repositories/mock/mock_progress_repository.dart';
 import '../repositories/mock/mock_vocabulary_repository.dart';
@@ -29,7 +30,14 @@ class AppProviders extends StatelessWidget {
           create: (_) => VocabularyProvider(MockVocabularyRepository()),
         ),
         ChangeNotifierProvider(
-          create: (_) => ProgressProvider(MockProgressRepository()),
+          // Tải ngay khi provider được tạo — an toàn vì thời điểm này chưa
+          // có widget nào lắng nghe, nên notifyListeners() bên trong
+          // loadProgress() không đụng vào một build đang diễn ra.
+          create: (_) => ProgressProvider(
+            MockProgressRepository(
+              initialProgress: MockLearningData.createInitialProgress(),
+            ),
+          )..loadProgress(),
         ),
       ],
       child: child,
