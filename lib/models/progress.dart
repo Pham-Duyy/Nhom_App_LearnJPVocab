@@ -72,13 +72,15 @@ class Progress {
     );
   }
 
-  /// Trả lời sai: quay về mức 1, ôn lại sớm nhất.
+  /// Trả lời sai: quay về mức 1, ôn lại sớm nhất. Từ đã được nhìn thấy và
+  /// trả lời (dù sai) vẫn tính là đã học, nên vẫn đánh dấu isLearned.
   Progress markWrong() {
     final now = DateTime.now();
     return copyWith(
       memoryLevel: 1,
       wrongCount: wrongCount + 1,
       reviewCount: reviewCount + 1,
+      isLearned: true,
       lastReviewedAt: now,
       nextReviewAt: now.add(Duration(days: reviewIntervalDays[1]!)),
     );

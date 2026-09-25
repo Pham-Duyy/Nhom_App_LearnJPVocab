@@ -43,6 +43,7 @@ class LessonProvider extends ChangeNotifier {
   Future<void> selectCategory(Category category) async {
     _selectedCategory = category;
     _selectedLesson = null;
+    _lessons = [];
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();

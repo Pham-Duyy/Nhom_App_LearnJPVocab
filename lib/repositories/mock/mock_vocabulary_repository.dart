@@ -7,9 +7,11 @@ import '../vocabulary_repository.dart';
 class MockVocabularyRepository implements VocabularyRepository {
   @override
   Future<List<Vocabulary>> getByLesson(String lessonId) async {
-    return MockLearningData.vocabulary
+    final result = MockLearningData.vocabulary
         .where((word) => word.lessonId == lessonId)
         .toList();
+    result.sort((a, b) => a.order.compareTo(b.order));
+    return result;
   }
 
   @override

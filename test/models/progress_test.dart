@@ -30,6 +30,13 @@ void main() {
       expect(updated.wrongCount, 1);
       expect(updated.reviewCount, 1);
     });
+
+    test('trả lời sai vẫn đánh dấu từ đã học', () {
+      const progress = Progress(vocabularyId: 'v1');
+      final updated = progress.markWrong();
+
+      expect(updated.isLearned, isTrue);
+    });
   });
 
   group('nextReviewAt được tính theo mức ghi nhớ', () {
