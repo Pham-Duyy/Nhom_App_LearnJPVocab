@@ -2,8 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Hiển thị tổng số từ đã học và phân bố theo 5 mức ghi nhớ. Chỉ nhận dữ
+/// liệu qua constructor — không tự đọc Provider — để widget dễ test và tái
+/// sử dụng.
 class MemoryCard extends StatelessWidget {
-  const MemoryCard({Key? key}) : super(key: key);
+  const MemoryCard({
+    Key? key,
+    required this.totalLearned,
+    required this.levelCounts,
+  }) : super(key: key);
+
+  final int totalLearned;
+
+  /// Số từ ở mỗi mức ghi nhớ, index 0 ứng với mức 1. Nếu thiếu phần tử,
+  /// mức tương ứng được coi là 0 thay vì gây lỗi.
+  final List<int> levelCounts;
+
+  int _countForLevel(int level) {
+    final index = level - 1;
+    if (index < 0 || index >= levelCounts.length) return 0;
+    return levelCounts[index];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,25 +33,25 @@ class MemoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: AppColors.cardBorder),
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(18),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('BẠN ĐÃ HỌC'),
+            const Text('BẠN ĐÃ HỌC'),
             Text(
-              '9 từ vựng',
-              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+              '$totalLearned từ vựng',
+              style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                MemoryBar(level: 1, count: 3, height: 55),
-                MemoryBar(level: 2, count: 3, height: 75),
-                MemoryBar(level: 3, count: 1, height: 35),
-                MemoryBar(level: 4, count: 1, height: 42),
-                MemoryBar(level: 5, count: 1, height: 48),
+                MemoryBar(level: 1, count: _countForLevel(1), height: 55),
+                MemoryBar(level: 2, count: _countForLevel(2), height: 75),
+                MemoryBar(level: 3, count: _countForLevel(3), height: 35),
+                MemoryBar(level: 4, count: _countForLevel(4), height: 42),
+                MemoryBar(level: 5, count: _countForLevel(5), height: 48),
               ],
             ),
           ],

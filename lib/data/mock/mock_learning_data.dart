@@ -1,5 +1,6 @@
 import '../../models/category.dart';
 import '../../models/lesson.dart';
+import '../../models/progress.dart';
 import '../../models/vocabulary.dart';
 
 /// Dữ liệu N5 mẫu dùng để phát triển UI/Provider trước khi nối Firestore.
@@ -457,4 +458,86 @@ class MockLearningData {
       order: 5,
     ),
   ];
+
+  /// Sinh 9 Progress mẫu (phân bố mức 3-3-1-1-1, tất cả đã học) để trang chủ
+  /// và phiên ôn tập có dữ liệu ngay khi mở app, trước khi có Firestore.
+  ///
+  /// Đúng 3 từ (mức 1) đến hạn ôn tại thời điểm [now]; 6 từ còn lại có lịch
+  /// ôn nằm trong tương lai. Nhận [now] qua tham số thay vì hard-code một
+  /// ngày cụ thể, để test có thể dùng một mốc thời gian cố định.
+  static List<Progress> createInitialProgress({DateTime? now}) {
+    final reference = now ?? DateTime.now();
+
+    Progress buildProgress({
+      required String vocabularyId,
+      required int memoryLevel,
+      required Duration reviewedAgo,
+    }) {
+      final lastReviewedAt = reference.subtract(reviewedAgo);
+      return Progress(
+        vocabularyId: vocabularyId,
+        memoryLevel: memoryLevel,
+        correctCount: 1,
+        reviewCount: 1,
+        isLearned: true,
+        lastReviewedAt: lastReviewedAt,
+        nextReviewAt: lastReviewedAt.add(
+          Duration(days: Progress.reviewIntervalDays[memoryLevel]!),
+        ),
+      );
+    }
+
+    return [
+      // Mức 1 (hạn ôn 1 ngày, ôn lần cuối 2 ngày trước) -> đã đến hạn.
+      buildProgress(
+        vocabularyId: 'v_greet_1',
+        memoryLevel: 1,
+        reviewedAgo: const Duration(days: 2),
+      ),
+      buildProgress(
+        vocabularyId: 'v_greet_2',
+        memoryLevel: 1,
+        reviewedAgo: const Duration(days: 2),
+      ),
+      buildProgress(
+        vocabularyId: 'v_greet_3',
+        memoryLevel: 1,
+        reviewedAgo: const Duration(days: 2),
+      ),
+      // Mức 2 (hạn ôn 3 ngày, ôn lần cuối 1 ngày trước) -> chưa đến hạn.
+      buildProgress(
+        vocabularyId: 'v_greet_6',
+        memoryLevel: 2,
+        reviewedAgo: const Duration(days: 1),
+      ),
+      buildProgress(
+        vocabularyId: 'v_family_1',
+        memoryLevel: 2,
+        reviewedAgo: const Duration(days: 1),
+      ),
+      buildProgress(
+        vocabularyId: 'v_family_2',
+        memoryLevel: 2,
+        reviewedAgo: const Duration(days: 1),
+      ),
+      // Mức 3 (hạn ôn 7 ngày, ôn lần cuối 2 ngày trước) -> chưa đến hạn.
+      buildProgress(
+        vocabularyId: 'v_family_6',
+        memoryLevel: 3,
+        reviewedAgo: const Duration(days: 2),
+      ),
+      // Mức 4 (hạn ôn 14 ngày, ôn lần cuối 3 ngày trước) -> chưa đến hạn.
+      buildProgress(
+        vocabularyId: 'v_school_1',
+        memoryLevel: 4,
+        reviewedAgo: const Duration(days: 3),
+      ),
+      // Mức 5 (hạn ôn 30 ngày, ôn lần cuối 5 ngày trước) -> chưa đến hạn.
+      buildProgress(
+        vocabularyId: 'v_school_6',
+        memoryLevel: 5,
+        reviewedAgo: const Duration(days: 5),
+      ),
+    ];
+  }
 }

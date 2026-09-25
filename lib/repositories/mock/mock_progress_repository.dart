@@ -5,6 +5,12 @@ import '../progress_repository.dart';
 /// thay bằng một implementation đọc/ghi Cloud Firestore ở giai đoạn sau,
 /// giữ nguyên interface [ProgressRepository].
 class MockProgressRepository implements ProgressRepository {
+  MockProgressRepository({List<Progress> initialProgress = const []}) {
+    for (final progress in initialProgress) {
+      _store[progress.vocabularyId] = progress;
+    }
+  }
+
   final Map<String, Progress> _store = {};
 
   @override
