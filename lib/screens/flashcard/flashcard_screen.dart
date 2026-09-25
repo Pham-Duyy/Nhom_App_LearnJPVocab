@@ -22,6 +22,11 @@ class FlashcardScreen extends StatefulWidget {
 class _FlashcardScreenState extends State<FlashcardScreen> {
   bool _showBack = false;
 
+  // Chặn bấm đúp trong lúc markCorrect()/markWrong() đang chờ lưu — nếu
+  // không, một cú bấm kép có thể lưu một từ hai lần, nhảy qua từ tiếp theo,
+  // sai số liệu phiên, hoặc mở màn hình kết quả nhiều lần.
+  bool _isSubmitting = false;
+
   // Đếm số lần đúng/sai của riêng phiên học này để hiển thị ở màn hình kết
   // quả. Đây là số liệu tạm thời của UI, khác với memoryLevel tích lũy lâu
   // dài mà ProgressProvider/ProgressRepository lưu trữ.
@@ -29,22 +34,47 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   int _wrongCount = 0;
 
   Future<void> _markWrong(Vocabulary word) async {
-    await context.read<ProgressProvider>().markWrong(word.id);
-    _wrongCount++;
-    _advance();
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    try {
+      await context.read<ProgressProvider>().markWrong(word.id);
+      _wrongCount++;
+      _advance();
+    } catch (_) {
+      _handleSaveError();
+    }
   }
 
   Future<void> _markCorrect(Vocabulary word) async {
-    await context.read<ProgressProvider>().markCorrect(word.id);
-    _correctCount++;
-    _advance();
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    try {
+      await context.read<ProgressProvider>().markCorrect(word.id);
+      _correctCount++;
+      _advance();
+    } catch (_) {
+      _handleSaveError();
+    }
+  }
+
+  void _handleSaveError() {
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Không thể lưu tiến độ. Vui lòng thử lại.')),
+    );
   }
 
   void _advance() {
     if (!mounted) return;
     final vocabularyProvider = context.read<VocabularyProvider>();
     vocabularyProvider.nextCard();
-    setState(() => _showBack = false);
+    setState(() {
+      _isSubmitting = false;
+      _showBack = false;
+    });
 
     if (vocabularyProvider.sessionStatus == LearningSessionStatus.completed) {
       Navigator.of(context).pushReplacement(
@@ -110,7 +140,8 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => _markWrong(word),
+                        onPressed:
+                            _isSubmitting ? null : () => _markWrong(word),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.redAccent,
                           side: const BorderSide(color: Colors.redAccent),
@@ -122,7 +153,8 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => _markCorrect(word),
+                        onPressed:
+                            _isSubmitting ? null : () => _markCorrect(word),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 14),

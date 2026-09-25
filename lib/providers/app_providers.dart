@@ -5,6 +5,7 @@ import '../repositories/mock/mock_category_repository.dart';
 import '../repositories/mock/mock_progress_repository.dart';
 import '../repositories/mock/mock_vocabulary_repository.dart';
 import 'lesson_provider.dart';
+import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
 import 'vocabulary_provider.dart';
 
@@ -20,6 +21,7 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => MainNavigationProvider()),
         ChangeNotifierProvider(
           create: (_) => LessonProvider(MockCategoryRepository()),
         ),

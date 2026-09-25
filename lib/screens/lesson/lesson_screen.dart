@@ -14,8 +14,18 @@ class LessonScreen extends StatelessWidget {
 
   Future<void> _openLesson(BuildContext context, Lesson lesson) async {
     context.read<LessonProvider>().selectLesson(lesson);
-    await context.read<VocabularyProvider>().loadByLesson(lesson.id);
+    final vocabularyProvider = context.read<VocabularyProvider>();
+    await vocabularyProvider.loadByLesson(lesson.id);
     if (!context.mounted) return;
+
+    // Tải thất bại thì ở lại danh sách bài học thay vì mở flashcard rỗng/lỗi.
+    if (vocabularyProvider.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(vocabularyProvider.errorMessage!)),
+      );
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => FlashcardScreen(lesson: lesson)),
     );

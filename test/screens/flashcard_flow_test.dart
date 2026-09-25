@@ -1,5 +1,6 @@
 import 'package:chibakanji/app.dart';
 import 'package:chibakanji/providers/app_providers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> _openFirstLesson(WidgetTester tester) async {
@@ -43,7 +44,7 @@ void main() {
     expect(find.text('Đã nhớ: 5 · Chưa nhớ: 0'), findsOneWidget);
   });
 
-  testWidgets('nhấn Về trang chủ thoát khỏi luồng flashcard', (tester) async {
+  testWidgets('nhấn Về trang chủ chuyển hẳn về tab Ôn tập', (tester) async {
     await _openFirstLesson(tester);
 
     for (var i = 0; i < 5; i++) {
@@ -54,10 +55,30 @@ void main() {
     await tester.tap(find.text('Về trang chủ'));
     await tester.pumpAndSettle();
 
-    // popUntil(isFirst) quay về MainScreen, nhưng MainScreen giữ nguyên
-    // tab đang chọn ("Học mới") vì State của nó không bị huỷ khi push/pop
-    // các route con — nên thấy lại danh sách chủ đề, không phải tab "Ôn tập".
     expect(find.text('Kết quả buổi học'), findsNothing);
-    expect(find.text('Chào hỏi và giao tiếp'), findsOneWidget);
+    expect(find.text('Chào Duy!'), findsOneWidget);
+    expect(find.text('Đến giờ ôn rồi!'), findsOneWidget);
+  });
+
+  testWidgets('khoá nút khi đang lưu để tránh bấm đúp bỏ qua từ', (
+    tester,
+  ) async {
+    await _openFirstLesson(tester);
+
+    expect(find.text('Từ 1/5'), findsOneWidget);
+
+    // Gọi trực tiếp closure onPressed đã bắt được lúc build, hai lần liên
+    // tiếp trong cùng một tick — mô phỏng đúng race condition thực tế: hai
+    // lần bấm đến trước khi khung hình kịp vẽ lại nút ở trạng thái bị khoá.
+    // Dùng tester.tap() hai lần với await ở giữa sẽ không tái hiện được vì
+    // await đã để cho lần lưu đầu tiên kịp hoàn tất và mở khoá lại nút.
+    final button = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Đã nhớ'),
+    );
+    button.onPressed!();
+    button.onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Từ 2/5'), findsOneWidget);
   });
 }
