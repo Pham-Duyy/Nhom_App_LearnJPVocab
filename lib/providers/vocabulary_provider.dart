@@ -26,7 +26,17 @@ class VocabularyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> loadByLesson(String lessonId) async {
+  Future<void> loadByLesson(String lessonId) =>
+      _loadWords(() => _repository.getByLesson(lessonId));
+
+  /// Tải một phiên ôn tập gồm các từ thuộc [vocabularyIds] — có thể đến từ
+  /// nhiều bài học khác nhau. Danh sách id đến hạn do ProgressProvider (hoặc
+  /// tầng điều phối phía trên) cung cấp; provider này không tự quyết định
+  /// từ nào cần ôn.
+  Future<void> loadReviewWords(List<String> vocabularyIds) =>
+      _loadWords(() => _repository.getByIds(vocabularyIds));
+
+  Future<void> _loadWords(Future<List<Vocabulary>> Function() fetch) async {
     _words = [];
     _currentIndex = 0;
     _sessionStatus = LearningSessionStatus.idle;
@@ -35,8 +45,7 @@ class VocabularyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _words = await _repository.getByLesson(lessonId);
-      _currentIndex = 0;
+      _words = await fetch();
       _sessionStatus = _words.isEmpty
           ? LearningSessionStatus.idle
           : LearningSessionStatus.inProgress;

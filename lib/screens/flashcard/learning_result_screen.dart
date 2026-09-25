@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/lesson.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import 'flashcard_screen.dart';
 
-/// Tổng kết sau khi học hết một bài flashcard.
+/// Tổng kết sau khi học hết một phiên flashcard — dùng chung cho phiên học
+/// theo bài lẫn phiên ôn tập, không phụ thuộc vào Lesson.
 class LearningResultScreen extends StatelessWidget {
   const LearningResultScreen({
     Key? key,
-    required this.lesson,
+    required this.title,
+    required this.completionTitle,
     required this.correctCount,
     required this.wrongCount,
   }) : super(key: key);
 
-  final Lesson lesson;
+  final String title;
+  final String completionTitle;
   final int correctCount;
   final int wrongCount;
 
@@ -25,7 +27,10 @@ class LearningResultScreen extends StatelessWidget {
   void _learnAgain(BuildContext context) {
     context.read<VocabularyProvider>().resetSession();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => FlashcardScreen(lesson: lesson)),
+      MaterialPageRoute(
+        builder: (_) =>
+            FlashcardScreen(title: title, completionTitle: completionTitle),
+      ),
     );
   }
 
@@ -50,7 +55,7 @@ class LearningResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Hoàn thành bài "${lesson.title}"!',
+              completionTitle,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),

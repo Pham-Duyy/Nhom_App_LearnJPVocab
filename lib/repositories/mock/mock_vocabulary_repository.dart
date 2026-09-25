@@ -23,6 +23,19 @@ class MockVocabularyRepository implements VocabularyRepository {
   }
 
   @override
+  Future<List<Vocabulary>> getByIds(List<String> vocabularyIds) async {
+    final byId = {
+      for (final word in MockLearningData.vocabulary) word.id: word
+    };
+    final result = <Vocabulary>[];
+    for (final id in vocabularyIds) {
+      final word = byId[id];
+      if (word != null) result.add(word);
+    }
+    return result;
+  }
+
+  @override
   Future<List<Vocabulary>> search(String keyword) async {
     return MockLearningData.vocabulary
         .where((word) => word.matches(keyword))
