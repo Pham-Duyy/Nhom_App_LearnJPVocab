@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../models/category.dart';
 import '../../providers/lesson_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_styles.dart';
+import '../../widgets/app_card.dart';
 import 'lesson_screen.dart';
 
 /// Màn hình đầu tiên của luồng "Học mới": hiển thị danh sách chủ đề.
@@ -60,7 +62,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         }
 
         return ListView.separated(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.page),
           itemCount: provider.categories.length,
           separatorBuilder: (_, __) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
@@ -88,19 +90,10 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.cardBorder),
-      ),
+    return AppCard(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(
-          category.name,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
+        title: Text(category.name, style: AppTextStyles.cardTitle),
         subtitle: Text(category.description),
         trailing: const Icon(Icons.chevron_right, color: AppColors.primary),
         onTap: onTap,

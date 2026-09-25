@@ -5,6 +5,8 @@ import '../../models/lesson.dart';
 import '../../providers/lesson_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_styles.dart';
+import '../../widgets/app_card.dart';
 import '../flashcard/flashcard_screen.dart';
 
 /// Danh sách bài học thuộc chủ đề đã chọn ở [CategoryScreen]. Dữ liệu do
@@ -80,7 +82,7 @@ class LessonScreen extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.page),
       itemCount: provider.lessons.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
@@ -103,19 +105,10 @@ class _LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.cardBorder),
-      ),
+    return AppCard(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(
-          lesson.title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
+        title: Text(lesson.title, style: AppTextStyles.cardTitle),
         subtitle: Text(
           '${lesson.description}\n${lesson.vocabularyCount} từ · ${lesson.jlptLevel}',
         ),

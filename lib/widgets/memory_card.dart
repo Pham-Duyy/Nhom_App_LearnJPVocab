@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_styles.dart';
+import 'app_card.dart';
 
 /// Hiển thị tổng số từ đã học và phân bố theo 5 mức ghi nhớ. Chỉ nhận dữ
 /// liệu qua constructor — không tự đọc Provider — để widget dễ test và tái
@@ -26,13 +28,8 @@ class MemoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.cardBorder),
-      ),
+    return AppCard(
+      radius: AppRadius.cardLarge,
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
