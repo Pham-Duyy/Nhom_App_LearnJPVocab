@@ -5,6 +5,8 @@ import '../../models/vocabulary.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_styles.dart';
+import '../../widgets/app_card.dart';
 import 'learning_result_screen.dart';
 
 /// Học từ vựng bằng flashcard. Dùng chung cho phiên học theo bài
@@ -124,7 +126,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           }
 
           return Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSpacing.page),
             child: Column(
               children: [
                 Text(
@@ -197,13 +199,8 @@ class _FlashcardFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.cardBorder),
-      ),
+    return AppCard(
+      radius: AppRadius.cardLarge,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Center(child: showBack ? _buildBack() : _buildFront()),

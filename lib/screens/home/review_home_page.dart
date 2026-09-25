@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/progress_provider.dart';
 import '../../providers/vocabulary_provider.dart';
+import '../../theme/app_styles.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
@@ -65,7 +66,7 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
     final progressProvider = context.watch<ProgressProvider>();
 
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.page),
       children: [
         const GreetingSection(),
         const SizedBox(height: 24),
