@@ -1,83 +1,124 @@
+/// Tiến độ ghi nhớ của một từ vựng theo thuật toán lặp lại ngắt quãng
+/// (spaced repetition) 5 mức. `lastReviewedAt`/`nextReviewAt` được lưu dưới
+/// dạng [DateTime] và chuyển sang ISO-8601 String trong [toMap]/[fromMap] để
+/// dữ liệu mock hoạt động độc lập; khi chuyển sang Firestore, chỉ cần đổi
+/// phần đọc/ghi hai trường này sang Timestamp mà không phải sửa model.
 class Progress {
-  final int _id;
-  final int _userId;
-  final int _vocabularyId;
-  int _box;
-  DateTime _lastReviewedAt;
-  DateTime _nextReviewAt;
+  static const Map<int, int> reviewIntervalDays = {
+    1: 1,
+    2: 3,
+    3: 7,
+    4: 14,
+    5: 30,
+  };
 
-  Progress({
-    required int id,
-    required int userId,
-    required int vocabularyId,
-    int box = 1,
+  final String vocabularyId;
+  final int memoryLevel;
+  final int correctCount;
+  final int wrongCount;
+  final int reviewCount;
+  final bool isLearned;
+  final bool isFavorite;
+  final DateTime? lastReviewedAt;
+  final DateTime? nextReviewAt;
+
+  const Progress({
+    required this.vocabularyId,
+    this.memoryLevel = 1,
+    this.correctCount = 0,
+    this.wrongCount = 0,
+    this.reviewCount = 0,
+    this.isLearned = false,
+    this.isFavorite = false,
+    this.lastReviewedAt,
+    this.nextReviewAt,
+  }) : assert(memoryLevel >= 1 && memoryLevel <= 5);
+
+  Progress copyWith({
+    String? vocabularyId,
+    int? memoryLevel,
+    int? correctCount,
+    int? wrongCount,
+    int? reviewCount,
+    bool? isLearned,
+    bool? isFavorite,
     DateTime? lastReviewedAt,
     DateTime? nextReviewAt,
-  })  : _id = id,
-        _userId = userId,
-        _vocabularyId = vocabularyId,
-        _box = box,
-        _lastReviewedAt = lastReviewedAt ?? DateTime.now(),
-        _nextReviewAt = nextReviewAt ?? DateTime.now();
-
-  int get id => _id;
-  int get userId => _userId;
-  int get vocabularyId => _vocabularyId;
-  int get box => _box;
-  DateTime get lastReviewedAt => _lastReviewedAt;
-  DateTime get nextReviewAt => _nextReviewAt;
-
-  /// Cập nhật box theo thuật toán Leitner sau một lượt ôn tập.
-  /// Trả lời đúng -> tăng box (tối đa 5), giãn ngày ôn tiếp theo.
-  /// Trả lời sai -> về box 1, ôn lại ngay ngày mai.
-  void updateBox(bool isCorrect) {
-    _box = isCorrect ? (_box < 5 ? _box + 1 : 5) : 1;
-    _lastReviewedAt = DateTime.now();
-    _nextReviewAt = _lastReviewedAt.add(Duration(days: _intervalForBox(_box)));
+  }) {
+    return Progress(
+      vocabularyId: vocabularyId ?? this.vocabularyId,
+      memoryLevel: memoryLevel ?? this.memoryLevel,
+      correctCount: correctCount ?? this.correctCount,
+      wrongCount: wrongCount ?? this.wrongCount,
+      reviewCount: reviewCount ?? this.reviewCount,
+      isLearned: isLearned ?? this.isLearned,
+      isFavorite: isFavorite ?? this.isFavorite,
+      lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
+      nextReviewAt: nextReviewAt ?? this.nextReviewAt,
+    );
   }
 
-  bool isDueForReview() => !_nextReviewAt.isAfter(DateTime.now());
-
-
-  void reset() {
-    _box = 1;
-    _lastReviewedAt = DateTime.now();
-    _nextReviewAt = DateTime.now();
+  /// Trả lời đúng: tăng mức ghi nhớ (tối đa 5) và giãn lịch ôn tiếp theo.
+  Progress markCorrect() {
+    final newLevel = memoryLevel < 5 ? memoryLevel + 1 : 5;
+    final now = DateTime.now();
+    return copyWith(
+      memoryLevel: newLevel,
+      correctCount: correctCount + 1,
+      reviewCount: reviewCount + 1,
+      isLearned: true,
+      lastReviewedAt: now,
+      nextReviewAt: now.add(Duration(days: reviewIntervalDays[newLevel]!)),
+    );
   }
 
-  int _intervalForBox(int box) {
-    switch (box) {
-      case 1:
-        return 1;
-      case 2:
-        return 3;
-      case 3:
-        return 7;
-      case 4:
-        return 14;
-      default:
-        return 30;
-    }
+  /// Trả lời sai: quay về mức 1, ôn lại sớm nhất.
+  Progress markWrong() {
+    final now = DateTime.now();
+    return copyWith(
+      memoryLevel: 1,
+      wrongCount: wrongCount + 1,
+      reviewCount: reviewCount + 1,
+      lastReviewedAt: now,
+      nextReviewAt: now.add(Duration(days: reviewIntervalDays[1]!)),
+    );
+  }
+
+  /// Từ chưa từng được ôn (`nextReviewAt` null) luôn coi là đến hạn.
+  bool isDueForReview([DateTime? now]) {
+    if (nextReviewAt == null) return true;
+    final reference = now ?? DateTime.now();
+    return !nextReviewAt!.isAfter(reference);
   }
 
   Map<String, dynamic> toMap() => {
-        'id': _id,
-        'userId': _userId,
-        'vocabularyId': _vocabularyId,
-        'box': _box,
-        'lastReviewedAt': _lastReviewedAt.toIso8601String(),
-        'nextReviewAt': _nextReviewAt.toIso8601String(),
+        'vocabularyId': vocabularyId,
+        'memoryLevel': memoryLevel,
+        'correctCount': correctCount,
+        'wrongCount': wrongCount,
+        'reviewCount': reviewCount,
+        'isLearned': isLearned,
+        'isFavorite': isFavorite,
+        'lastReviewedAt': lastReviewedAt?.toIso8601String(),
+        'nextReviewAt': nextReviewAt?.toIso8601String(),
       };
 
   factory Progress.fromMap(Map<String, dynamic> map) => Progress(
-        id: map['id'] as int,
-        userId: map['userId'] as int,
-        vocabularyId: map['vocabularyId'] as int,
-        box: map['box'] as int,
-        lastReviewedAt: DateTime.parse(map['lastReviewedAt'] as String),
-        nextReviewAt: DateTime.parse(map['nextReviewAt'] as String),
+        vocabularyId: map['vocabularyId'] as String,
+        memoryLevel: map['memoryLevel'] as int? ?? 1,
+        correctCount: map['correctCount'] as int? ?? 0,
+        wrongCount: map['wrongCount'] as int? ?? 0,
+        reviewCount: map['reviewCount'] as int? ?? 0,
+        isLearned: map['isLearned'] as bool? ?? false,
+        isFavorite: map['isFavorite'] as bool? ?? false,
+        lastReviewedAt: map['lastReviewedAt'] != null
+            ? DateTime.parse(map['lastReviewedAt'] as String)
+            : null,
+        nextReviewAt: map['nextReviewAt'] != null
+            ? DateTime.parse(map['nextReviewAt'] as String)
+            : null,
       );
 
   @override
-  String toString() => 'Progress(vocabularyId: $_vocabularyId, box: $_box)';
+  String toString() => 'Progress($vocabularyId, level: $memoryLevel)';
 }
