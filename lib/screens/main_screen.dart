@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/main_navigation_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/simple_page.dart';
 import 'home/review_home_page.dart';
 import 'lesson/category_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int selectedIndex = 0;
-
-  final List<String> pageNames = const [
+  static const List<String> _pageNames = [
     'Ôn tập',
     'Học mới',
     'Sổ từ',
@@ -24,19 +19,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedIndex = context.watch<MainNavigationProvider>().selectedIndex;
+
     return Scaffold(
-      appBar: buildAppBar(),
-      body: _buildBody(),
+      appBar: _buildAppBar(),
+      body: _buildBody(selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
+        onTap: (index) =>
+            context.read<MainNavigationProvider>().selectTab(index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.alarm),
@@ -59,18 +53,18 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(int selectedIndex) {
     switch (selectedIndex) {
       case 0:
         return const ReviewHomePage();
       case 1:
         return const CategoryScreen();
       default:
-        return SimplePage(title: pageNames[selectedIndex]);
+        return SimplePage(title: _pageNames[selectedIndex]);
     }
   }
 
-  AppBar buildAppBar() {
+  AppBar _buildAppBar() {
     return AppBar(
       elevation: 0,
       backgroundColor: AppColors.appBarBackground,
