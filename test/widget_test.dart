@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/main.dart';
+import 'package:myapp/app.dart';
 
 void main() {
   testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
