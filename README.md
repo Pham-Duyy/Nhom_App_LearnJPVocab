@@ -3,7 +3,8 @@
 > Ứng dụng Flutter hỗ trợ học từ vựng và Kanji tiếng Nhật theo từng phiên ngắn mỗi ngày.
 
 <p align="center">
-  <img src="assets/images/chibakanji-home.jpg" alt="Giao diện trang chủ ChibaKanji" width="360" />
+  <img src="![Uploading Screenshot 2026-09-25 031056.png…]()
+.jpg" alt="Giao diện trang chủ ChibaKanji" width="360" />
 </p>
 
 ## Giới thiệu
