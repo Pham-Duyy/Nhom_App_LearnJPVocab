@@ -8,14 +8,18 @@ import '../category_repository.dart';
 class MockCategoryRepository implements CategoryRepository {
   @override
   Future<List<Category>> getCategories() async {
-    return List.unmodifiable(MockLearningData.categories);
+    final result = MockLearningData.categories.toList();
+    result.sort((a, b) => a.order.compareTo(b.order));
+    return result;
   }
 
   @override
   Future<List<Lesson>> getLessonsByCategory(String categoryId) async {
-    return MockLearningData.lessons
+    final result = MockLearningData.lessons
         .where((lesson) => lesson.categoryId == categoryId)
         .toList();
+    result.sort((a, b) => a.order.compareTo(b.order));
+    return result;
   }
 
   @override

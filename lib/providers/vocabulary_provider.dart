@@ -27,6 +27,9 @@ class VocabularyProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> loadByLesson(String lessonId) async {
+    _words = [];
+    _currentIndex = 0;
+    _sessionStatus = LearningSessionStatus.idle;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
