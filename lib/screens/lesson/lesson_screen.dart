@@ -27,7 +27,12 @@ class LessonScreen extends StatelessWidget {
     }
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => FlashcardScreen(lesson: lesson)),
+      MaterialPageRoute(
+        builder: (_) => FlashcardScreen(
+          title: lesson.title,
+          completionTitle: 'Hoàn thành bài học!',
+        ),
+      ),
     );
   }
 

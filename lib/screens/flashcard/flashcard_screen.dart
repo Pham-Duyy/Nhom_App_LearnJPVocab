@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/lesson.dart';
 import '../../models/vocabulary.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import 'learning_result_screen.dart';
 
-/// Học từ vựng bằng flashcard cho một bài học. Danh sách từ đã được
-/// [VocabularyProvider.loadByLesson] tải trước khi màn hình này mở ra.
+/// Học từ vựng bằng flashcard. Dùng chung cho phiên học theo bài
+/// ([VocabularyProvider.loadByLesson]) lẫn phiên ôn tập gồm từ của nhiều bài
+/// khác nhau ([VocabularyProvider.loadReviewWords]) — màn hình không cần
+/// biết dữ liệu đến từ đâu, chỉ hiển thị [VocabularyProvider.words] hiện có.
+/// [title] hiển thị trên AppBar, [completionTitle] hiển thị ở màn hình kết
+/// quả khi học xong.
 class FlashcardScreen extends StatefulWidget {
-  const FlashcardScreen({Key? key, required this.lesson}) : super(key: key);
+  const FlashcardScreen({
+    Key? key,
+    required this.title,
+    required this.completionTitle,
+  }) : super(key: key);
 
-  final Lesson lesson;
+  final String title;
+  final String completionTitle;
 
   @override
   State<FlashcardScreen> createState() => _FlashcardScreenState();
@@ -80,7 +88,8 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => LearningResultScreen(
-            lesson: widget.lesson,
+            title: widget.title,
+            completionTitle: widget.completionTitle,
             correctCount: _correctCount,
             wrongCount: _wrongCount,
           ),
@@ -95,7 +104,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.appBarBackground,
         foregroundColor: AppColors.appBarForeground,
-        title: Text(widget.lesson.title),
+        title: Text(widget.title),
       ),
       body: Consumer<VocabularyProvider>(
         builder: (context, provider, _) {
