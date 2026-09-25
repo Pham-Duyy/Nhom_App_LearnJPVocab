@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/simple_page.dart';
 import 'home/review_home_page.dart';
+import 'lesson/category_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -25,9 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: selectedIndex == 0
-          ? const ReviewHomePage()
-          : SimplePage(title: pageNames[selectedIndex]),
+      body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         type: BottomNavigationBarType.fixed,
@@ -58,6 +57,17 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildBody() {
+    switch (selectedIndex) {
+      case 0:
+        return const ReviewHomePage();
+      case 1:
+        return const CategoryScreen();
+      default:
+        return SimplePage(title: pageNames[selectedIndex]);
+    }
   }
 
   AppBar buildAppBar() {
