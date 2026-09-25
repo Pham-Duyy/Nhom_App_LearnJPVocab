@@ -3,21 +3,21 @@ import 'package:provider/provider.dart';
 
 import '../../models/lesson.dart';
 import '../../providers/lesson_provider.dart';
+import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
+import '../flashcard/flashcard_screen.dart';
 
 /// Danh sách bài học thuộc chủ đề đã chọn ở [CategoryScreen]. Dữ liệu do
 /// LessonProvider.selectCategory() tải sẵn trước khi màn hình này được mở.
 class LessonScreen extends StatelessWidget {
   const LessonScreen({Key? key}) : super(key: key);
 
-  void _openLesson(BuildContext context, Lesson lesson) {
+  Future<void> _openLesson(BuildContext context, Lesson lesson) async {
     context.read<LessonProvider>().selectLesson(lesson);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Đã chọn "${lesson.title}". Màn hình flashcard sẽ được xây ở bước tiếp theo.',
-        ),
-      ),
+    await context.read<VocabularyProvider>().loadByLesson(lesson.id);
+    if (!context.mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => FlashcardScreen(lesson: lesson)),
     );
   }
 
