@@ -55,7 +55,7 @@ Luồng sử dụng chính:
 | Thành viên | Công việc |
 |---|---|
 | Phạm Khương Duy | Kiến trúc dữ liệu, Provider, Ôn tập, Học mới, Flashcard, Sổ từ và Cá nhân |
-| `truongsonnguyen17` | Hỗ trợ phát triển và tích hợp mã nguồn trên repository chung |
+| Nguyễn Vũ Trường Sơn | Hỗ trợ phát triển và tích hợp mã nguồn trên repository chung |
 
 > Nhóm cập nhật họ tên đầy đủ và mã số sinh viên của từng thành viên trước khi nộp bài.
 
