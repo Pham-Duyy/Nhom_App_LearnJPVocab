@@ -3,19 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../providers/main_navigation_provider.dart';
 import '../theme/app_colors.dart';
-import '../widgets/simple_page.dart';
 import 'home/review_home_page.dart';
 import 'lesson/category_screen.dart';
+import 'profile/profile_screen.dart';
+import 'vocabulary/vocabulary_book_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
-
-  static const List<String> _pageNames = [
-    'Ôn tập',
-    'Học mới',
-    'Sổ từ',
-    'Cá nhân',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +53,12 @@ class MainScreen extends StatelessWidget {
         return const ReviewHomePage();
       case 1:
         return const CategoryScreen();
+      case 2:
+        return const VocabularyBookScreen();
+      case 3:
+        return const ProfileScreen();
       default:
-        return SimplePage(title: _pageNames[selectedIndex]);
+        return const ReviewHomePage();
     }
   }
 
