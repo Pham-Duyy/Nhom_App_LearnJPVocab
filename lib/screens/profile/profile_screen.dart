@@ -3,12 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
+import '../base/generic_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+/// Kế thừa trực tiếp lớp 1 [GenericScreen]. Màn hình nằm trong tab của
+/// MainScreen nên không có AppBar riêng, chỉ cần viết phần nội dung.
+class ProfileScreen extends GenericScreen {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildContent(BuildContext context) {
     final progress = context.watch<ProgressProvider>();
     final learnedToday = progress.totalLearned.clamp(0, 10);
 
