@@ -6,9 +6,6 @@ mixin GenericLayout {
   String getTitle(BuildContext context);
 
   Widget buildBody(BuildContext context);
-
-  /// Màn hình là một tab trong MainScreen (đã có Scaffold và AppBar chung)
-  /// trả về false để chỉ dựng phần thân, tránh lồng hai Scaffold.
   bool get showAppBar => true;
 
   bool get showBackButton => true;
@@ -28,9 +25,6 @@ mixin GenericLayout {
   }
 }
 
-/// Bố cục chung cho các màn hình: Scaffold với AppBar theo màu chuẩn của app.
-/// Lớp con chỉ khai báo [getTitle] và [buildBody], không tự dựng lại
-/// Scaffold/AppBar ở từng màn hình.
 abstract class GenericScreen extends StatelessWidget with GenericLayout {
   const GenericScreen({Key? key}) : super(key: key);
 
