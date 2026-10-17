@@ -7,6 +7,7 @@ import '../../theme/app_styles.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
+import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
 
 class ReviewHomePage extends StatefulWidget {
@@ -16,7 +17,7 @@ class ReviewHomePage extends StatefulWidget {
   State<ReviewHomePage> createState() => _ReviewHomePageState();
 }
 
-class _ReviewHomePageState extends State<ReviewHomePage> {
+class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
   // Khoá nút "Ôn ngay" trong lúc loadReviewWords() đang chờ, để tránh bấm
   // nhiều lần mở nhiều phiên ôn tập chồng lên nhau.
   bool _isStartingReview = false;
@@ -62,7 +63,13 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  String getTitle(BuildContext context) => 'Ôn tập';
+
+  @override
+  bool get showAppBar => false;
+
+  @override
+  Widget buildBody(BuildContext context) {
     final progressProvider = context.watch<ProgressProvider>();
 
     return ListView(

@@ -7,6 +7,7 @@ import '../../models/vocabulary.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
+import '../common/generic_screen.dart';
 
 enum _WordFilter { all, due, favorite }
 
@@ -17,7 +18,8 @@ class VocabularyBookScreen extends StatefulWidget {
   State<VocabularyBookScreen> createState() => _VocabularyBookScreenState();
 }
 
-class _VocabularyBookScreenState extends State<VocabularyBookScreen> {
+class _VocabularyBookScreenState
+    extends GenericScreenState<VocabularyBookScreen> {
   final _searchController = TextEditingController();
   _WordFilter _filter = _WordFilter.all;
 
@@ -28,7 +30,13 @@ class _VocabularyBookScreenState extends State<VocabularyBookScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  String getTitle(BuildContext context) => 'Sổ từ';
+
+  @override
+  bool get showAppBar => false;
+
+  @override
+  Widget buildBody(BuildContext context) {
     final progressProvider = context.watch<ProgressProvider>();
     final progressById = {
       for (final progress in progressProvider.progressList)
@@ -250,7 +258,7 @@ class _VocabularyTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final levelColor = AppColors.memoryLevelColors[progress.memoryLevel - 1];
-    final title = word.kanji.isEmpty ? word.kana : word.kanji;
+    final title = word.name;
 
     return Material(
       color: Colors.white,
@@ -353,7 +361,7 @@ class _VocabularyTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 22),
-              Text(word.kanji.isEmpty ? word.kana : word.kanji,
+              Text(word.name,
                   style: const TextStyle(
                       fontSize: 38, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),

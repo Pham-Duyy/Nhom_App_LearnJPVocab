@@ -3,12 +3,19 @@ import 'package:provider/provider.dart';
 
 import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
+import '../common/generic_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends GenericScreen {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  String getTitle(BuildContext context) => 'Cá nhân';
+
+  @override
+  bool get showAppBar => false;
+
+  @override
+  Widget buildBody(BuildContext context) {
     final progress = context.watch<ProgressProvider>();
     final learnedToday = progress.totalLearned.clamp(0, 10);
 

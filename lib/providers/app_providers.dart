@@ -24,7 +24,10 @@ class AppProviders extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => MainNavigationProvider()),
         ChangeNotifierProvider(
-          create: (_) => LessonProvider(MockCategoryRepository()),
+          // Tải danh sách chủ đề ngay khi tạo, cùng lý do với ProgressProvider
+          // bên dưới; nhờ vậy CategoryScreen không cần initState.
+          create: (_) => LessonProvider(MockCategoryRepository())
+            ..loadCategories(),
         ),
         ChangeNotifierProvider(
           create: (_) => VocabularyProvider(MockVocabularyRepository()),

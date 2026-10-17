@@ -7,6 +7,7 @@ import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/app_card.dart';
+import '../common/generic_screen.dart';
 import 'learning_result_screen.dart';
 
 /// Học từ vựng bằng flashcard. Dùng chung cho phiên học theo bài
@@ -29,7 +30,7 @@ class FlashcardScreen extends StatefulWidget {
   State<FlashcardScreen> createState() => _FlashcardScreenState();
 }
 
-class _FlashcardScreenState extends State<FlashcardScreen> {
+class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
   bool _showBack = false;
 
   // Chặn bấm đúp trong lúc markCorrect()/markWrong() đang chờ lưu — nếu
@@ -101,88 +102,83 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.appBarBackground,
-        foregroundColor: AppColors.appBarForeground,
-        title: Text(widget.title),
-      ),
-      body: Consumer<VocabularyProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  String getTitle(BuildContext context) => widget.title;
 
-          if (provider.errorMessage != null) {
-            return Center(child: Text(provider.errorMessage!));
-          }
+  @override
+  Widget buildBody(BuildContext context) {
+    return Consumer<VocabularyProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          final word = provider.currentWord;
-          if (word == null) {
-            return const Center(
-              child: Text('Bài học này chưa có từ vựng nào.'),
-            );
-          }
+        if (provider.errorMessage != null) {
+          return Center(child: Text(provider.errorMessage!));
+        }
 
-          return Padding(
-            padding: const EdgeInsets.all(AppSpacing.page),
-            child: Column(
-              children: [
-                Text(
-                  'Từ ${provider.currentIndex + 1}/${provider.words.length}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: (provider.currentIndex + 1) / provider.words.length,
-                  color: AppColors.primary,
-                  backgroundColor: AppColors.cardBorder,
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _showBack = !_showBack),
-                    child: _FlashcardFace(word: word, showBack: _showBack),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed:
-                            _isSubmitting ? null : () => _markWrong(word),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          side: const BorderSide(color: Colors.redAccent),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text('Chưa nhớ'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed:
-                            _isSubmitting ? null : () => _markCorrect(word),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text(
-                          'Đã nhớ',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+        final word = provider.currentWord;
+        if (word == null) {
+          return const Center(
+            child: Text('Bài học này chưa có từ vựng nào.'),
           );
-        },
-      ),
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(AppSpacing.page),
+          child: Column(
+            children: [
+              Text(
+                'Từ ${provider.currentIndex + 1}/${provider.words.length}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              LinearProgressIndicator(
+                value: (provider.currentIndex + 1) / provider.words.length,
+                color: AppColors.primary,
+                backgroundColor: AppColors.cardBorder,
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _showBack = !_showBack),
+                  child: _FlashcardFace(word: word, showBack: _showBack),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isSubmitting ? null : () => _markWrong(word),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('Chưa nhớ'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed:
+                          _isSubmitting ? null : () => _markCorrect(word),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        'Đã nhớ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
