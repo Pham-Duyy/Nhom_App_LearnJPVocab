@@ -1,15 +1,15 @@
-class Category {
-  final String id;
-  final String name;
-  final String description;
+import 'generic_entity.dart';
+
+/// Chủ đề học. Kế thừa id, name, description từ [GenericEntity].
+class Category extends GenericEntity<String> {
   final String? imageUrl;
   final int order;
   final bool isPublished;
 
   const Category({
-    required this.id,
-    required this.name,
-    required this.description,
+    required super.id,
+    required super.name,
+    required super.description,
     this.imageUrl,
     required this.order,
     this.isPublished = true,
@@ -33,6 +33,7 @@ class Category {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,

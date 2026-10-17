@@ -1,23 +1,25 @@
 /// Một câu hỏi trắc nghiệm thuộc [Quiz]: một đề bài, danh sách đáp án và vị
 /// trí (index) của đáp án đúng trong danh sách đó.
-class Question {
-  final String id;
+/// Kế thừa id, name, description từ [GenericEntity]:
+/// `prompt` là `name`, `explanation` là `description` (rỗng nếu không có).
+class Question extends GenericEntity<String> {
   final String quizId;
-  final String prompt;
   final List<String> options;
   final int correctIndex;
   final String? explanation;
   final int order;
 
   const Question({
-    required this.id,
+    required super.id,
     required this.quizId,
-    required this.prompt,
+    required String prompt,
     required this.options,
     required this.correctIndex,
     this.explanation,
     required this.order,
-  });
+  }) : super(name: prompt, description: explanation ?? '');
+
+  String get prompt => name;
 
   /// `correctIndex` có trỏ tới một đáp án thật trong [options] hay không.
   /// Không dùng assert vì `options.length` không hợp lệ trong constructor
@@ -46,6 +48,7 @@ class Question {
 
   bool isCorrect(int selectedIndex) => selectedIndex == correctIndex;
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'quizId': quizId,

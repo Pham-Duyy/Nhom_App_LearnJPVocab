@@ -1,24 +1,24 @@
 /// Một bài kiểm tra gắn với một [Lesson]. Danh sách câu hỏi nằm ở [Question]
 /// (theo quizId), không nhúng trong Quiz, để khớp cách tổ chức collection
 /// riêng trên Firestore sau này.
-class Quiz {
-  final String id;
+/// Kế thừa id, name, description từ [GenericEntity]; `title` chính là `name`.
+class Quiz extends GenericEntity<String> {
   final String lessonId;
-  final String title;
-  final String description;
   final int questionCount;
   final int order;
   final bool isPublished;
 
   const Quiz({
-    required this.id,
+    required super.id,
     required this.lessonId,
-    required this.title,
-    required this.description,
+    required String title,
+    required super.description,
     this.questionCount = 0,
     required this.order,
     this.isPublished = true,
-  });
+  }) : super(name: title);
+
+  String get title => name;
 
   Quiz copyWith({
     String? id,
@@ -40,6 +40,7 @@ class Quiz {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'lessonId': lessonId,

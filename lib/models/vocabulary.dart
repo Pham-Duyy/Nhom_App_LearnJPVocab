@@ -1,10 +1,11 @@
-class Vocabulary {
-  final String id;
+import 'generic_entity.dart';
+
+/// Từ vựng. Kế thừa id, name, description từ [GenericEntity]:
+/// `kanji` là `name`, `meaning` là `description`.
+class Vocabulary extends GenericEntity<String> {
   final String lessonId;
-  final String kanji;
   final String kana;
   final String romaji;
-  final String meaning;
   final String exampleJapanese;
   final String exampleVietnamese;
   final String? audioUrl;
@@ -12,18 +13,21 @@ class Vocabulary {
   final int order;
 
   const Vocabulary({
-    required this.id,
+    required super.id,
     required this.lessonId,
-    required this.kanji,
+    required String kanji,
     required this.kana,
     required this.romaji,
-    required this.meaning,
+    required String meaning,
     required this.exampleJapanese,
     required this.exampleVietnamese,
     this.audioUrl,
     required this.jlptLevel,
     required this.order,
-  });
+  }) : super(name: kanji, description: meaning);
+
+  String get kanji => name;
+  String get meaning => description;
 
   Vocabulary copyWith({
     String? id,
@@ -53,7 +57,8 @@ class Vocabulary {
     );
   }
 
-  /// Tìm kiếm không phân biệt hoa thường theo kanji, kana, romaji hoặc nghĩa.
+  /// Override phương thức chung: tìm thêm theo kana và romaji.
+  @override
   bool matches(String keyword) {
     final lower = keyword.toLowerCase().trim();
     if (lower.isEmpty) return false;
@@ -63,6 +68,7 @@ class Vocabulary {
         meaning.toLowerCase().contains(lower);
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'lessonId': lessonId,

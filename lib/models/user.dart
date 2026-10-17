@@ -1,22 +1,20 @@
-class User {
-  final int _id;
-  final String _username;
-  final String _email;
+import 'generic_entity.dart';
+
+/// Người dùng. Kế thừa từ [GenericEntity] với id kiểu int:
+/// `username` là `name`, `email` là `description`.
+class User extends GenericEntity<int> {
   final String _passwordHash;
 
   User({
-    required int id,
+    required super.id,
     required String username,
     required String email,
     required String passwordHash,
-  })  : _id = id,
-        _username = username,
-        _email = email,
-        _passwordHash = passwordHash;
+  })  : _passwordHash = passwordHash,
+        super(name: username, description: email);
 
-  int get id => _id;
-  String get username => _username;
-  String get email => _email;
+  String get username => name;
+  String get email => description;
   String get passwordHash => _passwordHash;
 
   /// Kiểm tra định dạng email có hợp lệ không.
@@ -24,19 +22,20 @@ class User {
   /// không gọi mạng/DB nên vẫn hợp lệ nằm trong Model.
   bool isValidEmail() {
     final emailPattern = RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$');
-    return emailPattern.hasMatch(_email);
+    return emailPattern.hasMatch(email);
   }
 
   /// Tên hiển thị trên giao diện — viết hoa chữ cái đầu của username.
   String getDisplayName() {
-    if (_username.isEmpty) return _username;
-    return _username[0].toUpperCase() + _username.substring(1);
+    if (username.isEmpty) return username;
+    return username[0].toUpperCase() + username.substring(1);
   }
 
+  @override
   Map<String, dynamic> toMap() => {
-        'id': _id,
-        'username': _username,
-        'email': _email,
+        'id': id,
+        'username': username,
+        'email': email,
         'passwordHash': _passwordHash,
       };
 
@@ -48,5 +47,5 @@ class User {
       );
 
   @override
-  String toString() => 'User($_username, $_email)';
+  String toString() => 'User($username, $email)';
 }

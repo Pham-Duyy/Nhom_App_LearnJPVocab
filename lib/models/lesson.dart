@@ -1,23 +1,26 @@
-class Lesson {
-  final String id;
+import 'generic_entity.dart';
+
+/// Bài học. Kế thừa id, name, description từ [GenericEntity];
+/// `title` của bài học chính là `name` của lớp cha.
+class Lesson extends GenericEntity<String> {
   final String categoryId;
-  final String title;
-  final String description;
   final String jlptLevel;
   final int order;
   final int vocabularyCount;
   final bool isPublished;
 
   const Lesson({
-    required this.id,
+    required super.id,
     required this.categoryId,
-    required this.title,
-    required this.description,
+    required String title,
+    required super.description,
     required this.jlptLevel,
     required this.order,
     this.vocabularyCount = 0,
     this.isPublished = true,
-  });
+  }) : super(name: title);
+
+  String get title => name;
 
   Lesson copyWith({
     String? id,
@@ -41,6 +44,7 @@ class Lesson {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'categoryId': categoryId,
