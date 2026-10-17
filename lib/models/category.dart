@@ -1,19 +1,24 @@
-class Category {
-  final String id;
-  final String name;
-  final String description;
+import 'learning_content.dart';
+
+/// Chủ đề học. id, name, description, order, isPublished và các phương thức
+/// chung (getName, matches, toString...) kế thừa từ [LearningContent].
+class Category extends LearningContent {
   final String? imageUrl;
-  final int order;
-  final bool isPublished;
 
   const Category({
-    required this.id,
-    required this.name,
-    required this.description,
+    required String id,
+    required String name,
+    required String description,
     this.imageUrl,
-    required this.order,
-    this.isPublished = true,
-  });
+    required int order,
+    bool isPublished = true,
+  }) : super(
+          id: id,
+          name: name,
+          description: description,
+          order: order,
+          isPublished: isPublished,
+        );
 
   Category copyWith({
     String? id,
@@ -33,6 +38,7 @@ class Category {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,
@@ -50,7 +56,4 @@ class Category {
         order: map['order'] as int,
         isPublished: map['isPublished'] as bool? ?? true,
       );
-
-  @override
-  String toString() => 'Category($name)';
 }

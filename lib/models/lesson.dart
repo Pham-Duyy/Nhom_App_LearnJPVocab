@@ -1,23 +1,28 @@
-class Lesson {
-  final String id;
+import 'learning_content.dart';
+
+class Lesson extends LearningContent {
   final String categoryId;
-  final String title;
-  final String description;
   final String jlptLevel;
-  final int order;
   final int vocabularyCount;
-  final bool isPublished;
 
   const Lesson({
-    required this.id,
+    required String id,
     required this.categoryId,
-    required this.title,
-    required this.description,
+    required String title,
+    required String description,
     required this.jlptLevel,
-    required this.order,
+    required int order,
     this.vocabularyCount = 0,
-    this.isPublished = true,
-  });
+    bool isPublished = true,
+  }) : super(
+          id: id,
+          name: title,
+          description: description,
+          order: order,
+          isPublished: isPublished,
+        );
+
+  String get title => name;
 
   Lesson copyWith({
     String? id,
@@ -41,6 +46,7 @@ class Lesson {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'categoryId': categoryId,
@@ -62,7 +68,4 @@ class Lesson {
         vocabularyCount: map['vocabularyCount'] as int? ?? 0,
         isPublished: map['isPublished'] as bool? ?? true,
       );
-
-  @override
-  String toString() => 'Lesson($title)';
 }
