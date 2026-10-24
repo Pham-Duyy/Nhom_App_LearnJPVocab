@@ -48,6 +48,7 @@ class ReviewCard extends StatelessWidget {
               onPressed: hasDueWords && !isLoading ? onReview : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -62,8 +63,12 @@ class ReviewCard extends StatelessWidget {
                       ),
                     )
                   : const Text(
-                      'Ôn ngay',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Bắt đầu',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),

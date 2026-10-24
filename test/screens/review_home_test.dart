@@ -24,7 +24,7 @@ void main() {
       await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Ôn ngay'));
+      await tester.tap(find.text('Bắt đầu'));
       await tester.pumpAndSettle();
 
       // Đúng 3 từ đến hạn được đưa vào phiên, không phải 9 từ đã học hay
@@ -48,7 +48,7 @@ void main() {
       expect(find.text('Quay lại vào ngày mai nhé.'), findsOneWidget);
 
       final button = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Ôn ngay'),
+        find.widgetWithText(ElevatedButton, 'Bắt đầu'),
       );
       expect(button.onPressed, isNull);
     },
