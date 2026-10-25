@@ -2,7 +2,7 @@ import 'package:chibakanji/models/progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('Progress.markCorrect', () {
+  group('US09: Progress.markCorrect', () {
     test('tăng memoryLevel lên 1 mỗi lần trả lời đúng', () {
       const progress = Progress(vocabularyId: 'v1', memoryLevel: 2);
       final updated = progress.markCorrect();
@@ -21,7 +21,7 @@ void main() {
     });
   });
 
-  group('Progress.markWrong', () {
+  group('US09: Progress.markWrong', () {
     test('đưa memoryLevel về 1 dù đang ở mức cao', () {
       const progress = Progress(vocabularyId: 'v1', memoryLevel: 4);
       final updated = progress.markWrong();
@@ -39,7 +39,7 @@ void main() {
     });
   });
 
-  group('nextReviewAt được tính theo mức ghi nhớ', () {
+  group('US11: nextReviewAt được tính theo mức ghi nhớ', () {
     test('mức 1: ôn lại sau 1 ngày', () {
       const progress = Progress(vocabularyId: 'v1', memoryLevel: 3);
       final updated = progress.markWrong();
@@ -70,7 +70,7 @@ void main() {
     });
   });
 
-  group('Progress.isDueForReview', () {
+  group('US11: Progress.isDueForReview', () {
     test('true khi chưa từng được ôn (nextReviewAt null)', () {
       const progress = Progress(vocabularyId: 'v1');
 

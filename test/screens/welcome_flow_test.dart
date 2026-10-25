@@ -50,7 +50,7 @@ void main() {
     expect(find.text('3 từ đến hạn · Khoảng 2 phút'), findsOneWidget);
   });
 
-  testWidgets('mật khẩu xác nhận không khớp thì ở lại màn đăng ký', (
+  testWidgets('US03: mật khẩu xác nhận không khớp thì ở lại màn đăng ký', (
     tester,
   ) async {
     await _openRegisterForm(tester);

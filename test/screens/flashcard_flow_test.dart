@@ -17,7 +17,7 @@ Future<void> _openFirstLesson(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('chạm vào thẻ để lật xem nghĩa', (tester) async {
+  testWidgets('US08: chạm vào thẻ để lật xem nghĩa', (tester) async {
     await _openFirstLesson(tester);
 
     expect(find.text('Từ 1/5'), findsOneWidget);
@@ -29,7 +29,7 @@ void main() {
     expect(find.text('Xin chào (ban ngày)'), findsOneWidget);
   });
 
-  testWidgets('học hết 5 từ trong bài thì mở màn hình kết quả', (
+  testWidgets('US10: học hết 5 từ trong bài thì mở màn hình kết quả', (
     tester,
   ) async {
     await _openFirstLesson(tester);
@@ -44,7 +44,8 @@ void main() {
     expect(find.text('Đã nhớ: 5 · Chưa nhớ: 0'), findsOneWidget);
   });
 
-  testWidgets('nhấn Về trang chủ chuyển hẳn về tab Ôn tập', (tester) async {
+  testWidgets('US10: nhấn Về trang chủ chuyển hẳn về tab Ôn tập',
+      (tester) async {
     await _openFirstLesson(tester);
 
     for (var i = 0; i < 5; i++) {
@@ -65,7 +66,7 @@ void main() {
     expect(find.text('Chào Duy!'), findsOneWidget);
   });
 
-  testWidgets('khoá nút khi đang lưu để tránh bấm đúp bỏ qua từ', (
+  testWidgets('8a: khoá nút khi đang lưu để tránh bấm đúp bỏ qua từ', (
     tester,
   ) async {
     await _openFirstLesson(tester);
@@ -87,7 +88,8 @@ void main() {
     expect(find.text('Từ 2/5'), findsOneWidget);
   });
 
-  testWidgets('vuốt thẻ sang phải đủ xa thì tính là Đã nhớ', (tester) async {
+  testWidgets('US09: vuốt thẻ sang phải đủ xa thì tính là Đã nhớ',
+      (tester) async {
     await _openFirstLesson(tester);
 
     await tester.timedDrag(
@@ -101,7 +103,8 @@ void main() {
     expect(find.text('1 nhớ · 0 cần ôn'), findsOneWidget);
   });
 
-  testWidgets('vuốt sang trái đủ xa thì tính là Chưa nhớ', (tester) async {
+  testWidgets('US09: vuốt sang trái đủ xa thì tính là Chưa nhớ',
+      (tester) async {
     await _openFirstLesson(tester);
 
     await tester.timedDrag(
@@ -115,7 +118,7 @@ void main() {
     expect(find.text('0 nhớ · 1 cần ôn'), findsOneWidget);
   });
 
-  testWidgets('vuốt ngắn thì thẻ quay về chỗ cũ, không chấm điểm', (
+  testWidgets('US09: vuốt ngắn thì thẻ quay về chỗ cũ, không chấm điểm', (
     tester,
   ) async {
     await _openFirstLesson(tester);

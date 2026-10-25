@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'helpers/test_app.dart';
 
 void main() {
-  testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
+  testWidgets('US06, US07: tab Học mới hiện chủ đề, chạm chủ đề hiện bài học',
+      (tester) async {
     await pumpTestApp(tester);
 
     expect(find.text('Chào Duy!'), findsOneWidget);
@@ -21,7 +22,7 @@ void main() {
     expect(find.text('Chào hỏi cơ bản'), findsOneWidget);
   });
 
-  testWidgets('hiển thị giao diện Sổ từ và Cá nhân', (tester) async {
+  testWidgets('8e: hiển thị giao diện Sổ từ và Cá nhân', (tester) async {
     await pumpTestApp(tester);
 
     await tester.tap(find.text('Sổ từ'));

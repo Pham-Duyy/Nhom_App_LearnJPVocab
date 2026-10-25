@@ -5,7 +5,7 @@ import '../helpers/test_app.dart';
 
 void main() {
   testWidgets(
-    'LessonScreen lấy tên chủ đề làm tiêu đề, thẻ hiện thêm số từ và cấp độ',
+    'US07: LessonScreen lấy tên chủ đề làm tiêu đề, thẻ hiện thêm số từ và cấp độ',
     (tester) async {
       await pumpTestApp(tester);
 

@@ -89,7 +89,8 @@ void main() {
     expect(button.onPressed, isNotNull);
   });
 
-  testWidgets('email sai định dạng thì báo lỗi ngay, không gọi Firebase', (
+  testWidgets('US04: email sai định dạng thì báo lỗi ngay, không gọi Firebase',
+      (
     tester,
   ) async {
     final auth = FakeAuthService(currentUser: _guest)
@@ -105,7 +106,8 @@ void main() {
     expect(find.text('Đã có lỗi xảy ra. Vui lòng thử lại.'), findsNothing);
   });
 
-  testWidgets('quên mật khẩu khi chưa nhập email thì nhắc nhập email trước', (
+  testWidgets(
+      'US04: quên mật khẩu khi chưa nhập email thì nhắc nhập email trước', (
     tester,
   ) async {
     final auth = FakeAuthService(currentUser: _guest);
@@ -133,7 +135,7 @@ void main() {
     expect((await profiles.load())!.displayName, 'Phạm Duy');
   });
 
-  testWidgets('đăng nhập Google không ghi đè tên người học đã tự đặt', (
+  testWidgets('US04: đăng nhập Google không ghi đè tên người học đã tự đặt', (
     tester,
   ) async {
     final auth = FakeAuthService(currentUser: _guest);
@@ -148,7 +150,7 @@ void main() {
     expect(find.text('Chào Duy!'), findsOneWidget);
   });
 
-  testWidgets('hủy cửa sổ Google thì báo đã hủy và ở lại màn đăng nhập', (
+  testWidgets('US04: hủy cửa sổ Google thì báo đã hủy và ở lại màn đăng nhập', (
     tester,
   ) async {
     final auth = FakeAuthService(currentUser: _guest)
@@ -162,7 +164,7 @@ void main() {
     expect(find.text('Tiếp tục với Google'), findsOneWidget);
   });
 
-  testWidgets('quên mật khẩu với email hợp lệ thì gửi và báo đã gửi', (
+  testWidgets('US04: quên mật khẩu với email hợp lệ thì gửi và báo đã gửi', (
     tester,
   ) async {
     final auth = FakeAuthService(currentUser: _guest);

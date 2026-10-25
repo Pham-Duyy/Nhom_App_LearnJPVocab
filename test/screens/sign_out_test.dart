@@ -13,7 +13,7 @@ Future<void> _pumpFrames(WidgetTester tester) async {
 
 void main() {
   testWidgets(
-    'đăng xuất cảnh báo tài khoản khách, gọi signOut và đăng nhập lại được',
+    'US05: đăng xuất cảnh báo tài khoản khách, gọi signOut và đăng nhập lại được',
     (tester) async {
       final authService = FakeAuthService(
         currentUser: const AppAuthUser(uid: 'guest-1', isAnonymous: true),

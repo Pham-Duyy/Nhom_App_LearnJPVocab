@@ -77,7 +77,8 @@ void main() {
     expect(progress.memoryLevel, 1);
   });
 
-  testWidgets('bấm Back giữa chừng thì hỏi lại, chọn Làm tiếp thì ở lại', (
+  testWidgets('US16: bấm Back giữa chừng thì hỏi lại, chọn Làm tiếp thì ở lại',
+      (
     tester,
   ) async {
     await _openQuickQuiz(tester);

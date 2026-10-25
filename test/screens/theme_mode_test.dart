@@ -5,7 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_app.dart';
 
 void main() {
-  testWidgets('chọn Giao diện Tối ở Cá nhân thì cả app chuyển sang nền tối', (
+  testWidgets(
+      'US20: chọn Giao diện Tối ở Cá nhân thì cả app chuyển sang nền tối', (
     tester,
   ) async {
     await pumpTestApp(tester);

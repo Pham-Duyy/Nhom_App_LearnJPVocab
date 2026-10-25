@@ -2,7 +2,7 @@ import 'package:chibakanji/auth/auth_validators.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('email', () {
+  group('US03, US04: email', () {
     test('email hợp lệ, kể cả có khoảng trắng thừa', () {
       expect(AuthValidators.email('duy@gmail.com'), isNull);
       expect(AuthValidators.email('  duy.pham@phenikaa-uni.edu.vn  '), isNull);
@@ -28,7 +28,7 @@ void main() {
     });
   });
 
-  group('mật khẩu', () {
+  group('US03, US04: mật khẩu', () {
     test('đủ 6 ký tự thì hợp lệ, 5 ký tự thì không', () {
       expect(AuthValidators.password('123456'), isNull);
       expect(AuthValidators.password('12345'), isNotNull);

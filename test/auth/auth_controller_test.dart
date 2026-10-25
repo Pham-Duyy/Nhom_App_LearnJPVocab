@@ -9,7 +9,8 @@ import '../fakes/fake_auth_service.dart';
 void main() {
   const existingUser = AppAuthUser(uid: 'existing-uid', isAnonymous: true);
 
-  test('đã có currentUser: không đăng nhập lại và giữ nguyên UID', () async {
+  test('US02: đã có currentUser: không đăng nhập lại và giữ nguyên UID',
+      () async {
     final service = FakeAuthService(currentUser: existingUser);
     final controller = AuthController(service);
 
@@ -20,7 +21,7 @@ void main() {
     expect(controller.uid, 'existing-uid');
   });
 
-  test('chưa có currentUser: đăng nhập ẩn danh đúng một lần', () async {
+  test('US02: chưa có currentUser: đăng nhập ẩn danh đúng một lần', () async {
     final service = FakeAuthService();
     final controller = AuthController(service);
 
@@ -147,7 +148,7 @@ void main() {
     expect(service.signInCallCount, 0, reason: 'không tự đăng nhập lại');
   });
 
-  test('signOut gọi service, chuyển unauthenticated, retry tạo khách mới',
+  test('US05: signOut gọi service, chuyển unauthenticated, retry tạo khách mới',
       () async {
     final service = FakeAuthService(currentUser: existingUser);
     final controller = AuthController(service);
@@ -339,7 +340,7 @@ void main() {
     });
   });
 
-  group('quên mật khẩu', () {
+  group('US04: quên mật khẩu', () {
     test('gửi email đặt lại thành công', () async {
       final service = FakeAuthService();
       final controller = AuthController(service);

@@ -4,7 +4,7 @@ import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('tính đúng tổng số từ đã học và số lượng theo từng mức', () async {
+  test('US12: tính đúng tổng số từ đã học và số lượng theo từng mức', () async {
     final repository = MockProgressRepository();
     await repository.save(const Progress(
       vocabularyId: 'v1',
@@ -30,7 +30,7 @@ void main() {
     expect(provider.getCountForLevel(1), 1);
   });
 
-  test('markCorrect cập nhật provider và lưu vào repository', () async {
+  test('US09: markCorrect cập nhật provider và lưu vào repository', () async {
     final repository = MockProgressRepository();
     final provider = ProgressProvider(repository);
     await provider.loadProgress();
@@ -45,7 +45,8 @@ void main() {
     expect(saved!.memoryLevel, 2);
   });
 
-  test('markWrong đưa từ về mức 1 và phản ánh ngay trong thống kê', () async {
+  test('US09: markWrong đưa từ về mức 1 và phản ánh ngay trong thống kê',
+      () async {
     final repository = MockProgressRepository();
     await repository.save(const Progress(vocabularyId: 'v1', memoryLevel: 4));
     final provider = ProgressProvider(repository);

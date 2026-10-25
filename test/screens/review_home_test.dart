@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_app.dart';
 
 void main() {
-  testWidgets('trang chủ hiển thị đúng thống kê từ ProgressProvider', (
+  testWidgets('US12: trang chủ hiển thị đúng thống kê từ ProgressProvider', (
     tester,
   ) async {
     await pumpTestApp(tester);
@@ -18,7 +18,7 @@ void main() {
   });
 
   testWidgets(
-    'nhấn Bắt đầu ôn tập chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
+    'US11: nhấn Bắt đầu ôn tập chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
     (tester) async {
       await pumpTestApp(tester);
 
