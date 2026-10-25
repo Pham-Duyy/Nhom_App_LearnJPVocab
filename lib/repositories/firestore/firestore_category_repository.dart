@@ -3,40 +3,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/category.dart';
 import '../../models/lesson.dart';
 import '../category_repository.dart';
+import '../repository.dart';
+import 'firestore_repository.dart';
 
-/// Đọc category/lesson trực tiếp từ Cloud Firestore.
+/// Chủ đề (`categories`) và bài học (`lessons`) trên Cloud Firestore, mỗi
+/// collection là một FirestoreRepository tổng quát.
 class FirestoreCategoryRepository implements CategoryRepository {
   FirestoreCategoryRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _categories = FirestoreRepository<Category>(
+          path: () => 'categories',
+          fromMap: Category.fromMap,
+          toMap: (category) => category.toMap(),
+          idOf: (category) => category.id,
+          firestore: firestore,
+        ),
+        _lessons = FirestoreRepository<Lesson>(
+          path: () => 'lessons',
+          fromMap: Lesson.fromMap,
+          toMap: (lesson) => lesson.toMap(),
+          idOf: (lesson) => lesson.id,
+          firestore: firestore,
+        );
 
-  final FirebaseFirestore _firestore;
-
-  CollectionReference<Map<String, dynamic>> get _categoriesRef =>
-      _firestore.collection('categories');
-
-  CollectionReference<Map<String, dynamic>> get _lessonsRef =>
-      _firestore.collection('lessons');
-
-  @override
-  Future<List<Category>> getCategories() async {
-    final snapshot = await _categoriesRef.orderBy('order').get();
-    return snapshot.docs.map((doc) => Category.fromMap(doc.data())).toList();
-  }
-
-  @override
-  Future<List<Lesson>> getLessonsByCategory(String categoryId) async {
-    // Sắp xếp phía client: where + orderBy trên hai trường khác nhau cần
-    // composite index trên Firestore, thiếu index thì truy vấn lỗi.
-    final snapshot =
-        await _lessonsRef.where('categoryId', isEqualTo: categoryId).get();
-    return snapshot.docs.map((doc) => Lesson.fromMap(doc.data())).toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
-  }
+  final FirestoreRepository<Category> _categories;
+  final FirestoreRepository<Lesson> _lessons;
 
   @override
-  Future<Lesson?> getLessonById(String lessonId) async {
-    final doc = await _lessonsRef.doc(lessonId).get();
-    if (!doc.exists || doc.data() == null) return null;
-    return Lesson.fromMap(doc.data()!);
-  }
+  Future<List<Category>> getCategories() async =>
+      sortByOrder(await _categories.getAll());
+
+  @override
+  Future<List<Lesson>> getLessonsByCategory(String categoryId) async =>
+      sortByOrder(await _lessons.getWhere('categoryId', categoryId));
 }

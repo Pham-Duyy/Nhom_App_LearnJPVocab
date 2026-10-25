@@ -40,7 +40,7 @@ void main() {
     expect(provider.getCountForLevel(2), 1);
     expect(provider.totalLearned, 1);
 
-    final saved = await repository.getByVocabularyId('v1');
+    final saved = await repository.getById('v1');
     expect(saved, isNotNull);
     expect(saved!.memoryLevel, 2);
   });

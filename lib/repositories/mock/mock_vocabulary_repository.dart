@@ -1,44 +1,24 @@
 import '../../data/mock/mock_learning_data.dart';
 import '../../models/vocabulary.dart';
+import '../repository.dart';
 import '../vocabulary_repository.dart';
+import 'in_memory_repository.dart';
 
-/// Đọc từ vựng từ dữ liệu mock trong bộ nhớ. Sẽ được thay bằng một
-/// implementation đọc Cloud Firestore ở giai đoạn sau, giữ nguyên interface.
-class MockVocabularyRepository implements VocabularyRepository {
-  @override
-  Future<List<Vocabulary>> getByLesson(String lessonId) async {
-    final result = MockLearningData.vocabulary
-        .where((word) => word.lessonId == lessonId)
-        .toList();
-    result.sort((a, b) => a.order.compareTo(b.order));
-    return result;
-  }
+/// Từ vựng mẫu trong bộ nhớ, dùng cho test và chạy không cần Firebase.
+class MockVocabularyRepository extends InMemoryRepository<Vocabulary>
+    implements VocabularyRepository {
+  MockVocabularyRepository()
+      : super(
+          idOf: (word) => word.id,
+          initialItems: MockLearningData.vocabulary,
+        );
 
   @override
-  Future<Vocabulary?> getById(String vocabularyId) async {
-    for (final word in MockLearningData.vocabulary) {
-      if (word.id == vocabularyId) return word;
-    }
-    return null;
-  }
+  Future<List<Vocabulary>> getByLesson(String lessonId) async => sortByOrder(
+        (await getAll()).where((word) => word.lessonId == lessonId).toList(),
+      );
 
   @override
-  Future<List<Vocabulary>> getByIds(List<String> vocabularyIds) async {
-    final byId = {
-      for (final word in MockLearningData.vocabulary) word.id: word
-    };
-    final result = <Vocabulary>[];
-    for (final id in vocabularyIds) {
-      final word = byId[id];
-      if (word != null) result.add(word);
-    }
-    return result;
-  }
-
-  @override
-  Future<List<Vocabulary>> search(String keyword) async {
-    return MockLearningData.vocabulary
-        .where((word) => word.matches(keyword))
-        .toList();
-  }
+  Future<List<Vocabulary>> search(String keyword) async =>
+      (await getAll()).where((word) => word.matches(keyword)).toList();
 }

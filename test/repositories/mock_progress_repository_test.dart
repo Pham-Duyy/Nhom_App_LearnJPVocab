@@ -1,4 +1,5 @@
 import 'package:chibakanji/models/progress.dart';
+import 'package:chibakanji/providers/progress_provider.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,7 +13,7 @@ void main() {
     );
 
     await repository.save(progress);
-    final loaded = await repository.getByVocabularyId('v1');
+    final loaded = await repository.getById('v1');
 
     expect(loaded, isNotNull);
     expect(loaded!.memoryLevel, 3);
@@ -30,21 +31,26 @@ void main() {
     expect(all.first.memoryLevel, 4);
   });
 
-  test('getDueForReview chỉ trả về các từ đã đến hạn ôn tập', () async {
-    final repository = MockProgressRepository();
+  test('getById trả về null với từ chưa có tiến độ', () async {
+    expect(await MockProgressRepository().getById('chua-hoc'), isNull);
+  });
+
+  test('provider chỉ đưa vào danh sách ôn các từ đã đến hạn', () async {
     final now = DateTime.now();
-    await repository.save(Progress(
-      vocabularyId: 'due',
-      nextReviewAt: now.subtract(const Duration(days: 1)),
-    ));
-    await repository.save(Progress(
-      vocabularyId: 'not_due',
-      nextReviewAt: now.add(const Duration(days: 5)),
-    ));
+    final provider = ProgressProvider(MockProgressRepository(initialProgress: [
+      Progress(
+        vocabularyId: 'due',
+        nextReviewAt: now.subtract(const Duration(days: 1)),
+      ),
+      Progress(
+        vocabularyId: 'not_due',
+        nextReviewAt: now.add(const Duration(days: 5)),
+      ),
+    ]));
+    await provider.loadProgress();
 
-    final due = await repository.getDueForReview(now);
+    final due = provider.getDueForReview(now);
 
-    expect(due.length, 1);
-    expect(due.first.vocabularyId, 'due');
+    expect(due.map((p) => p.vocabularyId), ['due']);
   });
 }
