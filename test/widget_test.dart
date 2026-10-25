@@ -1,11 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chibakanji/app.dart';
-import 'package:chibakanji/providers/app_providers.dart';
+
+import 'helpers/test_app.dart';
 
 void main() {
   testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
-    await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
-    await tester.pumpAndSettle();
+    await pumpTestApp(tester);
 
     expect(find.text('Chào Duy!'), findsOneWidget);
     expect(find.text('9 từ vựng'), findsOneWidget);
@@ -23,8 +22,7 @@ void main() {
   });
 
   testWidgets('hiển thị giao diện Sổ từ và Cá nhân', (tester) async {
-    await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
-    await tester.pumpAndSettle();
+    await pumpTestApp(tester);
 
     await tester.tap(find.text('Sổ từ'));
     await tester.pumpAndSettle();

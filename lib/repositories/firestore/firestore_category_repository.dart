@@ -25,11 +25,12 @@ class FirestoreCategoryRepository implements CategoryRepository {
 
   @override
   Future<List<Lesson>> getLessonsByCategory(String categoryId) async {
-    final snapshot = await _lessonsRef
-        .where('categoryId', isEqualTo: categoryId)
-        .orderBy('order')
-        .get();
-    return snapshot.docs.map((doc) => Lesson.fromMap(doc.data())).toList();
+    // Sắp xếp phía client: where + orderBy trên hai trường khác nhau cần
+    // composite index trên Firestore, thiếu index thì truy vấn lỗi.
+    final snapshot =
+        await _lessonsRef.where('categoryId', isEqualTo: categoryId).get();
+    return snapshot.docs.map((doc) => Lesson.fromMap(doc.data())).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
   }
 
   @override

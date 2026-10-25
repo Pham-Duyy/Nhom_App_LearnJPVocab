@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'screens/auth_gate.dart';
 import 'screens/main_screen.dart';
 import 'theme/app_colors.dart';
 
@@ -19,7 +20,7 @@ class ChibaKanjiApp extends StatelessWidget {
           secondary: AppColors.secondary,
         ),
       ),
-      home: const MainScreen(),
+      home: const AuthGate(child: MainScreen()),
     );
   }
 }

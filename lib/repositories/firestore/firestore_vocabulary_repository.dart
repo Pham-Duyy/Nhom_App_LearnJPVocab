@@ -3,10 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/vocabulary.dart';
 import '../vocabulary_repository.dart';
 
-/// Đọc từ vựng trực tiếp từ Cloud Firestore.
+/// Đọc từ vựng trực tiếp từ Cloud Firestore. Document id trùng với
+/// [Vocabulary.id].
 class FirestoreVocabularyRepository implements VocabularyRepository {
   FirestoreVocabularyRepository({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  /// Giới hạn số phần tử của một truy vấn `whereIn` trên Firestore.
+  static const _whereInLimit = 30;
 
   final FirebaseFirestore _firestore;
 
@@ -15,11 +19,11 @@ class FirestoreVocabularyRepository implements VocabularyRepository {
 
   @override
   Future<List<Vocabulary>> getByLesson(String lessonId) async {
-    final snapshot = await _vocabulariesRef
-        .where('lessonId', isEqualTo: lessonId)
-        .orderBy('order')
-        .get();
-    return snapshot.docs.map((doc) => Vocabulary.fromMap(doc.data())).toList();
+    // Sắp xếp phía client để không cần composite index (lessonId + order).
+    final snapshot =
+        await _vocabulariesRef.where('lessonId', isEqualTo: lessonId).get();
+    return snapshot.docs.map((doc) => Vocabulary.fromMap(doc.data())).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
   }
 
   @override
@@ -32,14 +36,25 @@ class FirestoreVocabularyRepository implements VocabularyRepository {
   @override
   Future<List<Vocabulary>> getByIds(List<String> vocabularyIds) async {
     if (vocabularyIds.isEmpty) return [];
-    final result = <Vocabulary>[];
-    for (final id in vocabularyIds) {
-      final doc = await _vocabulariesRef.doc(id).get();
-      if (doc.exists && doc.data() != null) {
-        result.add(Vocabulary.fromMap(doc.data()!));
-      }
-    }
-    return result;
+
+    final ids = vocabularyIds.toSet().toList();
+    final chunks = [
+      for (var i = 0; i < ids.length; i += _whereInLimit)
+        ids.sublist(i, (i + _whereInLimit).clamp(0, ids.length)),
+    ];
+    final snapshots = await Future.wait(chunks.map(
+      (chunk) =>
+          _vocabulariesRef.where(FieldPath.documentId, whereIn: chunk).get(),
+    ));
+
+    final byId = {
+      for (final snapshot in snapshots)
+        for (final doc in snapshot.docs) doc.id: Vocabulary.fromMap(doc.data()),
+    };
+    return [
+      for (final id in vocabularyIds)
+        if (byId[id] != null) byId[id]!,
+    ];
   }
 
   @override
