@@ -2,8 +2,10 @@ import 'package:chibakanji/auth/auth_controller.dart';
 import 'package:chibakanji/models/progress.dart';
 import 'package:chibakanji/providers/lesson_provider.dart';
 import 'package:chibakanji/providers/progress_provider.dart';
+import 'package:chibakanji/providers/user_profile_provider.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
 import 'package:chibakanji/screens/auth_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +25,9 @@ Widget _buildGate(
       ),
       ChangeNotifierProvider.value(
         value: lessons ?? LessonProvider(MockCategoryRepository()),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => UserProfileProvider(MockUserProfileRepository()),
       ),
       ChangeNotifierProvider.value(value: progress),
     ],

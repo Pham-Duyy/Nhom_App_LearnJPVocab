@@ -1,9 +1,11 @@
 import 'package:chibakanji/app.dart';
 import 'package:chibakanji/auth/app_auth_user.dart';
 import 'package:chibakanji/data/mock/mock_learning_data.dart';
+import 'package:chibakanji/models/user_profile.dart';
 import 'package:chibakanji/providers/app_providers.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,6 +17,7 @@ import '../fakes/fake_auth_service.dart';
 Widget buildTestApp({
   bool showWelcome = false,
   FakeAuthService? authService,
+  MockUserProfileRepository? userProfileRepository,
 }) {
   return AppProviders(
     authService: authService ??
@@ -26,6 +29,10 @@ Widget buildTestApp({
     progressRepository: MockProgressRepository(
       initialProgress: MockLearningData.createInitialProgress(),
     ),
+    userProfileRepository: userProfileRepository ??
+        MockUserProfileRepository(
+          initialProfile: const UserProfile(displayName: 'Duy'),
+        ),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }

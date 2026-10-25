@@ -73,9 +73,9 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
     );
   }
 
-  ChibiMood _moodFor(ProgressProvider provider) {
+  ChibiMood _moodFor(ProgressProvider provider, int dailyGoal) {
     if (provider.isLoading) return ChibiMood.neutral;
-    if (provider.getReviewedTodayCount() >= ProgressProvider.dailyGoal) {
+    if (provider.getReviewedTodayCount() >= dailyGoal) {
       return ChibiMood.happy;
     }
     if (provider.getDueForReview().isEmpty) return ChibiMood.sleepy;
@@ -91,7 +91,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
   @override
   Widget buildBody(BuildContext context) {
     final progressProvider = context.watch<ProgressProvider>();
-    final displayName = context.watch<UserProfileProvider>().displayName;
+    final profile = context.watch<UserProfileProvider>();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -101,22 +101,22 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
         28,
       ),
       children: [
-        const Row(
+        Row(
           children: [
-            Expanded(
+            const Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: BrandLogo(),
               ),
             ),
-            SizedBox(width: 12),
-            StreakChip(days: 7),
+            const SizedBox(width: 12),
+            StreakChip(days: profile.streak),
           ],
         ),
         const SizedBox(height: 36),
         GreetingSection(
-          name: displayName,
-          mood: _moodFor(progressProvider),
+          name: profile.displayName,
+          mood: _moodFor(progressProvider, profile.dailyGoal),
         ),
         const SizedBox(height: 28),
         _buildProgressSection(progressProvider),
@@ -190,6 +190,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
       provider.progressList,
     );
     final reviewedToday = provider.getReviewedTodayCount();
+    final dailyGoal = context.watch<UserProfileProvider>().dailyGoal;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -209,7 +210,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '$reviewedToday / ${ProgressProvider.dailyGoal} từ',
+                '$reviewedToday / $dailyGoal từ',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: palette.primary,

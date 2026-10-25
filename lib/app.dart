@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/app_settings_provider.dart';
+import 'providers/user_profile_provider.dart';
 import 'screens/auth/welcome_screen.dart';
 import 'screens/auth_gate.dart';
 import 'screens/main_screen.dart';
@@ -20,7 +20,9 @@ class ChibaKanjiApp extends StatelessWidget {
       title: 'ChibaKanji',
       theme: _buildTheme(AppPalette.light, Brightness.light),
       darkTheme: _buildTheme(AppPalette.dark, Brightness.dark),
-      themeMode: context.watch<AppSettingsProvider>().themeMode,
+      themeMode: context.select<UserProfileProvider, ThemeMode>(
+        (profile) => profile.themeMode,
+      ),
       home: showWelcome
           ? const WelcomeScreen()
           : const AuthGate(child: MainScreen()),

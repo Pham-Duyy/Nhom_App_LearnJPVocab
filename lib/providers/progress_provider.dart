@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../models/progress.dart';
@@ -6,11 +8,12 @@ import '../repositories/progress_repository.dart';
 /// Quản lý tiến độ ghi nhớ của toàn bộ từ vựng: tổng số từ đã học, số từ
 /// đến hạn ôn tập và phân bố theo từng mức ghi nhớ (1-5).
 class ProgressProvider extends ChangeNotifier {
-  ProgressProvider(this._repository);
-
-  static const dailyGoal = 10;
+  /// [onStudyActivity] được gọi sau mỗi lần trả lời một thẻ (đúng hoặc sai),
+  /// để ghi nhận chuỗi ngày học mà provider này không cần biết đến hồ sơ.
+  ProgressProvider(this._repository, {this.onStudyActivity});
 
   final ProgressRepository _repository;
+  final Future<void> Function()? onStudyActivity;
 
   List<Progress> _progressList = [];
   bool _isLoading = false;
@@ -58,16 +61,23 @@ class ProgressProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> markCorrect(String vocabularyId) async {
-    final updated = await _updateAndSave(vocabularyId, (p) => p.markCorrect());
-    _replaceInList(updated);
-    notifyListeners();
-  }
+  Future<void> markCorrect(String vocabularyId) =>
+      _answer(vocabularyId, (p) => p.markCorrect());
 
-  Future<void> markWrong(String vocabularyId) async {
-    final updated = await _updateAndSave(vocabularyId, (p) => p.markWrong());
+  Future<void> markWrong(String vocabularyId) =>
+      _answer(vocabularyId, (p) => p.markWrong());
+
+  Future<void> _answer(
+    String vocabularyId,
+    Progress Function(Progress current) update,
+  ) async {
+    final updated = await _updateAndSave(vocabularyId, update);
     _replaceInList(updated);
     notifyListeners();
+    // Không chờ: lưu chuỗi ngày không được làm chậm việc chuyển thẻ, và lỗi
+    // của nó đã được UserProfileProvider tự xử lý.
+    final record = onStudyActivity;
+    if (record != null) unawaited(record());
   }
 
   Future<void> toggleFavorite(String vocabularyId) async {

@@ -5,10 +5,11 @@ import '../auth/auth_controller.dart';
 import '../auth/auth_status.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/progress_provider.dart';
+import '../providers/user_profile_provider.dart';
 import '../theme/app_colors.dart';
 
 /// Chỉ hiển thị [child] khi đã có người dùng (ẩn danh). Mỗi khi uid đổi,
-/// tải lại chủ đề và tiến độ của đúng người dùng đó.
+/// tải lại chủ đề, hồ sơ và tiến độ của đúng người dùng đó.
 class AuthGate extends StatefulWidget {
   const AuthGate({Key? key, required this.child}) : super(key: key);
 
@@ -50,6 +51,7 @@ class _AuthGateState extends State<AuthGate> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<LessonProvider>().loadCategories();
+      context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
     });
   }

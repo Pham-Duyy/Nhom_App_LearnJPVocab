@@ -56,4 +56,29 @@ void main() {
     expect(provider.getCountForLevel(1), 1);
     expect(provider.getCountForLevel(4), 0);
   });
+
+  test('US19: trả lời đúng hay sai đều được tính là một lần học', () async {
+    var studyCount = 0;
+    final provider = ProgressProvider(
+      MockProgressRepository(),
+      onStudyActivity: () async => studyCount++,
+    );
+
+    await provider.markCorrect('v1');
+    await provider.markWrong('v2');
+
+    expect(studyCount, 2);
+  });
+
+  test('đánh dấu yêu thích không được tính là một lần học', () async {
+    var studyCount = 0;
+    final provider = ProgressProvider(
+      MockProgressRepository(),
+      onStudyActivity: () async => studyCount++,
+    );
+
+    await provider.toggleFavorite('v1');
+
+    expect(studyCount, 0);
+  });
 }

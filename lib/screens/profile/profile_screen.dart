@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../auth/auth_controller.dart';
-import '../../providers/app_settings_provider.dart';
+import '../../models/user_profile.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
@@ -68,46 +68,55 @@ class ProfileScreen extends GenericScreen {
     await auth.signOut();
   }
 
-  void _pickTheme(BuildContext context) {
-    final settings = context.read<AppSettingsProvider>();
-    showModalBottomSheet<void>(
+  Future<void> _editDisplayName(BuildContext context) async {
+    final profile = context.read<UserProfileProvider>();
+    final name = await showDialog<String>(
       context: context,
-      builder: (sheetContext) {
-        final palette = sheetContext.palette;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  child: Text('GIAO DIỆN', style: palette.sectionLabel),
-                ),
-                for (final mode in ThemeMode.values)
-                  ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                    ),
-                    leading: Icon(_themeIcons[mode], color: palette.label),
-                    title: Text(_themeLabels[mode]!),
-                    trailing: settings.themeMode == mode
-                        ? Icon(Icons.check_rounded, color: palette.primary)
-                        : null,
-                    selected: settings.themeMode == mode,
-                    selectedTileColor: palette.lavenderSurface,
-                    onTap: () {
-                      settings.setThemeMode(mode);
-                      Navigator.pop(sheetContext);
-                    },
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (_) => _EditNameDialog(initialName: profile.displayName),
     );
+    if (name == null || !context.mounted) return;
+    await profile.updateDisplayName(name);
+    if (context.mounted) _showSaveError(context);
+  }
+
+  Future<void> _pickTheme(BuildContext context) async {
+    final profile = context.read<UserProfileProvider>();
+    final mode = await _showOptionsSheet<ThemeMode>(
+      context,
+      title: 'GIAO DIỆN',
+      options: ThemeMode.values,
+      selected: profile.themeMode,
+      labelOf: (mode) => _themeLabels[mode]!,
+      iconOf: (mode) => _themeIcons[mode]!,
+    );
+    if (mode == null || !context.mounted) return;
+    await profile.setThemeMode(mode);
+    if (context.mounted) _showSaveError(context);
+  }
+
+  Future<void> _pickDailyGoal(BuildContext context) async {
+    final profile = context.read<UserProfileProvider>();
+    final goal = await _showOptionsSheet<int>(
+      context,
+      title: 'MỤC TIÊU MỖI NGÀY',
+      options: UserProfile.dailyGoalOptions,
+      selected: profile.dailyGoal,
+      labelOf: (goal) => '$goal từ mỗi ngày',
+      iconOf: (_) => Icons.flag_outlined,
+    );
+    if (goal == null || !context.mounted) return;
+    await profile.setDailyGoal(goal);
+    if (context.mounted) _showSaveError(context);
+  }
+
+  void _showSaveError(BuildContext context) {
+    final profile = context.read<UserProfileProvider>();
+    final error = profile.errorMessage;
+    if (error == null) return;
+    profile.clearError();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(error)));
   }
 
   @override
@@ -115,7 +124,8 @@ class ProfileScreen extends GenericScreen {
     final palette = context.palette;
     final progress = context.watch<ProgressProvider>();
     final profile = context.watch<UserProfileProvider>();
-    final themeMode = context.watch<AppSettingsProvider>().themeMode;
+    final themeMode = profile.themeMode;
+    final streak = profile.streak;
     final reviewedToday = progress.getReviewedTodayCount();
 
     return ListView(
@@ -130,7 +140,7 @@ class ProfileScreen extends GenericScreen {
           label: 'TÀI KHOẢN',
           title: 'Cá nhân',
           trailing: TextButton.icon(
-            onPressed: () => _showComingSoon(context, 'Chỉnh sửa hồ sơ'),
+            onPressed: () => _editDisplayName(context),
             icon: const Icon(Icons.edit_outlined, size: 18),
             label: const Text(
               'Chỉnh sửa',
@@ -143,21 +153,24 @@ class ProfileScreen extends GenericScreen {
         const SizedBox(height: 24),
         _StatisticsRow(
           learned: progress.totalLearned,
-          streakDays: 7,
+          streakDays: streak,
           favorites: progress.favoriteCount,
         ),
         const SizedBox(height: 18),
-        _DailyGoalCard(
-          learned: reviewedToday,
-          goal: ProgressProvider.dailyGoal,
-        ),
+        _DailyGoalCard(learned: reviewedToday, goal: profile.dailyGoal),
         const SizedBox(height: 32),
         Text('HỌC TẬP', style: palette.sectionLabel),
         const SizedBox(height: 6),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
+          icon: Icons.flag_outlined,
+          title: 'Mục tiêu mỗi ngày',
+          value: '${profile.dailyGoal} từ',
+          onTap: () => _pickDailyGoal(context),
+        ),
+        _ProfileMenuItem(
           icon: Icons.workspace_premium_outlined,
           title: 'Thành tích',
-          value: '7 ngày đều đặn',
+          value: streak > 0 ? '$streak ngày đều đặn' : 'Chưa có',
         ),
         const _ProfileMenuItem(
           icon: Icons.history_rounded,
@@ -226,6 +239,106 @@ void _showComingSoon(BuildContext context, String feature) {
     ..showSnackBar(
       SnackBar(content: Text('$feature sẽ được hoàn thiện ở giai đoạn sau.')),
     );
+}
+
+/// Bottom sheet chọn một giá trị trong [options]; trả về giá trị được chọn,
+/// hoặc null nếu người dùng đóng sheet.
+Future<T?> _showOptionsSheet<T>(
+  BuildContext context, {
+  required String title,
+  required List<T> options,
+  required T selected,
+  required String Function(T option) labelOf,
+  required IconData Function(T option) iconOf,
+}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    builder: (sheetContext) {
+      final palette = sheetContext.palette;
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                child: Text(title, style: palette.sectionLabel),
+              ),
+              for (final option in options)
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.card),
+                  ),
+                  leading: Icon(iconOf(option), color: palette.label),
+                  title: Text(labelOf(option)),
+                  trailing: option == selected
+                      ? Icon(Icons.check_rounded, color: palette.primary)
+                      : null,
+                  selected: option == selected,
+                  selectedTileColor: palette.lavenderSurface,
+                  onTap: () => Navigator.pop(sheetContext, option),
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// Hộp thoại đổi tên hiển thị; trả về tên mới đã hợp lệ, hoặc null nếu hủy.
+class _EditNameDialog extends StatefulWidget {
+  const _EditNameDialog({required this.initialName});
+
+  final String initialName;
+
+  @override
+  State<_EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<_EditNameDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final _controller = TextEditingController(text: widget.initialName);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    Navigator.pop(context, _controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Đổi tên hiển thị'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _controller,
+          autofocus: true,
+          maxLength: UserProfile.maxDisplayNameLength,
+          textCapitalization: TextCapitalization.words,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(hintText: 'Tên của bạn'),
+          validator: (value) => UserProfile.validateDisplayName(value ?? ''),
+          onFieldSubmitted: (_) => _submit(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Hủy'),
+        ),
+        TextButton(onPressed: _submit, child: const Text('Lưu')),
+      ],
+    );
+  }
 }
 
 class _ProfileHeader extends StatelessWidget {

@@ -7,10 +7,11 @@ import '../auth/firebase_auth_service.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/firestore/firestore_category_repository.dart';
 import '../repositories/firestore/firestore_progress_repository.dart';
+import '../repositories/firestore/firestore_user_profile_repository.dart';
 import '../repositories/firestore/firestore_vocabulary_repository.dart';
 import '../repositories/progress_repository.dart';
+import '../repositories/user_profile_repository.dart';
 import '../repositories/vocabulary_repository.dart';
-import 'app_settings_provider.dart';
 import 'lesson_provider.dart';
 import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
@@ -28,6 +29,7 @@ class AppProviders extends StatelessWidget {
     this.categoryRepository,
     this.vocabularyRepository,
     this.progressRepository,
+    this.userProfileRepository,
   }) : super(key: key);
 
   final Widget child;
@@ -35,12 +37,12 @@ class AppProviders extends StatelessWidget {
   final CategoryRepository? categoryRepository;
   final VocabularyRepository? vocabularyRepository;
   final ProgressRepository? progressRepository;
+  final UserProfileRepository? userProfileRepository;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
         ChangeNotifierProvider(
           // initialize() an toàn khi gọi ở đây vì chưa có widget nào lắng
           // nghe, nên notifyListeners() bên trong không chạm vào build nào.
@@ -48,7 +50,13 @@ class AppProviders extends StatelessWidget {
             ..initialize(),
         ),
         ChangeNotifierProvider(create: (_) => MainNavigationProvider()),
-        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider(
+          // Không tải ngay: hồ sơ nằm ở users/{uid}, nên AuthGate gọi load()
+          // sau khi đã có người dùng.
+          create: (_) => UserProfileProvider(
+            userProfileRepository ?? FirestoreUserProfileRepository(),
+          ),
+        ),
         ChangeNotifierProvider(
           // Không tải ngay: Firestore chỉ cho đọc chủ đề khi đã đăng nhập,
           // nên AuthGate gọi loadCategories() sau khi đã có người dùng.
@@ -63,9 +71,12 @@ class AppProviders extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           // Không tải ngay: tiến độ nằm dưới users/{uid}, nên AuthGate gọi
-          // loadProgress() sau khi đã có người dùng.
-          create: (_) => ProgressProvider(
+          // loadProgress() sau khi đã có người dùng. Mỗi lần trả lời một thẻ
+          // được tính là một ngày học trong chuỗi ngày liên tiếp.
+          create: (context) => ProgressProvider(
             progressRepository ?? FirestoreProgressRepository(),
+            onStudyActivity:
+                context.read<UserProfileProvider>().recordStudyActivity,
           ),
         ),
       ],
