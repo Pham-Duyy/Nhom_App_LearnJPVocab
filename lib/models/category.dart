@@ -4,12 +4,14 @@ import 'learning_content.dart';
 /// chung (getName, matches, toString...) kế thừa từ [LearningContent].
 class Category extends LearningContent {
   final String? imageUrl;
+  final String jlptLevel;
 
   const Category({
     required String id,
     required String name,
     required String description,
     this.imageUrl,
+    this.jlptLevel = 'N5',
     required int order,
     bool isPublished = true,
   }) : super(
@@ -25,6 +27,7 @@ class Category extends LearningContent {
     String? name,
     String? description,
     String? imageUrl,
+    String? jlptLevel,
     int? order,
     bool? isPublished,
   }) {
@@ -33,6 +36,7 @@ class Category extends LearningContent {
       name: name ?? this.name,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      jlptLevel: jlptLevel ?? this.jlptLevel,
       order: order ?? this.order,
       isPublished: isPublished ?? this.isPublished,
     );
@@ -44,6 +48,7 @@ class Category extends LearningContent {
         'name': name,
         'description': description,
         'imageUrl': imageUrl,
+        'jlptLevel': jlptLevel,
         'order': order,
         'isPublished': isPublished,
       };
@@ -53,6 +58,7 @@ class Category extends LearningContent {
         name: map['name'] as String,
         description: map['description'] as String,
         imageUrl: map['imageUrl'] as String?,
+        jlptLevel: map['jlptLevel'] as String? ?? 'N5',
         order: map['order'] as int,
         isPublished: map['isPublished'] as bool? ?? true,
       );

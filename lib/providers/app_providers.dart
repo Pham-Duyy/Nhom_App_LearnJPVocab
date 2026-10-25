@@ -5,9 +5,11 @@ import '../data/mock/mock_learning_data.dart';
 import '../repositories/mock/mock_category_repository.dart';
 import '../repositories/mock/mock_progress_repository.dart';
 import '../repositories/mock/mock_vocabulary_repository.dart';
+import 'app_settings_provider.dart';
 import 'lesson_provider.dart';
 import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
+import 'user_profile_provider.dart';
 import 'vocabulary_provider.dart';
 
 /// Khởi tạo repository (hiện là bản mock) và các Provider dùng chung cho
@@ -22,12 +24,14 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
         ChangeNotifierProvider(create: (_) => MainNavigationProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProvider(
           // Tải danh sách chủ đề ngay khi tạo, cùng lý do với ProgressProvider
           // bên dưới; nhờ vậy CategoryScreen không cần initState.
-          create: (_) => LessonProvider(MockCategoryRepository())
-            ..loadCategories(),
+          create: (_) =>
+              LessonProvider(MockCategoryRepository())..loadCategories(),
         ),
         ChangeNotifierProvider(
           create: (_) => VocabularyProvider(MockVocabularyRepository()),

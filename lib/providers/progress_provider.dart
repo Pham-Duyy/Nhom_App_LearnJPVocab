@@ -8,6 +8,8 @@ import '../repositories/progress_repository.dart';
 class ProgressProvider extends ChangeNotifier {
   ProgressProvider(this._repository);
 
+  static const dailyGoal = 10;
+
   final ProgressRepository _repository;
 
   List<Progress> _progressList = [];
@@ -19,6 +21,19 @@ class ProgressProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   int get totalLearned => _progressList.where((p) => p.isLearned).length;
+
+  int get favoriteCount => _progressList.where((p) => p.isFavorite).length;
+
+  int getReviewedTodayCount([DateTime? now]) {
+    final reference = now ?? DateTime.now();
+    return _progressList.where((p) {
+      final reviewedAt = p.lastReviewedAt;
+      return reviewedAt != null &&
+          reviewedAt.year == reference.year &&
+          reviewedAt.month == reference.month &&
+          reviewedAt.day == reference.day;
+    }).length;
+  }
 
   List<Progress> getDueForReview([DateTime? now]) {
     final reference = now ?? DateTime.now();

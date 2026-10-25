@@ -7,6 +7,14 @@ class Progress {
     5: 30,
   };
 
+  static const Map<int, String> levelLabels = {
+    1: 'Mới học',
+    2: 'Đang nhớ',
+    3: 'Đã nhớ',
+    4: 'Nhớ tốt',
+    5: 'Nhớ vững',
+  };
+
   final String vocabularyId;
   final int memoryLevel;
   final int correctCount;
@@ -28,6 +36,8 @@ class Progress {
     this.lastReviewedAt,
     this.nextReviewAt,
   }) : assert(memoryLevel >= 1 && memoryLevel <= 5);
+
+  String get levelLabel => levelLabels[memoryLevel]!;
 
   Progress copyWith({
     String? vocabularyId,
