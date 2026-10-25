@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Nội dung học: mọi người dùng đã đăng nhập (kể cả ẩn danh) được đọc,
+    // không ai được ghi từ app. Sửa nội dung qua Firebase Console.
+    match /categories/{categoryId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /lessons/{lessonId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /vocabularies/{vocabularyId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Dữ liệu cá nhân (tiến độ học...): chỉ chính chủ được đọc và ghi.
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

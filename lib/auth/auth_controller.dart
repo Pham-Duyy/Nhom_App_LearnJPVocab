@@ -91,6 +91,9 @@ class AuthController extends ChangeNotifier {
       case 'network-request-failed':
         return 'Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
       case 'operation-not-allowed':
+      // Firebase trả mã này thay cho operation-not-allowed khi project chưa
+      // bật nhà cung cấp Anonymous.
+      case 'admin-restricted-operation':
         return 'Đăng nhập ẩn danh chưa được bật trong Firebase.';
       case 'too-many-requests':
         return 'Có quá nhiều yêu cầu. Vui lòng thử lại sau.';

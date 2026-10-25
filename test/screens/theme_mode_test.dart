@@ -1,17 +1,14 @@
-import 'package:chibakanji/app.dart';
-import 'package:chibakanji/providers/app_providers.dart';
 import 'package:chibakanji/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../helpers/test_app.dart';
 
 void main() {
   testWidgets('chọn Giao diện Tối ở Cá nhân thì cả app chuyển sang nền tối', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      const AppProviders(child: ChibaKanjiApp(showWelcome: false)),
-    );
-    await tester.pumpAndSettle();
+    await pumpTestApp(tester);
 
     await tester.tap(find.text('Cá nhân'));
     await tester.pumpAndSettle();

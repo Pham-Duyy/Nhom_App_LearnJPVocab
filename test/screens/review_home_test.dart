@@ -1,16 +1,14 @@
-import 'package:chibakanji/app.dart';
-import 'package:chibakanji/providers/app_providers.dart';
 import 'package:chibakanji/widgets/memory_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../helpers/test_app.dart';
 
 void main() {
   testWidgets('trang chủ hiển thị đúng thống kê từ ProgressProvider', (
     tester,
   ) async {
-    await tester.pumpWidget(
-        const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
-    await tester.pumpAndSettle();
+    await pumpTestApp(tester);
 
     expect(find.text('9 từ vựng'), findsOneWidget);
     expect(find.text('3 từ đến hạn · Khoảng 2 phút'), findsOneWidget);
@@ -22,9 +20,7 @@ void main() {
   testWidgets(
     'nhấn Bắt đầu ôn tập chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
     (tester) async {
-      await tester.pumpWidget(
-          const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
-      await tester.pumpAndSettle();
+      await pumpTestApp(tester);
 
       await tester.tap(find.text('Bắt đầu ôn tập'));
       await tester.pumpAndSettle();

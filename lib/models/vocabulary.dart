@@ -31,6 +31,35 @@ class Vocabulary extends LearningContent {
 
   String get meaning => description;
 
+  /// Factory tiện lợi giúp thêm từ vựng mới nhanh chóng mà không cần truyền id/order dài dòng
+  factory Vocabulary.create({
+    String? id,
+    String lessonId = 'les_school_2',
+    required String kanji,
+    required String kana,
+    required String romaji,
+    required String meaning,
+    String exampleJapanese = '',
+    String exampleVietnamese = '',
+    String? audioUrl,
+    String jlptLevel = 'N5',
+    int order = 1,
+  }) {
+    return Vocabulary(
+      id: id ?? 'v_${DateTime.now().microsecondsSinceEpoch}',
+      lessonId: lessonId,
+      kanji: kanji,
+      kana: kana,
+      romaji: romaji,
+      meaning: meaning,
+      exampleJapanese: exampleJapanese,
+      exampleVietnamese: exampleVietnamese,
+      audioUrl: audioUrl,
+      jlptLevel: jlptLevel,
+      order: order,
+    );
+  }
+
   Vocabulary copyWith({
     String? id,
     String? lessonId,

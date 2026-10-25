@@ -1,14 +1,13 @@
-import 'package:chibakanji/app.dart';
-import 'package:chibakanji/providers/app_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../helpers/test_app.dart';
 
 void main() {
   testWidgets(
     'LessonScreen lấy tên chủ đề làm tiêu đề, thẻ hiện thêm số từ và cấp độ',
     (tester) async {
-      await tester.pumpWidget(
-          const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
+      await pumpTestApp(tester);
 
       await tester.tap(find.text('Học mới'));
       await tester.pumpAndSettle();

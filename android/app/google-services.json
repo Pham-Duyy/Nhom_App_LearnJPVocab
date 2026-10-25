@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1054912720031",
+    "project_id": "csdlck",
+    "storage_bucket": "csdlck.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054912720031:android:1e8feb589ba0758dbb46aa",
+        "android_client_info": {
+          "package_name": "com.phamduy.chibakanji"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArt4fHqpKtFvfFbRgc5I4jzvCo8cJi-zc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

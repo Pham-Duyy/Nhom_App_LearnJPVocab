@@ -9,6 +9,7 @@ import '../../widgets/brand_logo.dart';
 import '../../widgets/chibi_mascot.dart';
 import '../../widgets/segmented_tabs.dart';
 import '../common/generic_screen.dart';
+import '../auth_gate.dart';
 import '../main_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -60,7 +61,9 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
     }
     context.read<MainNavigationProvider>().goHome();
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const MainScreen()),
+      MaterialPageRoute(
+        builder: (_) => const AuthGate(child: MainScreen()),
+      ),
       (_) => false,
     );
   }

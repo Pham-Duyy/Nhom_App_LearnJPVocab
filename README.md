@@ -104,7 +104,7 @@ flutter test
 - [x] Giao diện Sổ từ
 - [x] Giao diện Cá nhân
 - [x] Thiết kế và sơ đồ luồng công việc
-- [ ] Firebase Authentication và Cloud Firestore
+- [x] Firebase Authentication và Cloud Firestore
 - [ ] Quiz và kết quả quiz
 - [ ] Thông báo nhắc học
 
