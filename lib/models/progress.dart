@@ -1,8 +1,3 @@
-/// Tiến độ ghi nhớ của một từ vựng theo thuật toán lặp lại ngắt quãng
-/// (spaced repetition) 5 mức. `lastReviewedAt`/`nextReviewAt` được lưu dưới
-/// dạng [DateTime] và chuyển sang ISO-8601 String trong [toMap]/[fromMap] để
-/// dữ liệu mock hoạt động độc lập; khi chuyển sang Firestore, chỉ cần đổi
-/// phần đọc/ghi hai trường này sang Timestamp mà không phải sửa model.
 class Progress {
   static const Map<int, int> reviewIntervalDays = {
     1: 1,
@@ -58,7 +53,7 @@ class Progress {
     );
   }
 
-  /// Trả lời đúng: tăng mức ghi nhớ (tối đa 5) và giãn lịch ôn tiếp theo.
+  // Trả lời đúng: tăng mức ghi nhớ (tối đa 5) và giãn lịch ôn tiếp theo.
   Progress markCorrect() {
     final newLevel = memoryLevel < 5 ? memoryLevel + 1 : 5;
     final now = DateTime.now();
@@ -72,8 +67,8 @@ class Progress {
     );
   }
 
-  /// Trả lời sai: quay về mức 1, ôn lại sớm nhất. Từ đã được nhìn thấy và
-  /// trả lời (dù sai) vẫn tính là đã học, nên vẫn đánh dấu isLearned.
+  // Trả lời sai: quay về mức 1, ôn lại sớm nhất. Từ đã được nhìn thấy và
+  // trả lời (dù sai) vẫn tính là đã học, nên vẫn đánh dấu isLearned.
   Progress markWrong() {
     final now = DateTime.now();
     return copyWith(
@@ -86,7 +81,7 @@ class Progress {
     );
   }
 
-  /// Từ chưa từng được ôn (`nextReviewAt` null) luôn coi là đến hạn.
+  // Từ chưa từng được ôn (`nextReviewAt` null) luôn coi là đến hạn.
   bool isDueForReview([DateTime? now]) {
     if (nextReviewAt == null) return true;
     final reference = now ?? DateTime.now();
