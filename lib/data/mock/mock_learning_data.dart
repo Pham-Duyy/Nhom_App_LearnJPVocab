@@ -85,9 +85,9 @@ class MockLearningData {
     ),
   ];
 
-  static const List<Vocabulary> vocabulary = [
+  static final List<Vocabulary> _vocabulary = [
     // les_greetings_1 — Chào hỏi cơ bản
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_1',
       lessonId: 'les_greetings_1',
       kanji: '',
@@ -99,7 +99,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_2',
       lessonId: 'les_greetings_1',
       kanji: '',
@@ -111,7 +111,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_3',
       lessonId: 'les_greetings_1',
       kanji: '',
@@ -123,7 +123,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_4',
       lessonId: 'les_greetings_1',
       kanji: '',
@@ -135,7 +135,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_5',
       lessonId: 'les_greetings_1',
       kanji: '',
@@ -149,7 +149,7 @@ class MockLearningData {
     ),
 
     // les_greetings_2 — Giao tiếp hằng ngày
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_6',
       lessonId: 'les_greetings_2',
       kanji: '',
@@ -161,7 +161,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_7',
       lessonId: 'les_greetings_2',
       kanji: '元気',
@@ -173,7 +173,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_8',
       lessonId: 'les_greetings_2',
       kanji: '名前',
@@ -185,7 +185,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_9',
       lessonId: 'les_greetings_2',
       kanji: '学生',
@@ -197,7 +197,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_greet_10',
       lessonId: 'les_greetings_2',
       kanji: '先生',
@@ -211,7 +211,7 @@ class MockLearningData {
     ),
 
     // les_family_1 — Thành viên gia đình
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_1',
       lessonId: 'les_family_1',
       kanji: '家族',
@@ -223,7 +223,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_2',
       lessonId: 'les_family_1',
       kanji: '父',
@@ -235,7 +235,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_3',
       lessonId: 'les_family_1',
       kanji: '母',
@@ -247,7 +247,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_4',
       lessonId: 'les_family_1',
       kanji: '兄',
@@ -259,7 +259,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_5',
       lessonId: 'les_family_1',
       kanji: '妹',
@@ -273,7 +273,7 @@ class MockLearningData {
     ),
 
     // les_family_2 — Con người và ngoại hình
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_6',
       lessonId: 'les_family_2',
       kanji: '友達',
@@ -285,7 +285,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_7',
       lessonId: 'les_family_2',
       kanji: '子供',
@@ -297,7 +297,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_8',
       lessonId: 'les_family_2',
       kanji: '男の人',
@@ -309,7 +309,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_9',
       lessonId: 'les_family_2',
       kanji: '女の人',
@@ -321,7 +321,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_family_10',
       lessonId: 'les_family_2',
       kanji: '背が高い',
@@ -335,7 +335,7 @@ class MockLearningData {
     ),
 
     // les_school_1 — Đồ dùng học tập
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_1',
       lessonId: 'les_school_1',
       kanji: '本',
@@ -347,7 +347,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_2',
       lessonId: 'les_school_1',
       kanji: '鉛筆',
@@ -359,7 +359,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_3',
       lessonId: 'les_school_1',
       kanji: '教科書',
@@ -371,7 +371,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_4',
       lessonId: 'les_school_1',
       kanji: '机',
@@ -383,7 +383,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_5',
       lessonId: 'les_school_1',
       kanji: '椅子',
@@ -397,7 +397,7 @@ class MockLearningData {
     ),
 
     // les_school_2 — Cuộc sống hằng ngày
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_6',
       lessonId: 'les_school_2',
       kanji: '学校',
@@ -409,7 +409,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 1,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_7',
       lessonId: 'les_school_2',
       kanji: '勉強する',
@@ -421,7 +421,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 2,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_8',
       lessonId: 'les_school_2',
       kanji: '宿題',
@@ -433,7 +433,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 3,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_9',
       lessonId: 'les_school_2',
       kanji: '忙しい',
@@ -445,7 +445,7 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 4,
     ),
-    Vocabulary(
+    const Vocabulary(
       id: 'v_school_10',
       lessonId: 'les_school_2',
       kanji: '楽しい',
@@ -458,6 +458,44 @@ class MockLearningData {
       order: 5,
     ),
   ];
+
+  /// Danh sách từ vựng hiện tại (dùng cho học mới và ôn tập)
+  static List<Vocabulary> get vocabulary => _vocabulary;
+
+  /// Hàm tiện ích để thêm một từ vựng mới vào dữ liệu học / ôn tập.
+  /// Bạn có thể gọi hàm này từ bất kỳ đâu để thêm từ mới.
+  static Vocabulary addWord({
+    String? id,
+    String lessonId = 'les_school_2',
+    required String kanji,
+    required String kana,
+    required String romaji,
+    required String meaning,
+    String exampleJapanese = '',
+    String exampleVietnamese = '',
+    String jlptLevel = 'N5',
+    int? order,
+  }) {
+    final word = Vocabulary(
+      id: id ?? 'v_custom_${DateTime.now().microsecondsSinceEpoch}',
+      lessonId: lessonId,
+      kanji: kanji,
+      kana: kana,
+      romaji: romaji,
+      meaning: meaning,
+      exampleJapanese: exampleJapanese,
+      exampleVietnamese: exampleVietnamese,
+      jlptLevel: jlptLevel,
+      order: order ?? (_vocabulary.length + 1),
+    );
+    _vocabulary.add(word);
+    return word;
+  }
+
+  /// Hàm tiện ích để thêm nhiều từ vựng mới cùng lúc
+  static void addWords(List<Vocabulary> words) {
+    _vocabulary.addAll(words);
+  }
 
   /// Sinh 9 Progress mẫu (phân bố mức 3-3-1-1-1, tất cả đã học) để trang chủ
   /// và phiên ôn tập có dữ liệu ngay khi mở app, trước khi có Firestore.

@@ -24,7 +24,7 @@ void main() {
     expect(find.text('Xin chào (ban ngày)'), findsNothing);
 
     await tester.tap(find.text('こんにちは'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Xin chào (ban ngày)'), findsOneWidget);
   });

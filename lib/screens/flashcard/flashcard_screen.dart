@@ -6,7 +6,7 @@ import '../../providers/progress_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
-import '../../widgets/app_card.dart';
+import '../../widgets/flashcard_widget.dart';
 import 'learning_result_screen.dart';
 
 /// Học từ vựng bằng flashcard. Dùng chung cho phiên học theo bài
@@ -30,8 +30,6 @@ class FlashcardScreen extends StatefulWidget {
 }
 
 class _FlashcardScreenState extends State<FlashcardScreen> {
-  bool _showBack = false;
-
   // Chặn bấm đúp trong lúc markCorrect()/markWrong() đang chờ lưu — nếu
   // không, một cú bấm kép có thể lưu một từ hai lần, nhảy qua từ tiếp theo,
   // sai số liệu phiên, hoặc mở màn hình kết quả nhiều lần.
@@ -83,7 +81,6 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     vocabularyProvider.nextCard();
     setState(() {
       _isSubmitting = false;
-      _showBack = false;
     });
 
     if (vocabularyProvider.sessionStatus == LearningSessionStatus.completed) {
@@ -141,9 +138,9 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                 ),
                 const SizedBox(height: 20),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _showBack = !_showBack),
-                    child: _FlashcardFace(word: word, showBack: _showBack),
+                  child: FlashcardWidget(
+                    key: ValueKey(word.id),
+                    word: word,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -187,71 +184,3 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   }
 }
 
-class _FlashcardFace extends StatelessWidget {
-  const _FlashcardFace({
-    Key? key,
-    required this.word,
-    required this.showBack,
-  }) : super(key: key);
-
-  final Vocabulary word;
-  final bool showBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      radius: AppRadius.cardLarge,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(child: showBack ? _buildBack() : _buildFront()),
-      ),
-    );
-  }
-
-  Widget _buildFront() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (word.kanji.isNotEmpty) ...[
-          Text(
-            word.kanji,
-            style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-        ],
-        Text(word.kana, style: const TextStyle(fontSize: 24)),
-        const SizedBox(height: 4),
-        Text(
-          word.romaji,
-          style: const TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Chạm để xem nghĩa',
-          style: TextStyle(fontSize: 13, color: Colors.grey),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBack() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          word.meaning,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        Text(word.exampleJapanese, textAlign: TextAlign.center),
-        const SizedBox(height: 6),
-        Text(
-          word.exampleVietnamese,
-          style: const TextStyle(color: Colors.grey),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
