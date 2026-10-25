@@ -1,29 +1,35 @@
-class Vocabulary {
-  final String id;
+import 'learning_content.dart';
+
+class Vocabulary extends LearningContent {
   final String lessonId;
   final String kanji;
   final String kana;
   final String romaji;
-  final String meaning;
   final String exampleJapanese;
   final String exampleVietnamese;
   final String? audioUrl;
   final String jlptLevel;
-  final int order;
 
   const Vocabulary({
-    required this.id,
+    required String id,
     required this.lessonId,
     required this.kanji,
     required this.kana,
     required this.romaji,
-    required this.meaning,
+    required String meaning,
     required this.exampleJapanese,
     required this.exampleVietnamese,
     this.audioUrl,
     required this.jlptLevel,
-    required this.order,
-  });
+    required int order,
+  }) : super(
+          id: id,
+          name: kanji == '' ? kana : kanji,
+          description: meaning,
+          order: order,
+        );
+
+  String get meaning => description;
 
   /// Factory tiện lợi giúp thêm từ vựng mới nhanh chóng mà không cần truyền id/order dài dòng
   factory Vocabulary.create({
@@ -83,15 +89,16 @@ class Vocabulary {
   }
 
   /// Tìm kiếm không phân biệt hoa thường theo kanji, kana, romaji hoặc nghĩa.
+  @override
   bool matches(String keyword) {
+    if (super.matches(keyword)) return true;
     final lower = keyword.toLowerCase().trim();
     if (lower.isEmpty) return false;
-    return kanji.toLowerCase().contains(lower) ||
-        kana.toLowerCase().contains(lower) ||
-        romaji.toLowerCase().contains(lower) ||
-        meaning.toLowerCase().contains(lower);
+    return kana.toLowerCase().contains(lower) ||
+        romaji.toLowerCase().contains(lower);
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'lessonId': lessonId,

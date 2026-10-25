@@ -84,4 +84,48 @@ void main() {
 
     expect(find.text('Từ 2/5'), findsOneWidget);
   });
+
+  testWidgets('vuốt thẻ sang phải đủ xa thì tính là Đã nhớ', (tester) async {
+    await _openFirstLesson(tester);
+
+    await tester.timedDrag(
+      find.text('こんにちは'),
+      const Offset(320, 0),
+      const Duration(milliseconds: 400),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Từ 2/5'), findsOneWidget);
+    expect(find.text('1 nhớ · 0 cần ôn'), findsOneWidget);
+  });
+
+  testWidgets('vuốt sang trái đủ xa thì tính là Chưa nhớ', (tester) async {
+    await _openFirstLesson(tester);
+
+    await tester.timedDrag(
+      find.text('こんにちは'),
+      const Offset(-320, 0),
+      const Duration(milliseconds: 400),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Từ 2/5'), findsOneWidget);
+    expect(find.text('0 nhớ · 1 cần ôn'), findsOneWidget);
+  });
+
+  testWidgets('vuốt ngắn thì thẻ quay về chỗ cũ, không chấm điểm', (
+    tester,
+  ) async {
+    await _openFirstLesson(tester);
+
+    await tester.timedDrag(
+      find.text('こんにちは'),
+      const Offset(50, 0),
+      const Duration(milliseconds: 600),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Từ 1/5'), findsOneWidget);
+    expect(find.text('0 nhớ · 0 cần ôn'), findsOneWidget);
+  });
 }

@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/category.dart';
+import '../../providers/lesson_provider.dart';
+import '../../providers/main_navigation_provider.dart';
 import '../../providers/progress_provider.dart';
+import '../../providers/user_profile_provider.dart';
 import '../../providers/vocabulary_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/brand_logo.dart';
+import '../../widgets/chibi_mascot.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
+import '../../widgets/skeleton.dart';
+import '../../widgets/streak_chip.dart';
+import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
+import '../lesson/category_progress.dart';
+import '../lesson/category_screen.dart';
 
 class ReviewHomePage extends StatefulWidget {
   const ReviewHomePage({Key? key}) : super(key: key);
@@ -16,7 +28,7 @@ class ReviewHomePage extends StatefulWidget {
   State<ReviewHomePage> createState() => _ReviewHomePageState();
 }
 
-class _ReviewHomePageState extends State<ReviewHomePage> {
+class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
   // Khoá nút "Ôn ngay" trong lúc loadReviewWords() đang chờ, để tránh bấm
   // nhiều lần mở nhiều phiên ôn tập chồng lên nhau.
   bool _isStartingReview = false;
@@ -61,15 +73,52 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
     );
   }
 
+  ChibiMood _moodFor(ProgressProvider provider) {
+    if (provider.isLoading) return ChibiMood.neutral;
+    if (provider.getReviewedTodayCount() >= ProgressProvider.dailyGoal) {
+      return ChibiMood.happy;
+    }
+    if (provider.getDueForReview().isEmpty) return ChibiMood.sleepy;
+    return ChibiMood.neutral;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  String getTitle(BuildContext context) => 'Ôn tập';
+
+  @override
+  bool get showAppBar => false;
+
+  @override
+  Widget buildBody(BuildContext context) {
     final progressProvider = context.watch<ProgressProvider>();
+    final displayName = context.watch<UserProfileProvider>().displayName;
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.page),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.page,
+        16,
+        AppSpacing.page,
+        28,
+      ),
       children: [
-        const GreetingSection(),
-        const SizedBox(height: 24),
+        const Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: BrandLogo(),
+              ),
+            ),
+            SizedBox(width: 12),
+            StreakChip(days: 7),
+          ],
+        ),
+        const SizedBox(height: 36),
+        GreetingSection(
+          name: displayName,
+          mood: _moodFor(progressProvider),
+        ),
+        const SizedBox(height: 28),
         _buildProgressSection(progressProvider),
       ],
     );
@@ -77,9 +126,14 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
 
   Widget _buildProgressSection(ProgressProvider provider) {
     if (provider.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(child: CircularProgressIndicator()),
+      return const Shimmer(
+        child: Column(
+          children: [
+            SkeletonBox(height: 220, radius: 24),
+            SizedBox(height: 20),
+            SkeletonBox(height: 260, radius: 22),
+          ],
+        ),
       );
     }
 
@@ -102,7 +156,15 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
     final estimatedMinutes = dueCount == 0 ? 0 : (dueCount / 2).ceil();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        ReviewCard(
+          dueCount: dueCount,
+          estimatedMinutes: estimatedMinutes,
+          isLoading: _isStartingReview,
+          onReview: () => _startReview(provider),
+        ),
+        const SizedBox(height: 20),
         MemoryCard(
           totalLearned: provider.totalLearned,
           levelCounts: [
@@ -112,15 +174,115 @@ class _ReviewHomePageState extends State<ReviewHomePage> {
             provider.getCountForLevel(4),
             provider.getCountForLevel(5),
           ],
+          onViewAll: () => context.read<MainNavigationProvider>().selectTab(2),
         ),
-        const SizedBox(height: 16),
-        ReviewCard(
-          dueCount: dueCount,
-          estimatedMinutes: estimatedMinutes,
-          isLoading: _isStartingReview,
-          onReview: () => _startReview(provider),
-        ),
+        const SizedBox(height: 32),
+        _buildDailyGoal(provider),
       ],
+    );
+  }
+
+  Widget _buildDailyGoal(ProgressProvider provider) {
+    final palette = context.palette;
+    final lessonProvider = context.watch<LessonProvider>();
+    final nextCategory = findNextCategory(
+      lessonProvider.categories,
+      provider.progressList,
+    );
+    final reviewedToday = provider.getReviewedTodayCount();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: Text(
+                'Mục tiêu hôm nay',
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+              decoration: BoxDecoration(
+                color: palette.lavenderSurface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$reviewedToday / ${ProgressProvider.dailyGoal} từ',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: palette.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (nextCategory != null) ...[
+          const SizedBox(height: 14),
+          _ContinueLearningTile(
+            category: nextCategory,
+            onTap: () => openCategory(context, nextCategory),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ContinueLearningTile extends StatelessWidget {
+  const _ContinueLearningTile({required this.category, required this.onTap});
+
+  final Category category;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Material(
+      color: palette.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        side: BorderSide(color: palette.cardBorder),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: palette.lavenderSurface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(Icons.spa_outlined, color: palette.label),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tiếp tục học từ mới',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(category.name, style: palette.body),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: palette.textPrimary),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

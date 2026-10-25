@@ -1,24 +1,29 @@
+import 'learning_content.dart';
+
 /// Một bài kiểm tra gắn với một [Lesson]. Danh sách câu hỏi nằm ở [Question]
 /// (theo quizId), không nhúng trong Quiz, để khớp cách tổ chức collection
 /// riêng trên Firestore sau này.
-class Quiz {
-  final String id;
+class Quiz extends LearningContent {
   final String lessonId;
-  final String title;
-  final String description;
   final int questionCount;
-  final int order;
-  final bool isPublished;
 
   const Quiz({
-    required this.id,
+    required String id,
     required this.lessonId,
-    required this.title,
-    required this.description,
+    required String title,
+    required String description,
     this.questionCount = 0,
-    required this.order,
-    this.isPublished = true,
-  });
+    required int order,
+    bool isPublished = true,
+  }) : super(
+          id: id,
+          name: title,
+          description: description,
+          order: order,
+          isPublished: isPublished,
+        );
+
+  String get title => name;
 
   Quiz copyWith({
     String? id,
@@ -40,6 +45,7 @@ class Quiz {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'lessonId': lessonId,
@@ -59,7 +65,4 @@ class Quiz {
         order: map['order'] as int,
         isPublished: map['isPublished'] as bool? ?? true,
       );
-
-  @override
-  String toString() => 'Quiz($title)';
 }

@@ -9,16 +9,23 @@ import '../repositories/category_repository.dart';
 class LessonProvider extends ChangeNotifier {
   LessonProvider(this._repository);
 
+  static const jlptLevels = ['N5', 'N4', 'N3'];
+
   final CategoryRepository _repository;
 
   List<Category> _categories = [];
   List<Lesson> _lessons = [];
   Category? _selectedCategory;
   Lesson? _selectedLesson;
+  String _selectedLevel = jlptLevels.first;
   bool _isLoading = false;
   String? _errorMessage;
 
   List<Category> get categories => _categories;
+  String get selectedLevel => _selectedLevel;
+  List<Category> get categoriesForSelectedLevel => _categories
+      .where((category) => category.jlptLevel == _selectedLevel)
+      .toList();
   List<Lesson> get lessons => _lessons;
   Category? get selectedCategory => _selectedCategory;
   Lesson? get selectedLesson => _selectedLesson;
@@ -56,6 +63,12 @@ class LessonProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void selectLevel(String level) {
+    if (level == _selectedLevel) return;
+    _selectedLevel = level;
+    notifyListeners();
   }
 
   void selectLesson(Lesson lesson) {

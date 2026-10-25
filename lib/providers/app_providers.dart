@@ -10,9 +10,11 @@ import '../repositories/firestore/firestore_progress_repository.dart';
 import '../repositories/firestore/firestore_vocabulary_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/vocabulary_repository.dart';
+import 'app_settings_provider.dart';
 import 'lesson_provider.dart';
 import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
+import 'user_profile_provider.dart';
 import 'vocabulary_provider.dart';
 
 /// Khởi tạo xác thực, repository và các Provider dùng chung cho toàn bộ
@@ -38,15 +40,18 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AppSettingsProvider()),
         ChangeNotifierProvider(
           // initialize() an toàn khi gọi ở đây vì chưa có widget nào lắng
           // nghe, nên notifyListeners() bên trong không chạm vào build nào.
-          create: (_) =>
-              AuthController(authService ?? FirebaseAuthService())
-                ..initialize(),
+          create: (_) => AuthController(authService ?? FirebaseAuthService())
+            ..initialize(),
         ),
         ChangeNotifierProvider(create: (_) => MainNavigationProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProvider(
+          // Không tải ngay: Firestore chỉ cho đọc chủ đề khi đã đăng nhập,
+          // nên AuthGate gọi loadCategories() sau khi đã có người dùng.
           create: (_) => LessonProvider(
             categoryRepository ?? FirestoreCategoryRepository(),
           ),

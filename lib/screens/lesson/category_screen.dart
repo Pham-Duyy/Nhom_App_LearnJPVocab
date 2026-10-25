@@ -3,100 +3,208 @@ import 'package:provider/provider.dart';
 
 import '../../models/category.dart';
 import '../../providers/lesson_provider.dart';
+import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
-import '../../widgets/app_card.dart';
+import '../../widgets/animated_progress_bar.dart';
+import '../../widgets/chibi_mascot.dart';
+import '../../widgets/segmented_tabs.dart';
+import '../../widgets/tab_header.dart';
+import '../common/generic_list_screen.dart';
+import 'category_progress.dart';
 import 'lesson_screen.dart';
 
-/// Màn hình đầu tiên của luồng "Học mới": hiển thị danh sách chủ đề.
-class CategoryScreen extends StatefulWidget {
+Future<void> openCategory(BuildContext context, Category category) async {
+  await context.read<LessonProvider>().selectCategory(category);
+  if (!context.mounted) return;
+  Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => const LessonScreen()),
+  );
+}
+
+class CategoryScreen extends GenericListScreen<Category> {
   const CategoryScreen({Key? key}) : super(key: key);
 
-  @override
-  State<CategoryScreen> createState() => _CategoryScreenState();
-}
+  static const _topicIcons = [
+    Icons.chat_bubble_outline_rounded,
+    Icons.people_outline_rounded,
+    Icons.school_outlined,
+  ];
 
-class _CategoryScreenState extends State<CategoryScreen> {
   @override
-  void initState() {
-    super.initState();
-    // loadCategories() gọi notifyListeners() ngay khi bắt đầu; gọi thẳng
-    // trong initState sẽ rơi vào lúc widget đang build, nên phải đợi qua
-    // frame đầu tiên.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LessonProvider>().loadCategories();
-    });
+  String getTitle(BuildContext context) => 'Học mới';
+
+  @override
+  bool get showAppBar => false;
+
+  @override
+  List<Category> getItems(BuildContext context) =>
+      context.watch<LessonProvider>().categoriesForSelectedLevel;
+
+  @override
+  bool isLoading(BuildContext context) =>
+      context.watch<LessonProvider>().isLoading;
+
+  @override
+  String? getErrorMessage(BuildContext context) =>
+      context.watch<LessonProvider>().errorMessage;
+
+  @override
+  String get emptyMessage => 'Chủ đề ở cấp độ này đang được biên soạn.';
+
+  @override
+  void onRetry(BuildContext context) {
+    context.read<LessonProvider>().loadCategories();
   }
 
-  Future<void> _openCategory(Category category) async {
-    final provider = context.read<LessonProvider>();
-    await provider.selectCategory(category);
-    if (!mounted) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const LessonScreen()),
-    );
-  }
+  @override
+  Future<void> onItemTap(BuildContext context, Category item) =>
+      openCategory(context, item);
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<LessonProvider>(
-      builder: (context, provider, _) {
-        if (provider.isLoading && provider.categories.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+  Widget buildHeader(BuildContext context) {
+    final palette = context.palette;
+    final provider = context.watch<LessonProvider>();
+    const levels = LessonProvider.jlptLevels;
+    final topicCount = provider.categoriesForSelectedLevel.length;
 
-        if (provider.errorMessage != null && provider.categories.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(provider.errorMessage!),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () => provider.loadCategories(),
-                  child: const Text('Thử lại'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const TabHeader(
+          label: 'HỌC TỪ VỰNG',
+          title: 'Học mới',
+          subtitle: 'Chọn cấp độ và chủ đề để bắt đầu.',
+        ),
+        const SizedBox(height: 24),
+        SegmentedTabs(
+          labels: levels,
+          selectedIndex: levels.indexOf(provider.selectedLevel),
+          showCheck: true,
+          onChanged: (index) => provider.selectLevel(levels[index]),
+        ),
+        const SizedBox(height: 28),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Chủ đề ${provider.selectedLevel}',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
+              ),
             ),
-          );
-        }
-
-        return ListView.separated(
-          padding: const EdgeInsets.all(AppSpacing.page),
-          itemCount: provider.categories.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final category = provider.categories[index];
-            return _CategoryCard(
-              category: category,
-              onTap: () => _openCategory(category),
-            );
-          },
-        );
-      },
+            Text(
+              '$topicCount chủ đề',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
-}
-
-class _CategoryCard extends StatelessWidget {
-  const _CategoryCard({
-    Key? key,
-    required this.category,
-    required this.onTap,
-  }) : super(key: key);
-
-  final Category category;
-  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(category.name, style: AppTextStyles.cardTitle),
-        subtitle: Text(category.description),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.primary),
-        onTap: onTap,
+  Widget buildEmptyState(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const ChibiMascot(size: 120, mood: ChibiMood.sleepy),
+        const SizedBox(height: 16),
+        Text(
+          emptyMessage,
+          textAlign: TextAlign.center,
+          style: context.palette.body,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget buildSeparator(BuildContext context) => const Divider();
+
+  @override
+  Widget buildItem(BuildContext context, Category item) {
+    final palette = context.palette;
+    final progressList = context.watch<ProgressProvider>().progressList;
+    final categories = getItems(context);
+    final progress = CategoryProgress.of(item, progressList);
+    final isNext = findNextCategory(categories, progressList)?.id == item.id;
+    final paletteIndex =
+        categories.indexOf(item) % palette.topicBackgrounds.length;
+
+    return InkWell(
+      onTap: () => onItemTap(context, item),
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: palette.topicBackgrounds[paletteIndex],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                _topicIcons[paletteIndex % _topicIcons.length],
+                color: palette.topicForegrounds[paletteIndex],
+              ),
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: AppTextStyles.cardTitle.copyWith(fontSize: 17),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(item.description, style: palette.body),
+                  const SizedBox(height: 14),
+                  AnimatedProgressBar(
+                    value: progress.ratio,
+                    color: palette.primarySoft,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${progress.learned} / ${progress.total} từ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: palette.textSecondary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        progress.isComplete
+                            ? 'Ôn lại →'
+                            : isNext
+                                ? 'Tiếp tục học →'
+                                : 'Khám phá →',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isNext ? palette.primary : palette.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

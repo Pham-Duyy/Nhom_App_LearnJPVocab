@@ -12,17 +12,21 @@ import '../fakes/fake_auth_service.dart';
 
 /// Toàn bộ ứng dụng chạy trên dữ liệu mock và một người dùng ẩn danh giả,
 /// không cần Firebase.
-Widget buildTestApp() {
+Widget buildTestApp({
+  bool showWelcome = false,
+  FakeAuthService? authService,
+}) {
   return AppProviders(
-    authService: FakeAuthService(
-      currentUser: const AppAuthUser(uid: 'test-user', isAnonymous: true),
-    ),
+    authService: authService ??
+        FakeAuthService(
+          currentUser: const AppAuthUser(uid: 'test-user', isAnonymous: true),
+        ),
     categoryRepository: MockCategoryRepository(),
     vocabularyRepository: MockVocabularyRepository(),
     progressRepository: MockProgressRepository(
       initialProgress: MockLearningData.createInitialProgress(),
     ),
-    child: const ChibaKanjiApp(),
+    child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }
 

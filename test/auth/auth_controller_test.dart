@@ -147,6 +147,24 @@ void main() {
     expect(service.signInCallCount, 0, reason: 'không tự đăng nhập lại');
   });
 
+  test('signOut gọi service, chuyển unauthenticated, retry tạo khách mới',
+      () async {
+    final service = FakeAuthService(currentUser: existingUser);
+    final controller = AuthController(service);
+    await controller.initialize();
+
+    await controller.signOut();
+    await pumpEventQueue();
+
+    expect(service.signOutCallCount, 1);
+    expect(controller.status, AuthStatus.unauthenticated);
+
+    await controller.retry();
+
+    expect(controller.status, AuthStatus.authenticated);
+    expect(controller.uid, 'anonymous-1');
+  });
+
   test('dispose hủy subscription và không notify sau dispose', () async {
     final service = FakeAuthService();
     final controller = AuthController(service);

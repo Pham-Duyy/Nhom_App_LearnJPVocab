@@ -20,57 +20,62 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final hasDueWords = dueCount > 0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
       decoration: BoxDecoration(
-        color: AppColors.reviewCardBackground,
-        borderRadius: BorderRadius.circular(22),
+        color: palette.lavenderSurface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: palette.lavenderBorder),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text('ÔN TẬP HÔM NAY', style: palette.sectionLabel),
+          const SizedBox(height: 14),
           Text(
-            hasDueWords ? 'Đến giờ ôn rồi!' : 'Bạn đã ôn xong hôm nay!',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            hasDueWords ? 'Đến giờ ôn tập' : 'Bạn đã ôn xong hôm nay!',
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.4,
+            ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 8),
           Text(
             hasDueWords
-                ? '$dueCount từ đang chờ bạn · khoảng $estimatedMinutes phút'
+                ? '$dueCount từ đến hạn · Khoảng $estimatedMinutes phút'
                 : 'Quay lại vào ngày mai nhé.',
+            style: palette.body.copyWith(fontSize: 15),
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: hasDueWords && !isLoading ? onReview : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+          const SizedBox(height: 22),
+          ElevatedButton(
+            onPressed: hasDueWords && !isLoading ? onReview : null,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(60),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Bắt đầu',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
             ),
+            child: isLoading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: palette.onPrimary,
+                    ),
+                  )
+                : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.play_arrow_outlined),
+                      SizedBox(width: 8),
+                      Text('Bắt đầu ôn tập'),
+                    ],
+                  ),
           ),
         ],
       ),

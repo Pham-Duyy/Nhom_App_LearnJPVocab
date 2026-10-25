@@ -1,6 +1,8 @@
 import 'package:chibakanji/auth/auth_controller.dart';
 import 'package:chibakanji/models/progress.dart';
+import 'package:chibakanji/providers/lesson_provider.dart';
 import 'package:chibakanji/providers/progress_provider.dart';
+import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:chibakanji/screens/auth_gate.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +11,18 @@ import 'package:provider/provider.dart';
 
 import '../fakes/fake_auth_service.dart';
 
-Widget _buildGate(FakeAuthService authService, ProgressProvider progress) {
+Widget _buildGate(
+  FakeAuthService authService,
+  ProgressProvider progress, [
+  LessonProvider? lessons,
+]) {
   return MultiProvider(
     providers: [
       ChangeNotifierProvider(
         create: (_) => AuthController(authService)..initialize(),
+      ),
+      ChangeNotifierProvider.value(
+        value: lessons ?? LessonProvider(MockCategoryRepository()),
       ),
       ChangeNotifierProvider.value(value: progress),
     ],
@@ -24,22 +33,24 @@ Widget _buildGate(FakeAuthService authService, ProgressProvider progress) {
 }
 
 void main() {
-  testWidgets('đăng nhập ẩn danh xong thì hiện nội dung và tải tiến độ', (
-    tester,
-  ) async {
+  testWidgets('đăng nhập ẩn danh xong thì hiện nội dung, tải chủ đề và tiến độ',
+      (tester) async {
     final authService = FakeAuthService();
     final progress = ProgressProvider(MockProgressRepository(
       initialProgress: const [Progress(vocabularyId: 'v1', isLearned: true)],
     ));
+    final lessons = LessonProvider(MockCategoryRepository());
 
-    await tester.pumpWidget(_buildGate(authService, progress));
+    await tester.pumpWidget(_buildGate(authService, progress, lessons));
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(lessons.categories, isEmpty);
 
     await tester.pumpAndSettle();
 
     expect(find.text('Nội dung chính'), findsOneWidget);
     expect(authService.signInCallCount, 1);
     expect(progress.totalLearned, 1);
+    expect(lessons.categories, isNotEmpty);
   });
 
   testWidgets('đăng nhập lỗi thì hiện thông báo, bấm Thử lại để vào app', (

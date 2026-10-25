@@ -1,6 +1,3 @@
-/// Kết quả một lần làm [Quiz]. `startedAt`/`completedAt` lưu dưới dạng
-/// ISO-8601 String trong [toMap]/[fromMap], cùng cách với Progress, để sau
-/// này chỉ cần đổi sang Timestamp khi nối Firestore.
 class QuizAttempt {
   final String id;
   final String quizId;

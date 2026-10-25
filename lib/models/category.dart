@@ -1,25 +1,33 @@
-class Category {
-  final String id;
-  final String name;
-  final String description;
+import 'learning_content.dart';
+
+/// Chủ đề học. id, name, description, order, isPublished và các phương thức
+/// chung (getName, matches, toString...) kế thừa từ [LearningContent].
+class Category extends LearningContent {
   final String? imageUrl;
-  final int order;
-  final bool isPublished;
+  final String jlptLevel;
 
   const Category({
-    required this.id,
-    required this.name,
-    required this.description,
+    required String id,
+    required String name,
+    required String description,
     this.imageUrl,
-    required this.order,
-    this.isPublished = true,
-  });
+    this.jlptLevel = 'N5',
+    required int order,
+    bool isPublished = true,
+  }) : super(
+          id: id,
+          name: name,
+          description: description,
+          order: order,
+          isPublished: isPublished,
+        );
 
   Category copyWith({
     String? id,
     String? name,
     String? description,
     String? imageUrl,
+    String? jlptLevel,
     int? order,
     bool? isPublished,
   }) {
@@ -28,16 +36,19 @@ class Category {
       name: name ?? this.name,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      jlptLevel: jlptLevel ?? this.jlptLevel,
       order: order ?? this.order,
       isPublished: isPublished ?? this.isPublished,
     );
   }
 
+  @override
   Map<String, dynamic> toMap() => {
         'id': id,
         'name': name,
         'description': description,
         'imageUrl': imageUrl,
+        'jlptLevel': jlptLevel,
         'order': order,
         'isPublished': isPublished,
       };
@@ -47,10 +58,8 @@ class Category {
         name: map['name'] as String,
         description: map['description'] as String,
         imageUrl: map['imageUrl'] as String?,
+        jlptLevel: map['jlptLevel'] as String? ?? 'N5',
         order: map['order'] as int,
         isPublished: map['isPublished'] as bool? ?? true,
       );
-
-  @override
-  String toString() => 'Category($name)';
 }

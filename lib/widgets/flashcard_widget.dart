@@ -130,10 +130,10 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
         if (widget.word.kanji.isNotEmpty) ...[
           Text(
             widget.word.kanji,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 44,
               fontWeight: FontWeight.bold,
-              color: AppColors.appBarForeground,
+              color: context.palette.textPrimary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -181,10 +181,10 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
       children: [
         Text(
           widget.word.meaning,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            color: AppColors.appBarForeground,
+            color: context.palette.textPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -193,14 +193,15 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: context.palette.mutedSurface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
                 Text(
                   widget.word.exampleJapanese,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
                 if (widget.word.exampleVietnamese.isNotEmpty) ...[

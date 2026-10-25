@@ -41,6 +41,17 @@ class AuthController extends ChangeNotifier {
 
   Future<void> retry() => initialize();
 
+  Future<void> signOut() async {
+    try {
+      await _authService.signOut();
+    } catch (error) {
+      debugPrint(
+        'Auth signOut failed: '
+        '${error is AuthException ? error.code : error.runtimeType}',
+      );
+    }
+  }
+
   Future<void> _runInitialize() async {
     _listenToAuthChanges();
     _status = AuthStatus.loading;
