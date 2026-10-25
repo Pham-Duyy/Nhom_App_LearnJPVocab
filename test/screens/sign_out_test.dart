@@ -40,8 +40,9 @@ void main() {
       await tester.tap(loginLink);
       await _pumpFrames(tester);
 
+      authService.addAccount('lan@gmail.com', '123456', uid: 'lan-uid');
       final fields = find.byType(TextFormField);
-      await tester.enterText(fields.at(0), 'lan_hocnhat');
+      await tester.enterText(fields.at(0), 'lan@gmail.com');
       await tester.enterText(fields.at(1), '123456');
       final submit = find.widgetWithText(ElevatedButton, 'Đăng nhập');
       await tester.scrollUntilVisible(
@@ -52,7 +53,9 @@ void main() {
       await tester.tap(submit);
       await tester.pumpAndSettle();
 
-      expect(authService.signInCallCount, 1);
+      // Đăng nhập lại bằng email thật, không tạo thêm tài khoản khách nào.
+      expect(authService.currentUser!.uid, 'lan-uid');
+      expect(authService.signInCallCount, 0);
       expect(find.text('Chào Duy!'), findsOneWidget);
     },
   );

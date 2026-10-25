@@ -41,14 +41,69 @@ class AuthController extends ChangeNotifier {
 
   Future<void> retry() => initialize();
 
+  /// Trả về thông báo lỗi, hoặc null nếu đăng ký thành công. Lỗi ở đây chỉ
+  /// thuộc về form nên không đổi [status] hay [errorMessage] của cả app.
+  Future<String?> registerWithEmail({
+    required String email,
+    required String password,
+  }) {
+    return _runSignInAction(
+      'register',
+      () => _authService.registerWithEmail(email: email, password: password),
+    );
+  }
+
+  /// Trả về thông báo lỗi, hoặc null nếu đăng nhập thành công.
+  Future<String?> signInWithEmail({
+    required String email,
+    required String password,
+  }) {
+    return _runSignInAction(
+      'signIn',
+      () => _authService.signInWithEmail(email: email, password: password),
+    );
+  }
+
+  /// Trả về thông báo lỗi (kể cả khi người dùng đóng cửa sổ Google), hoặc
+  /// null nếu đăng nhập thành công.
+  Future<String?> signInWithGoogle() {
+    return _runSignInAction('signInWithGoogle', _authService.signInWithGoogle);
+  }
+
+  /// Trả về thông báo lỗi, hoặc null nếu đã gửi email đặt lại mật khẩu.
+  Future<String?> sendPasswordResetEmail(String email) async {
+    try {
+      await _authService.sendPasswordResetEmail(email);
+      return null;
+    } catch (error) {
+      _logError('sendPasswordReset', error);
+      return _signInErrorMessage(error);
+    }
+  }
+
   Future<void> signOut() async {
     try {
       await _authService.signOut();
     } catch (error) {
-      debugPrint(
-        'Auth signOut failed: '
-        '${error is AuthException ? error.code : error.runtimeType}',
-      );
+      _logError('signOut', error);
+    }
+  }
+
+  Future<String?> _runSignInAction(
+    String name,
+    Future<AppAuthUser> Function() action,
+  ) async {
+    try {
+      // Cập nhật ngay từ kết quả: khi gắn email vào tài khoản khách, uid không
+      // đổi nên authStateChanges() không phát sự kiện mới.
+      _user = await action();
+      _status = AuthStatus.authenticated;
+      _errorMessage = null;
+      _notify();
+      return null;
+    } catch (error) {
+      _logError(name, error);
+      return _signInErrorMessage(error);
     }
   }
 
@@ -63,12 +118,7 @@ class AuthController extends ChangeNotifier {
       _user = existing ?? await _authService.signInAnonymously();
       _status = AuthStatus.authenticated;
     } catch (error) {
-      // Chỉ log loại lỗi/mã lỗi, không log nguyên văn exception vì thông
-      // điệp của nó có thể chứa dữ liệu nhạy cảm (token...).
-      debugPrint(
-        'Auth initialize failed: '
-        '${error is AuthException ? error.code : error.runtimeType}',
-      );
+      _logError('initialize', error);
       _user = null;
       _status = AuthStatus.failure;
       _errorMessage = _friendlyMessage(error);
@@ -96,22 +146,80 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  String _friendlyMessage(Object error) {
-    final code = error is AuthException ? error.code : null;
+  /// Chỉ log tên thao tác và mã lỗi, không log nguyên văn exception vì thông
+  /// điệp của nó có thể chứa dữ liệu nhạy cảm (token, email...).
+  void _logError(String action, Object error) {
+    debugPrint(
+      'Auth $action failed: '
+      '${error is AuthException ? error.code : error.runtimeType}',
+    );
+  }
+
+  static String? _codeOf(Object error) =>
+      error is AuthException ? error.code : null;
+
+  /// Thông báo cho các lỗi dùng chung giữa đăng nhập khách và đăng nhập email.
+  static String? _commonMessage(String? code) {
     switch (code) {
       case 'network-request-failed':
         return 'Không thể kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.';
-      case 'operation-not-allowed':
-      // Firebase trả mã này thay cho operation-not-allowed khi project chưa
-      // bật nhà cung cấp Anonymous.
-      case 'admin-restricted-operation':
-        return 'Đăng nhập ẩn danh chưa được bật trong Firebase.';
       case 'too-many-requests':
         return 'Có quá nhiều yêu cầu. Vui lòng thử lại sau.';
       case 'user-disabled':
         return 'Tài khoản đã bị vô hiệu hóa.';
       default:
-        return 'Không thể khởi tạo tài khoản. Vui lòng thử lại.';
+        return null;
+    }
+  }
+
+  String _friendlyMessage(Object error) {
+    final code = _codeOf(error);
+    switch (code) {
+      case 'operation-not-allowed':
+      // Firebase trả mã này thay cho operation-not-allowed khi project chưa
+      // bật nhà cung cấp Anonymous.
+      case 'admin-restricted-operation':
+        return 'Đăng nhập ẩn danh chưa được bật trong Firebase.';
+      default:
+        return _commonMessage(code) ??
+            'Không thể khởi tạo tài khoản. Vui lòng thử lại.';
+    }
+  }
+
+  static String _signInErrorMessage(Object error) {
+    final code = _codeOf(error);
+    switch (code) {
+      case 'email-already-in-use':
+      case 'credential-already-in-use':
+        return 'Email này đã được dùng cho một tài khoản khác.';
+      case 'invalid-email':
+        return 'Email không đúng định dạng.';
+      case 'weak-password':
+        return 'Mật khẩu quá yếu, cần ít nhất 6 ký tự.';
+      // Firebase gộp "sai mật khẩu" và "không có tài khoản" thành
+      // invalid-credential để không lộ email nào đã đăng ký.
+      case 'invalid-credential':
+      case 'wrong-password':
+      case 'user-not-found':
+        return 'Email hoặc mật khẩu không đúng.';
+      case 'operation-not-allowed':
+        return 'Phương thức đăng nhập này chưa được bật trong Firebase.';
+      // Người dùng đóng cửa sổ Google (web: popup; Android: trình duyệt).
+      case 'popup-closed-by-user':
+      case 'cancelled-popup-request':
+      case 'web-context-canceled':
+      case 'web-context-cancelled':
+        return 'Bạn đã hủy đăng nhập Google.';
+      case 'popup-blocked':
+        return 'Trình duyệt đã chặn cửa sổ đăng nhập. '
+            'Hãy cho phép cửa sổ bật lên rồi thử lại.';
+      case 'account-exists-with-different-credential':
+        return 'Email này đã được đăng ký bằng mật khẩu. '
+            'Hãy đăng nhập bằng email và mật khẩu.';
+      case 'unauthorized-domain':
+        return 'Trang web này chưa được cấp phép đăng nhập trong Firebase.';
+      default:
+        return _commonMessage(code) ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
     }
   }
 

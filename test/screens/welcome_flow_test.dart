@@ -36,11 +36,14 @@ Future<void> _fillAndSubmit(
 }
 
 void main() {
-  testWidgets('màn chào → đăng ký → vào trang chủ qua AuthGate với tên mới', (
-    tester,
-  ) async {
+  testWidgets(
+      'US03: màn chào → đăng ký → vào trang chủ với tên mới, '
+      'giữ nguyên tiến độ của tài khoản khách', (tester) async {
     await _openRegisterForm(tester);
-    await _fillAndSubmit(tester, ['Lan', 'lan_hocnhat', '123456', '123456']);
+    await _fillAndSubmit(
+      tester,
+      ['Lan', 'lan@gmail.com', '123456', '123456'],
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Chào Lan!'), findsOneWidget);
@@ -51,7 +54,10 @@ void main() {
     tester,
   ) async {
     await _openRegisterForm(tester);
-    await _fillAndSubmit(tester, ['Lan', 'lan_hocnhat', '123456', '654321']);
+    await _fillAndSubmit(
+      tester,
+      ['Lan', 'lan@gmail.com', '123456', '654321'],
+    );
     await _pumpFrames(tester);
 
     expect(find.text('Mật khẩu xác nhận chưa khớp.'), findsOneWidget);

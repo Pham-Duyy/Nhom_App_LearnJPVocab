@@ -126,6 +126,7 @@ class ProfileScreen extends GenericScreen {
     final profile = context.watch<UserProfileProvider>();
     final themeMode = profile.themeMode;
     final streak = profile.streak;
+    final email = context.watch<AuthController>().user?.email;
     final reviewedToday = progress.getReviewedTodayCount();
 
     return ListView(
@@ -197,9 +198,10 @@ class ProfileScreen extends GenericScreen {
           value: _themeLabels[themeMode],
           onTap: () => _pickTheme(context),
         ),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
           icon: Icons.person_outline_rounded,
-          title: 'Thông tin tài khoản',
+          title: 'Tài khoản',
+          value: email ?? 'Khách',
         ),
         const _ProfileMenuItem(
           icon: Icons.help_outline_rounded,
@@ -610,11 +612,16 @@ class _ProfileMenuItem extends StatelessWidget {
                   ),
                 ),
                 if (value != null)
-                  Text(
-                    value!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: palette.textSecondary,
+                  // Giá trị dài (vd. email) tự rút gọn thay vì làm tràn dòng.
+                  Flexible(
+                    child: Text(
+                      value!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: palette.textSecondary,
+                      ),
                     ),
                   ),
                 const SizedBox(width: 6),

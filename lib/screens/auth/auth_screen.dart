@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../auth/auth_controller.dart';
-import '../../auth/auth_status.dart';
+import '../../auth/auth_validators.dart';
+import '../../models/user_profile.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
@@ -24,11 +25,9 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends GenericScreenState<AuthScreen> {
-  static final _usernamePattern = RegExp(r'^[A-Za-z0-9_]{3,24}$');
-
   var _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
@@ -36,33 +35,101 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
   bool _hidePassword = true;
   bool _hideConfirm = true;
 
+  /// Đang chờ Firebase trả lời; khóa nút để không gửi hai lần.
+  bool _isSubmitting = false;
+
+  /// Lỗi từ Firebase (sai mật khẩu, email đã dùng...), hiện ngay trên nút.
+  String? _formError;
+
   @override
   void dispose() {
     _displayNameController.dispose();
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
   }
 
   void _switchMode(bool register) {
-    if (register == _isRegister) return;
+    if (register == _isRegister || _isSubmitting) return;
     setState(() {
       _isRegister = register;
+      _formError = null;
       _formKey = GlobalKey<FormState>();
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    if (_isRegister) {
-      context
-          .read<UserProfileProvider>()
-          .updateDisplayName(_displayNameController.text);
-    }
     final auth = context.read<AuthController>();
-    if (auth.status != AuthStatus.authenticated) auth.retry();
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    if (_isRegister) {
+      await _runSignIn(
+        () => auth.registerWithEmail(email: email, password: password),
+        onSuccess: () => _applyDisplayName(_displayNameController.text),
+      );
+    } else {
+      await _runSignIn(
+        () => auth.signInWithEmail(email: email, password: password),
+      );
+    }
+  }
+
+  Future<void> _signInWithGoogle() {
+    final auth = context.read<AuthController>();
+    return _runSignIn(
+      auth.signInWithGoogle,
+      // Lấy tên Google làm tên hiển thị, trừ khi người học đã tự đặt tên.
+      onSuccess: () =>
+          _applyDisplayName(auth.user?.displayName, onlyIfUnset: true),
+    );
+  }
+
+  /// Khóa nút trong lúc chờ [action]; lỗi thì hiện trên form, thành công thì
+  /// chạy [onSuccess] rồi vào trang chủ.
+  Future<void> _runSignIn(
+    Future<String?> Function() action, {
+    Future<void> Function()? onSuccess,
+  }) async {
+    if (_isSubmitting) return;
+    setState(() {
+      _isSubmitting = true;
+      _formError = null;
+    });
+
+    final error = await action();
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() {
+        _isSubmitting = false;
+        _formError = error;
+      });
+      return;
+    }
+
+    if (onSuccess != null) await onSuccess();
+    if (!mounted) return;
+    _openHome();
+  }
+
+  /// Tải hồ sơ của đúng tài khoản vừa đăng nhập trước khi đặt tên, để tên
+  /// mới không bị ghép với hồ sơ (mục tiêu, chuỗi ngày) của người dùng trước.
+  /// Tên không hợp lệ (vd. tên Google quá dài) được bỏ qua.
+  Future<void> _applyDisplayName(String? name,
+      {bool onlyIfUnset = false}) async {
+    final profile = context.read<UserProfileProvider>();
+    await profile.load();
+    if (name == null) return;
+    if (onlyIfUnset && profile.displayName != UserProfile.defaultDisplayName) {
+      return;
+    }
+    await profile.updateDisplayName(name);
+  }
+
+  void _openHome() {
     context.read<MainNavigationProvider>().goHome();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
@@ -72,14 +139,24 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
     );
   }
 
-  void _signInWithGoogle() {
+  Future<void> _resetPassword() async {
+    final email = _emailController.text;
+    if (AuthValidators.email(email) != null) {
+      _showMessage('Hãy nhập đúng email của bạn vào ô Email trước.');
+      return;
+    }
+    final error =
+        await context.read<AuthController>().sendPasswordResetEmail(email);
+    if (!mounted) return;
+    _showMessage(
+      error ?? 'Đã gửi hướng dẫn đặt lại mật khẩu tới ${email.trim()}.',
+    );
+  }
+
+  void _showMessage(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(
-          content: Text('Đăng nhập Google sẽ có khi nối Firebase Auth.'),
-        ),
-      );
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -111,7 +188,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
               ),
               const SizedBox(height: 22),
               OutlinedButton(
-                onPressed: _signInWithGoogle,
+                onPressed: _isSubmitting ? null : _signInWithGoogle,
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(60),
                   backgroundColor: palette.card,
@@ -146,30 +223,25 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
               _buildDividerLabel(palette),
               const SizedBox(height: 10),
               ..._buildFields(),
-              const SizedBox(height: 28),
+              if (!_isRegister)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _isSubmitting ? null : _resetPassword,
+                    child: const Text('Quên mật khẩu?'),
+                  ),
+                ),
+              if (_formError != null) ...[
+                const SizedBox(height: 12),
+                _FormErrorBanner(message: _formError!),
+              ],
+              const SizedBox(height: 24),
               _GradientButton(
                 label: _isRegister ? 'Tạo tài khoản' : 'Đăng nhập',
+                isLoading: _isSubmitting,
                 onPressed: _submit,
               ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.science_outlined,
-                    size: 18,
-                    color: palette.textMuted,
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      'Bản trải nghiệm giao diện',
-                      style: TextStyle(color: palette.textMuted),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 12),
               TextButton(
                 onPressed: () => _switchMode(!_isRegister),
                 child: Text.rich(
@@ -266,7 +338,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'hoặc bằng tên đăng nhập',
+            'hoặc bằng email',
             style: TextStyle(color: palette.label),
           ),
         ),
@@ -288,26 +360,23 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
               hintText: 'Chibi nên gọi bạn là gì?',
               prefixIcon: Icon(Icons.person_outline_rounded),
             ),
-            validator: (value) => (value ?? '').trim().isEmpty
-                ? 'Hãy cho Chibi biết tên của bạn.'
-                : null,
+            maxLength: UserProfile.maxDisplayNameLength,
+            validator: (value) => UserProfile.validateDisplayName(value ?? ''),
           ),
         ),
       _LabeledField(
-        label: 'Tên đăng nhập',
+        label: 'Email',
         child: TextFormField(
-          controller: _usernameController,
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           autocorrect: false,
-          decoration: InputDecoration(
-            hintText: 'Ví dụ: duy_hocnhat',
-            prefixIcon: const Icon(Icons.alternate_email_rounded),
-            helperText:
-                _isRegister ? '3–24 ký tự: chữ không dấu, số hoặc dấu _' : null,
+          autofillHints: const [AutofillHints.email],
+          decoration: const InputDecoration(
+            hintText: 'Ví dụ: duy@gmail.com',
+            prefixIcon: Icon(Icons.alternate_email_rounded),
           ),
-          validator: (value) => _usernamePattern.hasMatch(value ?? '')
-              ? null
-              : 'Tên đăng nhập gồm 3–24 ký tự: chữ không dấu, số hoặc _.',
+          validator: AuthValidators.email,
         ),
       ),
       _LabeledField(
@@ -319,17 +388,17 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
               _isRegister ? TextInputAction.next : TextInputAction.done,
           onFieldSubmitted: _isRegister ? null : (_) => _submit(),
           decoration: InputDecoration(
-            hintText: _isRegister ? 'Tạo mật khẩu mẫu' : 'Nhập mật khẩu',
+            hintText: _isRegister ? 'Tạo mật khẩu' : 'Nhập mật khẩu',
             prefixIcon: const Icon(Icons.lock_outline_rounded),
-            helperText:
-                _isRegister ? 'Dùng ít nhất 6 ký tự cho bản demo.' : null,
+            helperText: _isRegister
+                ? 'Ít nhất ${AuthValidators.minPasswordLength} ký tự.'
+                : null,
             suffixIcon: _VisibilityToggle(
               hidden: _hidePassword,
               onPressed: () => setState(() => _hidePassword = !_hidePassword),
             ),
           ),
-          validator: (value) =>
-              (value ?? '').length < 6 ? 'Mật khẩu cần ít nhất 6 ký tự.' : null,
+          validator: AuthValidators.password,
         ),
       ),
       if (_isRegister)
@@ -341,16 +410,17 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _submit(),
             decoration: InputDecoration(
-              hintText: 'Nhập lại mật khẩu mẫu',
+              hintText: 'Nhập lại mật khẩu',
               prefixIcon: const Icon(Icons.verified_user_outlined),
               suffixIcon: _VisibilityToggle(
                 hidden: _hideConfirm,
                 onPressed: () => setState(() => _hideConfirm = !_hideConfirm),
               ),
             ),
-            validator: (value) => value != _passwordController.text
-                ? 'Mật khẩu xác nhận chưa khớp.'
-                : null,
+            validator: (value) => AuthValidators.confirmPassword(
+              value,
+              _passwordController.text,
+            ),
           ),
         ),
     ];
@@ -400,11 +470,49 @@ class _VisibilityToggle extends StatelessWidget {
   }
 }
 
+class _FormErrorBanner extends StatelessWidget {
+  const _FormErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: palette.dangerSurface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: palette.dangerBorder),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline_rounded, color: palette.danger, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(message, style: TextStyle(color: palette.danger)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _GradientButton extends StatelessWidget {
-  const _GradientButton({required this.label, required this.onPressed});
+  const _GradientButton({
+    required this.label,
+    required this.onPressed,
+    this.isLoading = false,
+  });
 
   final String label;
   final VoidCallback onPressed;
+
+  /// Hiện vòng xoay và khóa nút trong lúc chờ.
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -424,23 +532,34 @@ class _GradientButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
+          disabledBackgroundColor: Colors.transparent,
+          disabledForegroundColor: palette.onPrimary,
           shadowColor: Colors.transparent,
           minimumSize: const Size.fromHeight(62),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label),
-            const SizedBox(width: 10),
-            const Icon(Icons.arrow_forward_rounded, size: 20),
-          ],
-        ),
+        child: isLoading
+            ? SizedBox.square(
+                dimension: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: palette.onPrimary,
+                  semanticsLabel: 'Đang xử lý',
+                ),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.arrow_forward_rounded, size: 20),
+                ],
+              ),
       ),
     );
   }
