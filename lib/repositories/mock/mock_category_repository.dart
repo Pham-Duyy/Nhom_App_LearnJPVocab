@@ -12,6 +12,10 @@ class MockCategoryRepository implements CategoryRepository {
       sortByOrder(MockLearningData.categories.toList());
 
   @override
+  Future<List<Lesson>> getAllLessons() async =>
+      MockLearningData.lessons.toList();
+
+  @override
   Future<List<Lesson>> getLessonsByCategory(String categoryId) async =>
       sortByOrder(MockLearningData.lessons
           .where((lesson) => lesson.categoryId == categoryId)

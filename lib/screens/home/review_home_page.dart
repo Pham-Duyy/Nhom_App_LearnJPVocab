@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/category.dart';
 import '../../providers/lesson_provider.dart';
+import '../../providers/library_provider.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
@@ -187,6 +188,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
     final nextCategory = findNextCategory(
       lessonProvider.categories,
       provider.progressList,
+      context.watch<LibraryProvider>(),
     );
     final reviewedToday = provider.getReviewedTodayCount();
     final dailyGoal = context.watch<UserProfileProvider>().dailyGoal;

@@ -35,4 +35,7 @@ class FirestoreCategoryRepository implements CategoryRepository {
   @override
   Future<List<Lesson>> getLessonsByCategory(String categoryId) async =>
       sortByOrder(await _lessons.getWhere('categoryId', categoryId));
+
+  @override
+  Future<List<Lesson>> getAllLessons() => _lessons.getAll();
 }

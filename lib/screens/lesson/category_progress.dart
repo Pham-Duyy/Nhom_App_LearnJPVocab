@@ -1,19 +1,17 @@
-import '../../data/mock/mock_learning_data.dart';
 import '../../models/category.dart';
 import '../../models/progress.dart';
+import '../../providers/library_provider.dart';
 
+/// Số từ đã học trên tổng số từ của một chủ đề.
 class CategoryProgress {
   const CategoryProgress({required this.learned, required this.total});
 
-  factory CategoryProgress.of(Category category, List<Progress> progressList) {
-    final lessonIds = MockLearningData.lessons
-        .where((lesson) => lesson.categoryId == category.id)
-        .map((lesson) => lesson.id)
-        .toSet();
-    final wordIds = MockLearningData.vocabulary
-        .where((word) => lessonIds.contains(word.lessonId))
-        .map((word) => word.id)
-        .toSet();
+  factory CategoryProgress.of(
+    Category category,
+    List<Progress> progressList,
+    LibraryProvider library,
+  ) {
+    final wordIds = library.wordIdsOf(category.id);
     final learned = progressList
         .where((p) => p.isLearned && wordIds.contains(p.vocabularyId))
         .length;
@@ -28,12 +26,14 @@ class CategoryProgress {
   bool get isComplete => total > 0 && learned >= total;
 }
 
+/// Chủ đề đầu tiên chưa học xong, để gợi ý "Học tiếp".
 Category? findNextCategory(
   List<Category> categories,
   List<Progress> progressList,
+  LibraryProvider library,
 ) {
   for (final category in categories) {
-    if (!CategoryProgress.of(category, progressList).isComplete) {
+    if (!CategoryProgress.of(category, progressList, library).isComplete) {
       return category;
     }
   }

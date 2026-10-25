@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/mock/mock_learning_data.dart';
 import '../../models/progress.dart';
 import '../../models/vocabulary.dart';
+import '../../providers/library_provider.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/chibi_mascot.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/favorite_button.dart';
 import '../../widgets/memory_level_chip.dart';
 import '../../widgets/skeleton.dart';
@@ -46,11 +47,12 @@ class _VocabularyBookScreenState
   Widget buildBody(BuildContext context) {
     final palette = context.palette;
     final progressProvider = context.watch<ProgressProvider>();
+    final library = context.watch<LibraryProvider>();
     final progressById = {
       for (final progress in progressProvider.progressList)
         progress.vocabularyId: progress,
     };
-    final learnedWords = MockLearningData.vocabulary
+    final learnedWords = library.words
         .where((word) => progressById[word.id]?.isLearned == true)
         .where(_matchesSearch)
         .where((word) => _matchesFilter(progressById[word.id]!))
@@ -102,33 +104,39 @@ class _VocabularyBookScreenState
         _buildFilters(palette, progressProvider.getDueForReview().length),
         const SizedBox(height: 8),
         Expanded(
-          child: progressProvider.isLoading
+          child: progressProvider.isLoading ||
+                  (library.isLoading && library.words.isEmpty)
               ? const SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.page),
                   child: SkeletonList(itemCount: 4),
                 )
-              : learnedWords.isEmpty
-                  ? _buildEmptyState(
-                      palette,
-                      progressProvider.totalLearned == 0,
+              : library.errorMessage != null && library.words.isEmpty
+                  ? ErrorView(
+                      message: library.errorMessage!,
+                      onRetry: library.load,
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.page,
-                        0,
-                        AppSpacing.page,
-                        24,
-                      ),
-                      itemCount: learnedWords.length,
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemBuilder: (context, index) {
-                        final word = learnedWords[index];
-                        return _VocabularyTile(
-                          word: word,
-                          progress: progressById[word.id]!,
-                        );
-                      },
-                    ),
+                  : learnedWords.isEmpty
+                      ? _buildEmptyState(
+                          palette,
+                          progressProvider.totalLearned == 0,
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.page,
+                            0,
+                            AppSpacing.page,
+                            24,
+                          ),
+                          itemCount: learnedWords.length,
+                          separatorBuilder: (_, __) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final word = learnedWords[index];
+                            return _VocabularyTile(
+                              word: word,
+                              progress: progressById[word.id]!,
+                            );
+                          },
+                        ),
         ),
       ],
     );

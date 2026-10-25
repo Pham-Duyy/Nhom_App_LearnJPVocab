@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../auth/auth_controller.dart';
 import '../auth/auth_status.dart';
 import '../providers/lesson_provider.dart';
+import '../providers/library_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/user_profile_provider.dart';
 import '../widgets/error_view.dart';
@@ -53,6 +54,7 @@ class _AuthGateState extends State<AuthGate> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<LessonProvider>().loadCategories();
+      context.read<LibraryProvider>().load();
       context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
     });

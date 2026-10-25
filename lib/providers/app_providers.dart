@@ -15,6 +15,7 @@ import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/user_profile_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import 'lesson_provider.dart';
+import 'library_provider.dart';
 import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
 import 'quiz_provider.dart';
@@ -46,7 +47,8 @@ class AppProviders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dùng chung một repository từ vựng cho học flashcard và làm quiz.
+    // Dùng chung một repository cho các provider cùng đọc một loại dữ liệu.
+    final categories = categoryRepository ?? FirestoreCategoryRepository();
     final vocabulary = vocabularyRepository ?? FirestoreVocabularyRepository();
 
     return MultiProvider(
@@ -68,9 +70,11 @@ class AppProviders extends StatelessWidget {
         ChangeNotifierProvider(
           // Không tải ngay: Firestore chỉ cho đọc chủ đề khi đã đăng nhập,
           // nên AuthGate gọi loadCategories() sau khi đã có người dùng.
-          create: (_) => LessonProvider(
-            categoryRepository ?? FirestoreCategoryRepository(),
-          ),
+          create: (_) => LessonProvider(categories),
+        ),
+        // Không tải ngay, cùng lý do với LessonProvider.
+        ChangeNotifierProvider(
+          create: (_) => LibraryProvider(categories, vocabulary),
         ),
         ChangeNotifierProvider(create: (_) => VocabularyProvider(vocabulary)),
         ChangeNotifierProvider(

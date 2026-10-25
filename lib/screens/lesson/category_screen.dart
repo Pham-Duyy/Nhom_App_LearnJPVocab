@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/category.dart';
 import '../../providers/lesson_provider.dart';
+import '../../providers/library_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
@@ -132,9 +133,11 @@ class CategoryScreen extends GenericListScreen<Category> {
   Widget buildItem(BuildContext context, Category item) {
     final palette = context.palette;
     final progressList = context.watch<ProgressProvider>().progressList;
+    final library = context.watch<LibraryProvider>();
     final categories = getItems(context);
-    final progress = CategoryProgress.of(item, progressList);
-    final isNext = findNextCategory(categories, progressList)?.id == item.id;
+    final progress = CategoryProgress.of(item, progressList, library);
+    final isNext =
+        findNextCategory(categories, progressList, library)?.id == item.id;
     final paletteIndex =
         categories.indexOf(item) % palette.topicBackgrounds.length;
 

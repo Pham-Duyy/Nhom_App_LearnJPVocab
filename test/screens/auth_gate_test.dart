@@ -1,11 +1,13 @@
 import 'package:chibakanji/auth/auth_controller.dart';
 import 'package:chibakanji/models/progress.dart';
 import 'package:chibakanji/providers/lesson_provider.dart';
+import 'package:chibakanji/providers/library_provider.dart';
 import 'package:chibakanji/providers/progress_provider.dart';
 import 'package:chibakanji/providers/user_profile_provider.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:chibakanji/screens/auth_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +31,12 @@ Widget _buildGate(
       ChangeNotifierProvider(
         create: (_) => UserProfileProvider(MockUserProfileRepository()),
       ),
+      ChangeNotifierProvider(
+        create: (_) => LibraryProvider(
+          MockCategoryRepository(),
+          MockVocabularyRepository(),
+        ),
+      ),
       ChangeNotifierProvider.value(value: progress),
     ],
     child: const MaterialApp(
@@ -38,7 +46,8 @@ Widget _buildGate(
 }
 
 void main() {
-  testWidgets('đăng nhập ẩn danh xong thì hiện nội dung, tải chủ đề và tiến độ',
+  testWidgets(
+      'US02: đăng nhập ẩn danh xong thì hiện nội dung, tải chủ đề và tiến độ',
       (tester) async {
     final authService = FakeAuthService();
     final progress = ProgressProvider(MockProgressRepository(
@@ -58,7 +67,7 @@ void main() {
     expect(lessons.categories, isNotEmpty);
   });
 
-  testWidgets('đăng nhập lỗi thì hiện thông báo, bấm Thử lại để vào app', (
+  testWidgets('8a: đăng nhập lỗi thì hiện thông báo, bấm Thử lại để vào app', (
     tester,
   ) async {
     final authService = FakeAuthService(shouldFailSignIn: true);
