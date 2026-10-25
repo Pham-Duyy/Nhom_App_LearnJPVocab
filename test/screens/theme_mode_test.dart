@@ -12,7 +12,11 @@ void main() {
 
     await tester.tap(find.text('Cá nhân'));
     await tester.pumpAndSettle();
+    // ListView chỉ dựng mục ở gần vùng nhìn thấy: cuộn tới cho mục xuất hiện,
+    // rồi ensureVisible để cả mục nằm trên thanh điều hướng, bấm trúng.
     await tester.scrollUntilVisible(find.text('Giao diện'), 200);
+    await tester.ensureVisible(find.text('Giao diện'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Giao diện'));
     await tester.pumpAndSettle();
 

@@ -8,58 +8,59 @@ import 'lesson/category_screen.dart';
 import 'profile/profile_screen.dart';
 import 'vocabulary/vocabulary_book_screen.dart';
 
+/// Khung chính của ứng dụng: 4 tab chuyển bằng BottomNavigationBar.
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
+  /// Trang của từng tab, cùng thứ tự với [_items].
+  static const _pages = <Widget>[
+    ReviewHomePage(),
+    CategoryScreen(),
+    VocabularyBookScreen(),
+    ProfileScreen(),
+  ];
+
+  static const _items = <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.alarm_outlined),
+      activeIcon: Icon(Icons.alarm),
+      label: 'Ôn tập',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.import_contacts_outlined),
+      activeIcon: Icon(Icons.import_contacts),
+      label: 'Học mới',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.bookmark_border_rounded),
+      activeIcon: Icon(Icons.bookmark_rounded),
+      label: 'Sổ từ',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person_outline_rounded),
+      activeIcon: Icon(Icons.person_rounded),
+      label: 'Cá nhân',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final selectedIndex = context.watch<MainNavigationProvider>().selectedIndex;
+    final navigation = context.watch<MainNavigationProvider>();
 
     return Scaffold(
-      body: SafeArea(bottom: false, child: _buildBody(selectedIndex)),
+      body: SafeArea(bottom: false, child: _pages[navigation.selectedIndex]),
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: context.palette.divider)),
         ),
-        child: NavigationBar(
-          selectedIndex: selectedIndex,
-          onDestinationSelected: (index) =>
-              context.read<MainNavigationProvider>().selectTab(index),
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.alarm_outlined),
-              label: 'Ôn tập',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.import_contacts_outlined),
-              label: 'Học mới',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.bookmark_border_rounded),
-              label: 'Sổ từ',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              label: 'Cá nhân',
-            ),
-          ],
+        child: BottomNavigationBar(
+          // fixed: đủ 4 tab luôn hiện nhãn, không đổi màu nền theo tab.
+          type: BottomNavigationBarType.fixed,
+          currentIndex: navigation.selectedIndex,
+          onTap: navigation.selectTab,
+          items: _items,
         ),
       ),
     );
-  }
-
-  Widget _buildBody(int selectedIndex) {
-    switch (selectedIndex) {
-      case 0:
-        return const ReviewHomePage();
-      case 1:
-        return const CategoryScreen();
-      case 2:
-        return const VocabularyBookScreen();
-      case 3:
-        return const ProfileScreen();
-      default:
-        return const ReviewHomePage();
-    }
   }
 }

@@ -143,31 +143,17 @@ class ChibaKanjiApp extends StatelessWidget {
         showDragHandle: true,
         dragHandleColor: palette.lavenderBorder,
       ),
-      navigationBarTheme: NavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: palette.background,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: palette.secondary,
         elevation: 0,
-        height: 72,
-        labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => font.copyWith(
-            fontSize: 12,
-            fontWeight: states.contains(WidgetState.selected)
-                ? FontWeight.w700
-                : FontWeight.w500,
-            color: states.contains(WidgetState.selected)
-                ? palette.primary
-                : palette.textSecondary,
-          ),
-        ),
-        iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(
-            size: 22,
-            color: states.contains(WidgetState.selected)
-                ? palette.primary
-                : palette.textSecondary,
-          ),
-        ),
+        selectedItemColor: palette.primary,
+        unselectedItemColor: palette.textSecondary,
+        selectedIconTheme: const IconThemeData(size: 24),
+        unselectedIconTheme: const IconThemeData(size: 22),
+        selectedLabelStyle:
+            font.copyWith(fontSize: 12, fontWeight: FontWeight.w700),
+        unselectedLabelStyle:
+            font.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
