@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/progress_provider.dart';
 import '../theme/app_colors.dart';
+import 'error_view.dart';
 
 class FavoriteButton extends StatelessWidget {
   const FavoriteButton({
@@ -19,8 +20,13 @@ class FavoriteButton extends StatelessWidget {
     final palette = context.palette;
     return IconButton(
       tooltip: isFavorite ? 'Bỏ yêu thích' : 'Thêm vào yêu thích',
-      onPressed: () =>
-          context.read<ProgressProvider>().toggleFavorite(vocabularyId),
+      onPressed: () async {
+        final error =
+            await context.read<ProgressProvider>().toggleFavorite(vocabularyId);
+        if (error != null && context.mounted) {
+          showErrorSnackBar(context, error);
+        }
+      },
       icon: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, animation) =>

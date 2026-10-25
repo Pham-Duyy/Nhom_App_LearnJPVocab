@@ -7,18 +7,55 @@ import 'app.dart';
 import 'data/firestore_seeder.dart';
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
+import 'utils/app_error.dart';
+import 'widgets/error_view.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _catchUnexpectedErrors();
+
+  if (!await _initFirebase()) {
+    runApp(const _StartupErrorApp());
+    return;
+  }
+  if (kDebugMode) await _seedContentIfEmpty();
+  runApp(const AppProviders(child: ChibaKanjiApp()));
+}
+
+/// Lưới an toàn cuối cùng: lỗi không được nơi nào bắt (khi dựng giao diện,
+/// hoặc trong một Future không ai chờ) được ghi log thay vì âm thầm làm hỏng
+/// app. Lỗi dự đoán được đã được từng provider tự xử lý trước đó.
+void _catchUnexpectedErrors() {
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AppError.log('FlutterError', details.exception, details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppError.log('Uncaught', error, stack);
+    return true;
+  };
+  // Bản phát hành: phần giao diện bị lỗi hiện một dòng thông báo, thay cho
+  // khung xám không rõ nghĩa.
+  if (kReleaseMode) {
+    ErrorWidget.builder = (_) => const Center(
+          child: Text(
+            'Đã có lỗi khi hiển thị phần này.',
+            textDirection: TextDirection.ltr,
+          ),
+        );
+  }
+}
+
+Future<bool> _initFirebase() async {
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  } catch (e) {
-    debugPrint('Firebase.initializeApp error: $e');
+    return true;
+  } catch (e, stack) {
+    AppError.log('Firebase.initializeApp', e, stack);
+    return false;
   }
-  if (kDebugMode) await _seedContentIfEmpty();
-  runApp(const AppProviders(child: ChibaKanjiApp()));
 }
 
 /// Chỉ ở bản debug: đẩy dữ liệu mẫu lên Firestore lần đầu chạy. Đăng nhập ẩn
@@ -34,6 +71,27 @@ Future<void> _seedContentIfEmpty() async {
         .timeout(const Duration(seconds: 10));
     if (seeded) debugPrint('Đã nạp dữ liệu mẫu lên Firestore.');
   } catch (e) {
+    // Rules đã khóa quyền ghi hoặc đang mất mạng: bỏ qua, app vẫn chạy.
     debugPrint('Không nạp được dữ liệu mẫu: $e');
+  }
+}
+
+/// Hiện khi Firebase không khởi động được, thay vì để app chạy tiếp rồi lỗi
+/// ở lần đầu đọc dữ liệu.
+class _StartupErrorApp extends StatelessWidget {
+  const _StartupErrorApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: ErrorView(
+          message: 'Không thể khởi động ứng dụng. '
+              'Hãy kiểm tra kết nối mạng rồi thử lại.',
+          onRetry: main,
+        ),
+      ),
+    );
   }
 }

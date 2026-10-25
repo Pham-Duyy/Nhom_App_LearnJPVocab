@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/progress.dart';
 import '../repositories/progress_repository.dart';
+import '../utils/app_error.dart';
 
 /// Quản lý tiến độ ghi nhớ của toàn bộ từ vựng: tổng số từ đã học, số từ
 /// đến hạn ôn tập và phân bố theo từng mức ghi nhớ (1-5).
@@ -53,17 +54,21 @@ class ProgressProvider extends ChangeNotifier {
 
     try {
       _progressList = await _repository.getAll();
-    } catch (e) {
-      _errorMessage = 'Không thể tải tiến độ: $e';
+    } catch (e, stack) {
+      AppError.log('ProgressProvider.loadProgress', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải tiến độ học');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
+  /// Ném lỗi nếu lưu thất bại, để màn hình flashcard giữ nguyên thẻ hiện tại
+  /// cho người học thử lại (xem FlashcardScreen).
   Future<void> markCorrect(String vocabularyId) =>
       _answer(vocabularyId, (p) => p.markCorrect());
 
+  /// Ném lỗi nếu lưu thất bại, như [markCorrect].
   Future<void> markWrong(String vocabularyId) =>
       _answer(vocabularyId, (p) => p.markWrong());
 
@@ -80,13 +85,21 @@ class ProgressProvider extends ChangeNotifier {
     if (record != null) unawaited(record());
   }
 
-  Future<void> toggleFavorite(String vocabularyId) async {
-    final updated = await _updateAndSave(
-      vocabularyId,
-      (p) => p.copyWith(isFavorite: !p.isFavorite),
-    );
-    _replaceInList(updated);
-    notifyListeners();
+  /// Trả về thông báo lỗi nếu lưu thất bại (dấu yêu thích giữ nguyên như cũ),
+  /// hoặc null nếu thành công.
+  Future<String?> toggleFavorite(String vocabularyId) async {
+    try {
+      final updated = await _updateAndSave(
+        vocabularyId,
+        (p) => p.copyWith(isFavorite: !p.isFavorite),
+      );
+      _replaceInList(updated);
+      notifyListeners();
+      return null;
+    } catch (e, stack) {
+      AppError.log('ProgressProvider.toggleFavorite', e, stack);
+      return AppError.message(e, action: 'lưu từ yêu thích');
+    }
   }
 
   Future<Progress> _updateAndSave(

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/vocabulary.dart';
 import '../repositories/vocabulary_repository.dart';
+import '../utils/app_error.dart';
 
 /// Trạng thái của một phiên học flashcard: chưa bắt đầu, đang học, đã học hết.
 enum LearningSessionStatus { idle, inProgress, completed }
@@ -36,7 +37,16 @@ class VocabularyProvider extends ChangeNotifier {
   Future<void> loadReviewWords(List<String> vocabularyIds) =>
       _loadWords(() => _repository.getByIds(vocabularyIds));
 
+  /// Tải lại lần gần nhất (cùng bài học hoặc cùng phiên ôn) sau khi lỗi.
+  Future<void> retry() async {
+    final fetch = _lastFetch;
+    if (fetch != null) await _loadWords(fetch);
+  }
+
+  Future<List<Vocabulary>> Function()? _lastFetch;
+
   Future<void> _loadWords(Future<List<Vocabulary>> Function() fetch) async {
+    _lastFetch = fetch;
     _words = [];
     _currentIndex = 0;
     _sessionStatus = LearningSessionStatus.idle;
@@ -49,8 +59,9 @@ class VocabularyProvider extends ChangeNotifier {
       _sessionStatus = _words.isEmpty
           ? LearningSessionStatus.idle
           : LearningSessionStatus.inProgress;
-    } catch (e) {
-      _errorMessage = 'Không thể tải từ vựng: $e';
+    } catch (e, stack) {
+      AppError.log('VocabularyProvider.loadWords', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải từ vựng');
     } finally {
       _isLoading = false;
       notifyListeners();

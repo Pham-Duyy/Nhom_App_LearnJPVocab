@@ -6,7 +6,7 @@ import '../auth/auth_status.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/user_profile_provider.dart';
-import '../theme/app_colors.dart';
+import '../widgets/error_view.dart';
 
 /// Chỉ hiển thị [child] khi đã có người dùng (ẩn danh). Mỗi khi uid đổi,
 /// tải lại chủ đề, hồ sơ và tiến độ của đúng người dùng đó.
@@ -33,9 +33,11 @@ class _AuthGateState extends State<AuthGate> {
 
     if (auth.status == AuthStatus.failure ||
         auth.status == AuthStatus.unauthenticated) {
-      return _AuthErrorView(
-        message: auth.errorMessage ?? 'Bạn đã đăng xuất.',
-        onRetry: auth.isInitializing ? null : auth.retry,
+      return Scaffold(
+        body: ErrorView(
+          message: auth.errorMessage ?? 'Bạn đã đăng xuất.',
+          onRetry: auth.isInitializing ? null : auth.retry,
+        ),
       );
     }
 
@@ -54,36 +56,5 @@ class _AuthGateState extends State<AuthGate> {
       context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
     });
-  }
-}
-
-class _AuthErrorView extends StatelessWidget {
-  const _AuthErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.cloud_off, size: 56, color: context.palette.primary),
-              const SizedBox(height: 16),
-              Text(message, textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: onRetry,
-                child: const Text('Thử lại'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

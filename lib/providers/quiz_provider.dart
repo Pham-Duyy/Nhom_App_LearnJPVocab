@@ -8,6 +8,7 @@ import '../models/quiz_attempt.dart';
 import '../models/vocabulary.dart';
 import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/vocabulary_repository.dart';
+import '../utils/app_error.dart';
 
 /// Báo kết quả của một câu ra ngoài (vd. đưa từ trả lời sai về lịch ôn).
 typedef QuizAnswerCallback = Future<void> Function(
@@ -116,9 +117,9 @@ class QuizProvider extends ChangeNotifier {
       return started
           ? null
           : 'Hãy học ít nhất ${QuizGenerator.minWords} từ để làm quiz.';
-    } catch (e) {
-      debugPrint('Load quiz words failed: $e');
-      return 'Không thể tải từ vựng. Vui lòng thử lại.';
+    } catch (e, stack) {
+      AppError.log('QuizProvider.startWithWordIds', e, stack);
+      return AppError.message(e, action: 'tải từ vựng cho quiz');
     }
   }
 
@@ -136,7 +137,14 @@ class QuizProvider extends ChangeNotifier {
     final vocabularyId = question.vocabularyId;
     final callback = onAnswer;
     if (vocabularyId != null && callback != null) {
-      unawaited(callback(vocabularyId, question.isCorrect(optionIndex)));
+      // Không chờ để giao diện phản hồi ngay; lỗi (vd. mất mạng khi đưa từ
+      // về lịch ôn) chỉ ghi log, không làm hỏng lượt quiz đang làm.
+      unawaited(
+        callback(vocabularyId, question.isCorrect(optionIndex)).catchError(
+          (Object e, StackTrace stack) =>
+              AppError.log('QuizProvider.onAnswer', e, stack),
+        ),
+      );
     }
   }
 
@@ -168,9 +176,9 @@ class QuizProvider extends ChangeNotifier {
 
     try {
       await _attempts.save(attempt);
-    } catch (e) {
-      debugPrint('Save quiz attempt failed: $e');
-      _errorMessage = 'Không lưu được kết quả lên máy chủ.';
+    } catch (e, stack) {
+      AppError.log('QuizProvider.finish', e, stack);
+      _errorMessage = AppError.message(e, action: 'lưu kết quả quiz');
       notifyListeners();
     }
   }
@@ -184,9 +192,9 @@ class QuizProvider extends ChangeNotifier {
     try {
       _history = (await _attempts.getAll())
         ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
-    } catch (e) {
-      debugPrint('Load quiz history failed: $e');
-      _errorMessage = 'Không thể tải lịch sử quiz. Vui lòng thử lại.';
+    } catch (e, stack) {
+      AppError.log('QuizProvider.loadHistory', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải lịch sử quiz');
     } finally {
       _isLoadingHistory = false;
       notifyListeners();

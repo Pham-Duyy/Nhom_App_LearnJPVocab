@@ -11,6 +11,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
 import '../../widgets/chibi_mascot.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
@@ -139,17 +140,9 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
     }
 
     if (provider.errorMessage != null) {
-      return Center(
-        child: Column(
-          children: [
-            Text(provider.errorMessage!),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => provider.loadProgress(),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: provider.errorMessage!,
+        onRetry: provider.loadProgress,
       );
     }
 

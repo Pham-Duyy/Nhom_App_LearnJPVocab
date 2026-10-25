@@ -7,6 +7,7 @@ import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/animated_progress_bar.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/skeleton.dart';
 import '../../widgets/swipe_flashcard.dart';
 import '../common/generic_screen.dart';
@@ -112,7 +113,10 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
         if (provider.isLoading) return _buildSkeleton();
 
         if (provider.errorMessage != null) {
-          return Center(child: Text(provider.errorMessage!));
+          return ErrorView(
+            message: provider.errorMessage!,
+            onRetry: provider.retry,
+          );
         }
 
         final word = provider.currentWord;

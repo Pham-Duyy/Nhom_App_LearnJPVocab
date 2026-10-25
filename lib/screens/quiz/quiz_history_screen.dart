@@ -5,6 +5,7 @@ import '../../models/quiz_attempt.dart';
 import '../../providers/quiz_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/error_view.dart';
 import '../common/generic_screen.dart';
 import 'quiz_screen.dart';
 
@@ -37,17 +38,14 @@ class _QuizHistoryScreenState extends GenericScreenState<QuizHistoryScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (quiz.errorMessage != null && quiz.history.isEmpty) {
-      return _Message(
-        text: quiz.errorMessage!,
-        actionLabel: 'Thử lại',
-        onAction: quiz.loadHistory,
-      );
+      return ErrorView(message: quiz.errorMessage!, onRetry: quiz.loadHistory);
     }
     if (quiz.history.isEmpty) {
-      return _Message(
-        text: 'Bạn chưa làm quiz nào.',
+      return ErrorView(
+        icon: Icons.quiz_outlined,
+        message: 'Bạn chưa làm quiz nào.',
         actionLabel: 'Làm quiz nhanh',
-        onAction: () => openQuickQuiz(context),
+        onRetry: () => openQuickQuiz(context),
       );
     }
 
@@ -105,35 +103,6 @@ class _AttemptTile extends StatelessWidget {
         trailing: Text(
           '${attempt.correctCount}/${attempt.totalQuestions}',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-        ),
-      ),
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  const _Message({
-    required this.text,
-    required this.actionLabel,
-    required this.onAction,
-  });
-
-  final String text;
-  final String actionLabel;
-  final VoidCallback onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(text, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: onAction, child: Text(actionLabel)),
-          ],
         ),
       ),
     );

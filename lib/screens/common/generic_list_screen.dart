@@ -4,6 +4,7 @@ import '../../models/generic_entity.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/skeleton.dart';
 import 'generic_screen.dart';
 
@@ -80,17 +81,6 @@ abstract class GenericListScreen<T extends GenericEntity>
     final errorMessage = getErrorMessage(context);
     if (errorMessage == null) return buildEmptyState(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(errorMessage, textAlign: TextAlign.center),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () => onRetry(context),
-          style: ElevatedButton.styleFrom(minimumSize: const Size(120, 48)),
-          child: const Text('Thử lại'),
-        ),
-      ],
-    );
+    return ErrorView(message: errorMessage, onRetry: () => onRetry(context));
   }
 }

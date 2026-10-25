@@ -19,6 +19,7 @@ Widget buildTestApp({
   bool showWelcome = false,
   FakeAuthService? authService,
   MockUserProfileRepository? userProfileRepository,
+  MockProgressRepository? progressRepository,
 }) {
   return AppProviders(
     authService: authService ??
@@ -27,9 +28,10 @@ Widget buildTestApp({
         ),
     categoryRepository: MockCategoryRepository(),
     vocabularyRepository: MockVocabularyRepository(),
-    progressRepository: MockProgressRepository(
-      initialProgress: MockLearningData.createInitialProgress(),
-    ),
+    progressRepository: progressRepository ??
+        MockProgressRepository(
+          initialProgress: MockLearningData.createInitialProgress(),
+        ),
     userProfileRepository: userProfileRepository ??
         MockUserProfileRepository(
           initialProfile: const UserProfile(displayName: 'Duy'),

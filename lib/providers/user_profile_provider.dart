@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/user_profile.dart';
 import '../repositories/user_profile_repository.dart';
+import '../utils/app_error.dart';
 
 /// Quản lý hồ sơ và tùy chọn của người học: tên hiển thị, mục tiêu mỗi
 /// ngày, giao diện sáng/tối và chuỗi ngày học liên tiếp.
@@ -43,10 +44,10 @@ class UserProfileProvider extends ChangeNotifier {
       final loaded = await _repository.load();
       if (generation != _loadGeneration) return;
       _profile = loaded ?? const UserProfile();
-    } catch (e) {
+    } catch (e, stack) {
       if (generation != _loadGeneration) return;
-      debugPrint('Load profile failed: $e');
-      _errorMessage = 'Không thể tải hồ sơ. Vui lòng thử lại.';
+      AppError.log('UserProfileProvider.load', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải hồ sơ');
     } finally {
       if (generation == _loadGeneration) {
         _isLoading = false;
@@ -93,11 +94,11 @@ class UserProfileProvider extends ChangeNotifier {
 
     try {
       await _repository.save(next);
-    } catch (e) {
-      debugPrint('Save profile failed: $e');
+    } catch (e, stack) {
+      AppError.log('UserProfileProvider.save', e, stack);
       // Chỉ hoàn tác nếu chưa có thay đổi nào mới hơn ghi đè lên [next].
       if (identical(_profile, next)) _profile = previous;
-      _errorMessage = 'Không thể lưu thay đổi. Vui lòng thử lại.';
+      _errorMessage = AppError.message(e, action: 'lưu thay đổi');
       notifyListeners();
     }
   }

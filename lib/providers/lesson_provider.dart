@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import '../models/category.dart';
 import '../models/lesson.dart';
 import '../repositories/category_repository.dart';
+import '../utils/app_error.dart';
 
 /// Quản lý danh sách chủ đề (category) và bài học (lesson) đang được chọn
 /// để hiển thị ở màn hình "Học mới".
@@ -39,8 +40,9 @@ class LessonProvider extends ChangeNotifier {
 
     try {
       _categories = await _repository.getCategories();
-    } catch (e) {
-      _errorMessage = 'Không thể tải danh sách chủ đề: $e';
+    } catch (e, stack) {
+      AppError.log('LessonProvider.loadCategories', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải danh sách chủ đề');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -57,8 +59,9 @@ class LessonProvider extends ChangeNotifier {
 
     try {
       _lessons = await _repository.getLessonsByCategory(category.id);
-    } catch (e) {
-      _errorMessage = 'Không thể tải danh sách bài học: $e';
+    } catch (e, stack) {
+      AppError.log('LessonProvider.selectCategory', e, stack);
+      _errorMessage = AppError.message(e, action: 'tải danh sách bài học');
     } finally {
       _isLoading = false;
       notifyListeners();

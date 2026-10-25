@@ -7,6 +7,7 @@ import '../../providers/progress_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/memory_level_chip.dart';
 import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
@@ -187,7 +188,12 @@ class VocabularyDetailScreen extends GenericScreen {
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          onPressed: () => provider.toggleFavorite(word.id),
+          onPressed: () async {
+            final error = await provider.toggleFavorite(word.id);
+            if (error != null && context.mounted) {
+              showErrorSnackBar(context, error);
+            }
+          },
           icon: Icon(
             progress.isFavorite
                 ? Icons.favorite_rounded
