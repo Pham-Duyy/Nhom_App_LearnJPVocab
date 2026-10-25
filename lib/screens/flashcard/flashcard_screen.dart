@@ -188,7 +188,14 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
                         children: [
                           Icon(Icons.replay_rounded, size: 20),
                           SizedBox(width: 8),
-                          Text('Chưa nhớ'),
+                          // Flexible: không tràn nút khi người dùng phóng to
+                          // cỡ chữ của hệ thống trên màn hình hẹp.
+                          Flexible(
+                            child: Text(
+                              'Chưa nhớ',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -207,7 +214,12 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
                         children: [
                           Icon(Icons.check_rounded, size: 20),
                           SizedBox(width: 8),
-                          Text('Đã nhớ'),
+                          Flexible(
+                            child: Text(
+                              'Đã nhớ',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),
