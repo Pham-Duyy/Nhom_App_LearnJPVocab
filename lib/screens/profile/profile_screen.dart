@@ -11,6 +11,7 @@ import '../../widgets/animated_progress_bar.dart';
 import '../../widgets/tab_header.dart';
 import '../auth/welcome_screen.dart';
 import '../common/generic_screen.dart';
+import '../quiz/quiz_history_screen.dart';
 
 class ProfileScreen extends GenericScreen {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -173,10 +174,12 @@ class ProfileScreen extends GenericScreen {
           title: 'Thành tích',
           value: streak > 0 ? '$streak ngày đều đặn' : 'Chưa có',
         ),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
           icon: Icons.history_rounded,
-          title: 'Lịch sử ôn tập',
-          value: 'Chưa có phiên',
+          title: 'Lịch sử quiz',
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QuizHistoryScreen()),
+          ),
         ),
         const _ProfileMenuItem(
           icon: Icons.notifications_none_rounded,

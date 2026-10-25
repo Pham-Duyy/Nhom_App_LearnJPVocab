@@ -9,6 +9,12 @@ class Question {
   final String? explanation;
   final int order;
 
+  /// Hướng dẫn hiện trên đề bài, vd. "Chọn nghĩa đúng".
+  final String? instruction;
+
+  /// Từ vựng mà câu hỏi kiểm tra; trả lời sai thì từ này được đưa về lịch ôn.
+  final String? vocabularyId;
+
   const Question({
     required this.id,
     required this.quizId,
@@ -17,7 +23,11 @@ class Question {
     required this.correctIndex,
     this.explanation,
     required this.order,
+    this.instruction,
+    this.vocabularyId,
   });
+
+  String get correctAnswer => options[correctIndex];
 
   /// `correctIndex` có trỏ tới một đáp án thật trong [options] hay không.
   /// Không dùng assert vì `options.length` không hợp lệ trong constructor
@@ -32,6 +42,8 @@ class Question {
     int? correctIndex,
     String? explanation,
     int? order,
+    String? instruction,
+    String? vocabularyId,
   }) {
     return Question(
       id: id ?? this.id,
@@ -41,6 +53,8 @@ class Question {
       correctIndex: correctIndex ?? this.correctIndex,
       explanation: explanation ?? this.explanation,
       order: order ?? this.order,
+      instruction: instruction ?? this.instruction,
+      vocabularyId: vocabularyId ?? this.vocabularyId,
     );
   }
 
@@ -54,6 +68,8 @@ class Question {
         'correctIndex': correctIndex,
         'explanation': explanation,
         'order': order,
+        'instruction': instruction,
+        'vocabularyId': vocabularyId,
       };
 
   factory Question.fromMap(Map<String, dynamic> map) => Question(
@@ -64,6 +80,8 @@ class Question {
         correctIndex: map['correctIndex'] as int,
         explanation: map['explanation'] as String?,
         order: map['order'] as int,
+        instruction: map['instruction'] as String?,
+        vocabularyId: map['vocabularyId'] as String?,
       );
 
   @override

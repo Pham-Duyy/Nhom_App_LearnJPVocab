@@ -7,14 +7,17 @@ import '../auth/firebase_auth_service.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/firestore/firestore_category_repository.dart';
 import '../repositories/firestore/firestore_progress_repository.dart';
+import '../repositories/firestore/firestore_quiz_attempt_repository.dart';
 import '../repositories/firestore/firestore_user_profile_repository.dart';
 import '../repositories/firestore/firestore_vocabulary_repository.dart';
 import '../repositories/progress_repository.dart';
+import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/user_profile_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import 'lesson_provider.dart';
 import 'main_navigation_provider.dart';
 import 'progress_provider.dart';
+import 'quiz_provider.dart';
 import 'user_profile_provider.dart';
 import 'vocabulary_provider.dart';
 
@@ -30,6 +33,7 @@ class AppProviders extends StatelessWidget {
     this.vocabularyRepository,
     this.progressRepository,
     this.userProfileRepository,
+    this.quizAttemptRepository,
   }) : super(key: key);
 
   final Widget child;
@@ -38,9 +42,13 @@ class AppProviders extends StatelessWidget {
   final VocabularyRepository? vocabularyRepository;
   final ProgressRepository? progressRepository;
   final UserProfileRepository? userProfileRepository;
+  final QuizAttemptRepository? quizAttemptRepository;
 
   @override
   Widget build(BuildContext context) {
+    // Dùng chung một repository từ vựng cho học flashcard và làm quiz.
+    final vocabulary = vocabularyRepository ?? FirestoreVocabularyRepository();
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -64,11 +72,7 @@ class AppProviders extends StatelessWidget {
             categoryRepository ?? FirestoreCategoryRepository(),
           ),
         ),
-        ChangeNotifierProvider(
-          create: (_) => VocabularyProvider(
-            vocabularyRepository ?? FirestoreVocabularyRepository(),
-          ),
-        ),
+        ChangeNotifierProvider(create: (_) => VocabularyProvider(vocabulary)),
         ChangeNotifierProvider(
           // Không tải ngay: tiến độ nằm dưới users/{uid}, nên AuthGate gọi
           // loadProgress() sau khi đã có người dùng. Mỗi lần trả lời một thẻ
@@ -78,6 +82,21 @@ class AppProviders extends StatelessWidget {
             onStudyActivity:
                 context.read<UserProfileProvider>().recordStudyActivity,
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final progress = context.read<ProgressProvider>();
+            final profile = context.read<UserProfileProvider>();
+            return QuizProvider(
+              quizAttemptRepository ?? FirestoreQuizAttemptRepository(),
+              vocabulary,
+              // Sai thì đưa từ về mức 1 để ôn lại; đúng thì vẫn tính là một
+              // ngày học trong chuỗi ngày liên tiếp.
+              onAnswer: (vocabularyId, isCorrect) => isCorrect
+                  ? profile.recordStudyActivity()
+                  : progress.markWrong(vocabularyId),
+            );
+          },
         ),
       ],
       child: child,

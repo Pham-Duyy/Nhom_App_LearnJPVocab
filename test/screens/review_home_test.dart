@@ -37,6 +37,8 @@ void main() {
       expect(find.text('Kết quả buổi học'), findsOneWidget);
       expect(find.text('Hoàn thành phiên ôn tập!'), findsOneWidget);
 
+      await tester.ensureVisible(find.text('Về trang chủ'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Về trang chủ'));
       await tester.pumpAndSettle();
 

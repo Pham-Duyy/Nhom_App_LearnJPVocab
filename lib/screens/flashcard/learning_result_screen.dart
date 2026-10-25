@@ -7,6 +7,7 @@ import '../../theme/app_colors.dart';
 import '../../widgets/animated_progress_bar.dart';
 import '../../widgets/chibi_mascot.dart';
 import '../common/generic_screen.dart';
+import '../quiz/quiz_screen.dart';
 import 'flashcard_screen.dart';
 
 /// Tổng kết sau khi học hết một phiên flashcard — dùng chung cho phiên học
@@ -37,6 +38,19 @@ class LearningResultScreen extends GenericScreen {
         builder: (_) =>
             FlashcardScreen(title: title, completionTitle: completionTitle),
       ),
+    );
+  }
+
+  /// Kiểm tra lại ngay bộ từ vừa học.
+  void _takeQuiz(BuildContext context) {
+    final words = context.read<VocabularyProvider>().words;
+    final lessonIds = words.map((word) => word.lessonId).toSet();
+    openQuiz(
+      context,
+      // Phiên ôn tập gồm từ của nhiều bài thì gộp chung một mã.
+      quizId: lessonIds.length == 1 ? 'lesson-${lessonIds.first}' : 'review',
+      title: title,
+      words: words,
     );
   }
 
@@ -139,6 +153,12 @@ class LearningResultScreen extends GenericScreen {
               Text('Học lại'),
             ],
           ),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () => _takeQuiz(context),
+          icon: const Icon(Icons.quiz_outlined, size: 20),
+          label: const Text('Làm quiz bài này'),
         ),
         const SizedBox(height: 12),
         OutlinedButton(

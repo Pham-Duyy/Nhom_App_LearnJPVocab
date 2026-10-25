@@ -1,6 +1,9 @@
 class QuizAttempt {
   final String id;
   final String quizId;
+
+  /// Tên hiển thị trong lịch sử, vd. tên bài học hoặc "Quiz nhanh".
+  final String title;
   final int totalQuestions;
   final int correctCount;
 
@@ -12,6 +15,7 @@ class QuizAttempt {
   const QuizAttempt({
     required this.id,
     required this.quizId,
+    this.title = '',
     required this.totalQuestions,
     this.correctCount = 0,
     this.selectedAnswers = const {},
@@ -28,6 +32,7 @@ class QuizAttempt {
   QuizAttempt copyWith({
     String? id,
     String? quizId,
+    String? title,
     int? totalQuestions,
     int? correctCount,
     Map<String, int>? selectedAnswers,
@@ -37,6 +42,7 @@ class QuizAttempt {
     return QuizAttempt(
       id: id ?? this.id,
       quizId: quizId ?? this.quizId,
+      title: title ?? this.title,
       totalQuestions: totalQuestions ?? this.totalQuestions,
       correctCount: correctCount ?? this.correctCount,
       selectedAnswers: selectedAnswers ?? this.selectedAnswers,
@@ -48,6 +54,7 @@ class QuizAttempt {
   Map<String, dynamic> toMap() => {
         'id': id,
         'quizId': quizId,
+        'title': title,
         'totalQuestions': totalQuestions,
         'correctCount': correctCount,
         'selectedAnswers': selectedAnswers,
@@ -58,6 +65,7 @@ class QuizAttempt {
   factory QuizAttempt.fromMap(Map<String, dynamic> map) => QuizAttempt(
         id: map['id'] as String,
         quizId: map['quizId'] as String,
+        title: map['title'] as String? ?? '',
         totalQuestions: map['totalQuestions'] as int,
         correctCount: map['correctCount'] as int? ?? 0,
         selectedAnswers: Map<String, int>.from(

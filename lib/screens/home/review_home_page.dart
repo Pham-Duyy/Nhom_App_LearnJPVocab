@@ -20,6 +20,7 @@ import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
 import '../lesson/category_progress.dart';
 import '../lesson/category_screen.dart';
+import '../quiz/quiz_screen.dart';
 
 class ReviewHomePage extends StatefulWidget {
   const ReviewHomePage({Key? key}) : super(key: key);
@@ -176,6 +177,11 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           ],
           onViewAll: () => context.read<MainNavigationProvider>().selectTab(2),
         ),
+        const SizedBox(height: 20),
+        _QuickQuizTile(
+          learnedCount: provider.totalLearned,
+          onTap: () => openQuickQuiz(context),
+        ),
         const SizedBox(height: 32),
         _buildDailyGoal(provider),
       ],
@@ -227,6 +233,40 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Lối vào quiz nhanh từ các từ đã học.
+class _QuickQuizTile extends StatelessWidget {
+  const _QuickQuizTile({required this.learnedCount, required this.onTap});
+
+  final int learnedCount;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: palette.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        side: BorderSide(color: palette.cardBorder),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        leading: CircleAvatar(
+          backgroundColor: palette.lavenderSurface,
+          child: Icon(Icons.quiz_outlined, color: palette.primary),
+        ),
+        title: const Text('Quiz nhanh', style: AppTextStyles.cardTitle),
+        subtitle: Text('Kiểm tra $learnedCount từ bạn đã học'),
+        trailing: Icon(Icons.chevron_right_rounded, color: palette.textMuted),
+      ),
     );
   }
 }

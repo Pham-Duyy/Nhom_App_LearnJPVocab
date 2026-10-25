@@ -5,6 +5,7 @@ import 'package:chibakanji/models/user_profile.dart';
 import 'package:chibakanji/providers/app_providers.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_quiz_attempt_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:flutter/widgets.dart';
@@ -33,6 +34,7 @@ Widget buildTestApp({
         MockUserProfileRepository(
           initialProfile: const UserProfile(displayName: 'Duy'),
         ),
+    quizAttemptRepository: MockQuizAttemptRepository(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }
