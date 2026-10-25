@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../auth/auth_controller.dart';
+import '../../auth/auth_status.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
@@ -59,6 +61,8 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
           .read<UserProfileProvider>()
           .updateDisplayName(_displayNameController.text);
     }
+    final auth = context.read<AuthController>();
+    if (auth.status != AuthStatus.authenticated) auth.retry();
     context.read<MainNavigationProvider>().goHome();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../auth/auth_controller.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
@@ -34,12 +35,16 @@ class ProfileScreen extends GenericScreen {
 
   Future<void> _confirmSignOut(BuildContext context) async {
     final palette = context.palette;
+    final auth = context.read<AuthController>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Đăng xuất?'),
-        content: const Text(
-          'Bạn có thể đăng nhập lại bất cứ lúc nào để tiếp tục học.',
+        content: Text(
+          auth.isAnonymous
+              ? 'Bạn đang học bằng tài khoản khách. Sau khi đăng xuất, '
+                  'tiến độ hiện tại sẽ không lấy lại được.'
+              : 'Bạn có thể đăng nhập lại bất cứ lúc nào để tiếp tục học.',
         ),
         actions: [
           TextButton(
@@ -60,6 +65,7 @@ class ProfileScreen extends GenericScreen {
       MaterialPageRoute(builder: (_) => const WelcomeScreen()),
       (_) => false,
     );
+    await auth.signOut();
   }
 
   void _pickTheme(BuildContext context) {
