@@ -129,7 +129,12 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
                       ),
                     ),
                     SizedBox(width: 14),
-                    Text('Tiếp tục với Google'),
+                    Flexible(
+                      child: Text(
+                        'Tiếp tục với Google',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -152,9 +157,11 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
                     color: palette.textMuted,
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    'Bản trải nghiệm giao diện',
-                    style: TextStyle(color: palette.textMuted),
+                  Flexible(
+                    child: Text(
+                      'Bản trải nghiệm giao diện',
+                      style: TextStyle(color: palette.textMuted),
+                    ),
                   ),
                 ],
               ),

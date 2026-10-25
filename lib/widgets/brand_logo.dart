@@ -38,12 +38,16 @@ class BrandLogo extends StatelessWidget {
       children: [
         mark,
         SizedBox(width: size * 0.3),
-        Text(
-          'ChibaKanji',
-          style: TextStyle(
-            fontSize: size * 0.6,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.4,
+        Flexible(
+          child: Text(
+            'ChibaKanji',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: size * 0.6,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
+            ),
           ),
         ),
       ],

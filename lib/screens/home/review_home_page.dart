@@ -103,8 +103,13 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
       children: [
         const Row(
           children: [
-            BrandLogo(),
-            Spacer(),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: BrandLogo(),
+              ),
+            ),
+            SizedBox(width: 12),
             StreakChip(days: 7),
           ],
         ),
