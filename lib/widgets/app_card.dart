@@ -17,12 +17,15 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Card(
       elevation: 0,
-      color: Colors.white,
+      margin: EdgeInsets.zero,
+      color: palette.card,
+      surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
-        side: const BorderSide(color: AppColors.cardBorder),
+        side: BorderSide(color: palette.cardBorder),
       ),
       child: child,
     );

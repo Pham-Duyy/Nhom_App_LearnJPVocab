@@ -4,6 +4,7 @@ import '../../models/generic_entity.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/skeleton.dart';
 import 'generic_screen.dart';
 
 abstract class GenericListScreen<T extends GenericEntity>
@@ -24,6 +25,18 @@ abstract class GenericListScreen<T extends GenericEntity>
 
   String getSubtitle(T item) => item.description;
 
+  Widget? buildHeader(BuildContext context) => null;
+
+  Widget buildSeparator(BuildContext context) => const SizedBox(height: 12);
+
+  Widget buildLoading(BuildContext context) => const SkeletonList();
+
+  Widget buildEmptyState(BuildContext context) => Text(
+        emptyMessage,
+        textAlign: TextAlign.center,
+        style: context.palette.body,
+      );
+
   Widget buildItem(BuildContext context, T item) {
     final subtitle = getSubtitle(item);
     return AppCard(
@@ -32,7 +45,7 @@ abstract class GenericListScreen<T extends GenericEntity>
         title: Text(item.name, style: AppTextStyles.cardTitle),
         subtitle: Text(subtitle),
         isThreeLine: subtitle.contains('\n'),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.primary),
+        trailing: Icon(Icons.chevron_right, color: context.palette.primary),
         onTap: () => onItemTap(context, item),
       ),
     );
@@ -41,37 +54,43 @@ abstract class GenericListScreen<T extends GenericEntity>
   @override
   Widget buildBody(BuildContext context) {
     final items = getItems(context);
-    final errorMessage = getErrorMessage(context);
+    final header = buildHeader(context);
 
-    if (isLoading(context) && items.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (errorMessage != null && items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(errorMessage),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => onRetry(context),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (items.isEmpty) {
-      return Center(child: Text(emptyMessage));
-    }
-
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.all(AppSpacing.page),
-      itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (_, index) => buildItem(context, items[index]),
+      children: [
+        if (header != null) header,
+        if (items.isNotEmpty)
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0) buildSeparator(context),
+            buildItem(context, items[i]),
+          ]
+        else if (isLoading(context))
+          buildLoading(context)
+        else
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: Center(child: _buildMessage(context)),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMessage(BuildContext context) {
+    final errorMessage = getErrorMessage(context);
+    if (errorMessage == null) return buildEmptyState(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(errorMessage, textAlign: TextAlign.center),
+        const SizedBox(height: 12),
+        ElevatedButton(
+          onPressed: () => onRetry(context),
+          style: ElevatedButton.styleFrom(minimumSize: const Size(120, 48)),
+          child: const Text('Thử lại'),
+        ),
+      ],
     );
   }
 }

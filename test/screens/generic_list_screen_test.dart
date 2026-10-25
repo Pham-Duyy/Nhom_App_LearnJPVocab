@@ -1,5 +1,6 @@
 import 'package:chibakanji/models/category.dart';
 import 'package:chibakanji/screens/common/generic_list_screen.dart';
+import 'package:chibakanji/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -63,12 +64,12 @@ void main() {
     );
   });
 
-  testWidgets('đang tải và chưa có dữ liệu thì hiện vòng quay', (
+  testWidgets('đang tải và chưa có dữ liệu thì hiện khung chờ', (
     tester,
   ) async {
     await _pump(tester, const _FakeCategoryList(loading: true));
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(SkeletonList), findsOneWidget);
   });
 
   testWidgets('lỗi và chưa có dữ liệu thì hiện lỗi, bấm Thử lại gọi onRetry', (
@@ -118,7 +119,7 @@ void main() {
       const _FakeCategoryList(items: _categories, loading: true),
     );
 
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(SkeletonList), findsNothing);
     expect(find.text('Chào hỏi'), findsOneWidget);
   });
 }

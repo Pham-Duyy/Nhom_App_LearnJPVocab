@@ -7,7 +7,8 @@ void main() {
   testWidgets(
     'LessonScreen lấy tên chủ đề làm tiêu đề, thẻ hiện thêm số từ và cấp độ',
     (tester) async {
-      await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+      await tester.pumpWidget(
+          const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
 
       await tester.tap(find.text('Học mới'));
       await tester.pumpAndSettle();

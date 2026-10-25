@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
-
 mixin GenericLayout {
   String getTitle(BuildContext context);
 
@@ -16,8 +14,6 @@ mixin GenericLayout {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: showBackButton,
-        backgroundColor: AppColors.appBarBackground,
-        foregroundColor: AppColors.appBarForeground,
         title: Text(getTitle(context)),
       ),
       body: buildBody(context),

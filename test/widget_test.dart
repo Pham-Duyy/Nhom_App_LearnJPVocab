@@ -4,12 +4,13 @@ import 'package:chibakanji/providers/app_providers.dart';
 
 void main() {
   testWidgets('hiển thị giao diện chính và đổi tab', (tester) async {
-    await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+    await tester.pumpWidget(
+        const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
     await tester.pumpAndSettle();
 
     expect(find.text('Chào Duy!'), findsOneWidget);
     expect(find.text('9 từ vựng'), findsOneWidget);
-    expect(find.text('Đến giờ ôn rồi!'), findsOneWidget);
+    expect(find.text('Đến giờ ôn tập'), findsOneWidget);
 
     await tester.tap(find.text('Học mới'));
     await tester.pumpAndSettle();
@@ -23,16 +24,18 @@ void main() {
   });
 
   testWidgets('hiển thị giao diện Sổ từ và Cá nhân', (tester) async {
-    await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+    await tester.pumpWidget(
+        const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sổ từ'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Sổ từ của bạn'), findsOneWidget);
-    expect(find.text('9 từ đã học'), findsOneWidget);
+    expect(find.text('Sổ từ'), findsNWidgets(2));
+    expect(
+        find.text('9 từ đã học · Tìm kiếm và lưu yêu thích'), findsOneWidget);
     expect(find.text('Tất cả'), findsOneWidget);
-    expect(find.text('Đến hạn'), findsOneWidget);
+    expect(find.text('Đến hạn · 3'), findsOneWidget);
 
     await tester.tap(find.text('Cá nhân'));
     await tester.pumpAndSettle();

@@ -16,33 +16,34 @@ class MainScreen extends StatelessWidget {
     final selectedIndex = context.watch<MainNavigationProvider>().selectedIndex;
 
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) =>
-            context.read<MainNavigationProvider>().selectTab(index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.alarm),
-            label: 'Ôn tập',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: 'Học mới',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmarks),
-            label: 'Sổ từ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Cá nhân',
-          ),
-        ],
+      body: SafeArea(bottom: false, child: _buildBody(selectedIndex)),
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: context.palette.divider)),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (index) =>
+              context.read<MainNavigationProvider>().selectTab(index),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.alarm_outlined),
+              label: 'Ôn tập',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.import_contacts_outlined),
+              label: 'Học mới',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bookmark_border_rounded),
+              label: 'Sổ từ',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline_rounded),
+              label: 'Cá nhân',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -60,40 +61,5 @@ class MainScreen extends StatelessWidget {
       default:
         return const ReviewHomePage();
     }
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: AppColors.appBarBackground,
-      foregroundColor: AppColors.appBarForeground,
-      title: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'ChibaKanji',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            'Tiếng Nhật, vui mỗi ngày',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-          ),
-        ],
-      ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 16),
-          child: Chip(
-            avatar: Icon(
-              Icons.local_fire_department,
-              size: 18,
-              color: Colors.orange,
-            ),
-            label: Text('7 ngày'),
-            backgroundColor: Colors.white,
-          ),
-        ),
-      ],
-    );
   }
 }

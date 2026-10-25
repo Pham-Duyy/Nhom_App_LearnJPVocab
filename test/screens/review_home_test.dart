@@ -8,23 +8,25 @@ void main() {
   testWidgets('trang chủ hiển thị đúng thống kê từ ProgressProvider', (
     tester,
   ) async {
-    await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+    await tester.pumpWidget(
+        const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
     await tester.pumpAndSettle();
 
     expect(find.text('9 từ vựng'), findsOneWidget);
-    expect(find.text('3 từ đang chờ bạn · khoảng 2 phút'), findsOneWidget);
+    expect(find.text('3 từ đến hạn · Khoảng 2 phút'), findsOneWidget);
 
     final bars = tester.widgetList<MemoryBar>(find.byType(MemoryBar)).toList();
     expect(bars.map((bar) => bar.count).toList(), [3, 3, 1, 1, 1]);
   });
 
   testWidgets(
-    'nhấn Ôn ngay chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
+    'nhấn Bắt đầu ôn tập chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
     (tester) async {
-      await tester.pumpWidget(const AppProviders(child: ChibaKanjiApp()));
+      await tester.pumpWidget(
+          const AppProviders(child: ChibaKanjiApp(showWelcome: false)));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Ôn ngay'));
+      await tester.tap(find.text('Bắt đầu ôn tập'));
       await tester.pumpAndSettle();
 
       // Đúng 3 từ đến hạn được đưa vào phiên, không phải 9 từ đã học hay
@@ -46,9 +48,13 @@ void main() {
       // vốn đã không đến hạn từ đầu, nên due count phải về đúng 0.
       expect(find.text('Bạn đã ôn xong hôm nay!'), findsOneWidget);
       expect(find.text('Quay lại vào ngày mai nhé.'), findsOneWidget);
+      expect(
+        find.text('Hết từ cần ôn rồi, Chibi đi ngủ một chút.'),
+        findsOneWidget,
+      );
 
       final button = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Ôn ngay'),
+        find.widgetWithText(ElevatedButton, 'Bắt đầu ôn tập'),
       );
       expect(button.onPressed, isNull);
     },
