@@ -5,20 +5,26 @@ import '../auth/auth_controller.dart';
 import '../auth/auth_service.dart';
 import '../auth/firebase_auth_service.dart';
 import '../repositories/category_repository.dart';
+import '../repositories/combined_repository.dart';
 import '../repositories/firestore/firestore_category_repository.dart';
 import '../repositories/firestore/firestore_progress_repository.dart';
 import '../repositories/firestore/firestore_quiz_attempt_repository.dart';
+import '../repositories/firestore/firestore_user_topic_repository.dart';
+import '../repositories/firestore/firestore_user_word_repository.dart';
 import '../repositories/firestore/firestore_user_profile_repository.dart';
 import '../repositories/firestore/firestore_vocabulary_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/user_profile_repository.dart';
+import '../repositories/user_topic_repository.dart';
+import '../repositories/user_word_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../services/speaker.dart';
 import 'exam_provider.dart';
 import 'lesson_provider.dart';
 import 'library_provider.dart';
 import 'main_navigation_provider.dart';
+import 'my_vocabulary_provider.dart';
 import 'progress_provider.dart';
 import 'quiz_provider.dart';
 import 'user_profile_provider.dart';
@@ -37,6 +43,8 @@ class AppProviders extends StatelessWidget {
     this.progressRepository,
     this.userProfileRepository,
     this.quizAttemptRepository,
+    this.userTopicRepository,
+    this.userWordRepository,
     this.speaker,
   }) : super(key: key);
 
@@ -47,12 +55,21 @@ class AppProviders extends StatelessWidget {
   final ProgressRepository? progressRepository;
   final UserProfileRepository? userProfileRepository;
   final QuizAttemptRepository? quizAttemptRepository;
+  final UserTopicRepository? userTopicRepository;
+  final UserWordRepository? userWordRepository;
   final Speaker? speaker;
 
   @override
   Widget build(BuildContext context) {
     final categories = categoryRepository ?? FirestoreCategoryRepository();
-    final vocabulary = vocabularyRepository ?? FirestoreVocabularyRepository();
+    final topics = userTopicRepository ?? FirestoreUserTopicRepository();
+    final myWords = userWordRepository ?? FirestoreUserWordRepository();
+    // Từ của app cộng từ người học tự thêm: mọi nơi dùng từ vựng (flashcard,
+    // quiz, ôn tập, Sổ từ) đều thấy cả hai.
+    final vocabulary = CombinedVocabularyRepository(
+      shared: vocabularyRepository ?? FirestoreVocabularyRepository(),
+      personal: myWords,
+    );
     final attempts = quizAttemptRepository ?? FirestoreQuizAttemptRepository();
 
     return MultiProvider(
@@ -104,6 +121,15 @@ class AppProviders extends StatelessWidget {
           create: (context) => ExamProvider(
             attempts,
             onSaved: context.read<QuizProvider>().loadHistory,
+          ),
+        ),
+        ChangeNotifierProvider(
+          // Từ tự thêm thay đổi thì Sổ từ tải lại để thấy từ mới.
+          create: (context) => MyVocabularyProvider(
+            topics,
+            myWords,
+            vocabulary,
+            onWordsChanged: context.read<LibraryProvider>().load,
           ),
         ),
       ],

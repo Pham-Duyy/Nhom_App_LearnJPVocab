@@ -15,6 +15,9 @@ abstract class Repository<T, ID> {
 
   /// Thêm mới, hoặc ghi đè nếu đã có đối tượng cùng khóa.
   Future<void> save(T item);
+
+  /// Xóa đối tượng mang [id]; không có thì bỏ qua.
+  Future<void> delete(ID id);
 }
 
 /// Sắp xếp nội dung học (chủ đề, bài học, từ vựng) theo thứ tự hiển thị và

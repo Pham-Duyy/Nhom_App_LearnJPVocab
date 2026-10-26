@@ -14,6 +14,7 @@ import '../../widgets/favorite_button.dart';
 import '../../widgets/memory_level_chip.dart';
 import '../../widgets/skeleton.dart';
 import '../common/generic_screen.dart';
+import '../my_vocabulary/my_vocabulary_screen.dart';
 import 'vocabulary_detail_screen.dart';
 
 enum _WordFilter { all, due, favorite }
@@ -91,6 +92,21 @@ class _VocabularyBookScreenState
                 style: palette.body,
               ),
             ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.page,
+            0,
+            AppSpacing.page,
+            16,
+          ),
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const MyVocabularyScreen()),
+            ),
+            icon: const Icon(Icons.inventory_2_outlined),
+            label: const Text('Kho từ của tôi'),
           ),
         ),
         Padding(

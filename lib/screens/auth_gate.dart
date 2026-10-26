@@ -5,6 +5,7 @@ import '../auth/auth_controller.dart';
 import '../auth/auth_status.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/library_provider.dart';
+import '../providers/my_vocabulary_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/user_profile_provider.dart';
@@ -58,6 +59,7 @@ class _AuthGateState extends State<AuthGate> {
       context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
       context.read<QuizProvider>().loadHistory();
+      context.read<MyVocabularyProvider>().load();
     });
   }
 }

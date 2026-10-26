@@ -2,6 +2,7 @@ import 'package:chibakanji/auth/auth_controller.dart';
 import 'package:chibakanji/models/progress.dart';
 import 'package:chibakanji/providers/lesson_provider.dart';
 import 'package:chibakanji/providers/library_provider.dart';
+import 'package:chibakanji/providers/my_vocabulary_provider.dart';
 import 'package:chibakanji/providers/progress_provider.dart';
 import 'package:chibakanji/providers/quiz_provider.dart';
 import 'package:chibakanji/providers/user_profile_provider.dart';
@@ -9,6 +10,8 @@ import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_quiz_attempt_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_topic_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_word_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:chibakanji/screens/auth_gate.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +46,13 @@ Widget _buildGate(
       ChangeNotifierProvider(
         create: (_) => QuizProvider(
           MockQuizAttemptRepository(),
+          MockVocabularyRepository(),
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => MyVocabularyProvider(
+          MockUserTopicRepository(),
+          MockUserWordRepository(),
           MockVocabularyRepository(),
         ),
       ),

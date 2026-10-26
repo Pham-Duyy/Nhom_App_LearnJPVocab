@@ -105,4 +105,9 @@ class FirestoreRepository<T> implements Repository<T, String> {
         ?.doc(_idOf(item))
         .set(_toMap(item), SetOptions(merge: true));
   }
+
+  @override
+  Future<void> delete(String id) async {
+    await _collection?.doc(id).delete();
+  }
 }

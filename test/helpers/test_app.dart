@@ -7,6 +7,8 @@ import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_quiz_attempt_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_topic_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_user_word_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,6 +23,8 @@ Widget buildTestApp({
   FakeAuthService? authService,
   MockUserProfileRepository? userProfileRepository,
   MockProgressRepository? progressRepository,
+  MockUserTopicRepository? userTopicRepository,
+  MockUserWordRepository? userWordRepository,
   FakeSpeaker? speaker,
 }) {
   return AppProviders(
@@ -39,6 +43,8 @@ Widget buildTestApp({
           initialProfile: const UserProfile(displayName: 'Duy'),
         ),
     quizAttemptRepository: MockQuizAttemptRepository(),
+    userTopicRepository: userTopicRepository ?? MockUserTopicRepository(),
+    userWordRepository: userWordRepository ?? MockUserWordRepository(),
     speaker: speaker ?? FakeSpeaker(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );

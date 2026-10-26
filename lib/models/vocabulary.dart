@@ -1,6 +1,13 @@
 import 'learning_content.dart';
 
 class Vocabulary extends LearningContent {
+  /// "Cấp độ" của từ do người học tự thêm vào kho từ của mình.
+  static const personalLevel = 'Của tôi';
+
+  /// Id của từ tự thêm bắt đầu bằng tiền tố này, để biết từ nằm ở kho
+  /// riêng (`users/{uid}/words`) hay kho chung (`vocabularies`).
+  static const personalIdPrefix = 'my_';
+
   final String lessonId;
   final String kanji;
   final String kana;
@@ -30,6 +37,8 @@ class Vocabulary extends LearningContent {
         );
 
   String get meaning => description;
+
+  bool get isPersonal => id.startsWith(personalIdPrefix);
 
   /// Factory tiện lợi giúp thêm từ vựng mới nhanh chóng mà không cần truyền id/order dài dòng
   factory Vocabulary.create({

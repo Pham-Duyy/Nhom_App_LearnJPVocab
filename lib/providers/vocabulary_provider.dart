@@ -37,6 +37,10 @@ class VocabularyProvider extends ChangeNotifier {
   Future<void> loadReviewWords(List<String> vocabularyIds) =>
       _loadWords(() => _repository.getByIds(vocabularyIds));
 
+  /// Học một danh sách từ có sẵn, vd. các từ của một chủ đề tự tạo.
+  Future<void> loadWords(List<Vocabulary> words) =>
+      _loadWords(() async => words);
+
   /// Tải lại lần gần nhất (cùng bài học hoặc cùng phiên ôn) sau khi lỗi.
   Future<void> retry() async {
     final fetch = _lastFetch;

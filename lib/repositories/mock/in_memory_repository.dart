@@ -33,4 +33,9 @@ class InMemoryRepository<T> implements Repository<T, String> {
   Future<void> save(T item) async {
     _store[_idOf(item)] = item;
   }
+
+  @override
+  Future<void> delete(String id) async {
+    _store.remove(id);
+  }
 }

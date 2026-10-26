@@ -7,12 +7,12 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 280 test
+flutter test                 # chạy toàn bộ 300 test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
 
-Kết quả hiện tại: **280/280 test qua**, độ phủ code **89.6%**.
+Kết quả hiện tại: **300/300 test qua**, độ phủ code **89.6%**.
 
 ## Cấu trúc thư mục
 
@@ -28,7 +28,7 @@ Kết quả hiện tại: **280/280 test qua**, độ phủ code **89.6%**.
 | `screens/` | Widget test | Thao tác trên giao diện như người dùng thật |
 | `fakes/`, `helpers/` | Hỗ trợ | Dịch vụ giả, repository bật/tắt lỗi được, dựng app để test |
 
-Tên mỗi test bắt đầu bằng mã user story (`US01`–`US21`) hoặc mã yêu cầu kiểm
+Tên mỗi test bắt đầu bằng mã user story (`US01`–`US23`) hoặc mã yêu cầu kiểm
 thử của đề bài (`8a`, `8c`, `8e`), nên lọc được bằng `--plain-name`.
 
 ## 8b. Đối chiếu user story với test
@@ -56,6 +56,8 @@ thử của đề bài (`8a`, `8c`, `8e`), nên lọc được bằng `--plain-n
 | US19 | Là người học, tôi có thể xem chuỗi ngày học liên tiếp | 15 | `models/user_profile_test.dart`, `providers/progress_provider_test.dart`, `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart` |
 | US20 | Là người học, tôi có thể đổi tên hiển thị và chế độ sáng/tối | 13 | `models/user_profile_test.dart`, `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart`, `screens/theme_mode_test.dart` |
 | US21 | Là người học, tôi có thể làm bài thi thử trắc nghiệm có giới hạn thời gian | 15 | `providers/exam_provider_test.dart`, `screens/exam_flow_test.dart` |
+| US22 | Là người học, tôi có thể tạo chủ đề và thêm từ vựng của riêng mình để học | 9 | `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
+| US23 | Là người học, tôi có thể import danh sách từ vựng từ Excel hoặc Google Sheets | 6 | `data/vocabulary_import_parser_test.dart`, `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
 
 Một test có thể thuộc nhiều story (vd. `US06, US07`) nên tổng cột "Số test"
 lớn hơn số test chỉ gắn một mã.
