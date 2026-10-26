@@ -67,6 +67,27 @@ class MockLearningData {
       description: 'Thời tiết, cảnh vật thiên nhiên và động vật.',
       order: 9,
     ),
+    Category(
+      id: 'cat_ind_food',
+      name: 'Chế biến thực phẩm',
+      description: 'Vệ sinh, dây chuyền và kiểm hàng ở nhà máy thực phẩm.',
+      jlptLevel: Category.industryLevel,
+      order: 10,
+    ),
+    Category(
+      id: 'cat_ind_build',
+      name: 'Xây dựng',
+      description: 'An toàn lao động, vật liệu và dụng cụ ở công trường.',
+      jlptLevel: Category.industryLevel,
+      order: 11,
+    ),
+    Category(
+      id: 'cat_ind_care',
+      name: 'Điều dưỡng (Kaigo)',
+      description: 'Chăm sóc người cao tuổi, sức khỏe và ghi chép hằng ngày.',
+      jlptLevel: Category.industryLevel,
+      order: 12,
+    ),
   ];
 
   static const List<Lesson> lessons = [
@@ -229,6 +250,60 @@ class MockLearningData {
       title: 'Thiên nhiên và động vật',
       description: 'Núi, sông, biển, cây cối và con vật.',
       jlptLevel: 'N5',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_food_1',
+      categoryId: 'cat_ind_food',
+      title: 'Nhà xưởng và vệ sinh',
+      description: 'Quy tắc vệ sinh trước và trong khi làm việc.',
+      jlptLevel: Category.industryLevel,
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_food_2',
+      categoryId: 'cat_ind_food',
+      title: 'Dây chuyền sản xuất',
+      description: 'Nguyên liệu, gia nhiệt, đóng gói và xuất hàng.',
+      jlptLevel: Category.industryLevel,
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_build_1',
+      categoryId: 'cat_ind_build',
+      title: 'Công trường và an toàn',
+      description: 'Đồ bảo hộ, biển báo và họp đầu giờ.',
+      jlptLevel: Category.industryLevel,
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_build_2',
+      categoryId: 'cat_ind_build',
+      title: 'Vật liệu và dụng cụ',
+      description: 'Gỗ, thép, bê tông và các việc tay chân.',
+      jlptLevel: Category.industryLevel,
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_care_1',
+      categoryId: 'cat_ind_care',
+      title: 'Chăm sóc hằng ngày',
+      description: 'Ăn uống, tắm, thay đồ và đi lại.',
+      jlptLevel: Category.industryLevel,
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_ind_care_2',
+      categoryId: 'cat_ind_care',
+      title: 'Sức khỏe và ghi chép',
+      description: 'Thân nhiệt, huyết áp, thuốc và báo cáo.',
+      jlptLevel: Category.industryLevel,
       order: 2,
       vocabularyCount: 10,
     ),
@@ -1131,6 +1206,507 @@ class MockLearningData {
         'Bạn thích con vật nào?'
       ),
     ]),
+    ..._lessonWords(
+        'ind_food',
+        'les_ind_food_1',
+        1,
+        level: Category.industryLevel,
+        const [
+          (
+            '工場',
+            'こうじょう',
+            'koujou',
+            'Nhà máy, xưởng',
+            '毎朝八時に工場へ行きます。',
+            'Mỗi sáng tôi đến xưởng lúc 8 giờ.'
+          ),
+          (
+            '衛生',
+            'えいせい',
+            'eisei',
+            'Vệ sinh',
+            '食品工場では衛生がいちばん大切です。',
+            'Ở nhà máy thực phẩm, vệ sinh là quan trọng nhất.'
+          ),
+          (
+            '手洗い',
+            'てあらい',
+            'tearai',
+            'Rửa tay',
+            '作業の前に手洗いをします。',
+            'Rửa tay trước khi bắt đầu làm.'
+          ),
+          (
+            '消毒',
+            'しょうどく',
+            'shoudoku',
+            'Khử trùng',
+            '道具をアルコールで消毒します。',
+            'Khử trùng dụng cụ bằng cồn.'
+          ),
+          (
+            '作業着',
+            'さぎょうぎ',
+            'sagyougi',
+            'Quần áo làm việc',
+            '作業着に着替えてください。',
+            'Hãy thay quần áo làm việc.'
+          ),
+          (
+            '手袋',
+            'てぶくろ',
+            'tebukuro',
+            'Găng tay',
+            '手袋をしてから肉を切ります。',
+            'Đeo găng tay rồi mới cắt thịt.'
+          ),
+          (
+            '',
+            'マスク',
+            'masuku',
+            'Khẩu trang',
+            '工場の中ではマスクをつけます。',
+            'Trong xưởng phải đeo khẩu trang.'
+          ),
+          (
+            '異物',
+            'いぶつ',
+            'ibutsu',
+            'Dị vật',
+            '製品に異物が入っていないか見ます。',
+            'Kiểm tra xem sản phẩm có lẫn dị vật không.'
+          ),
+          (
+            '賞味期限',
+            'しょうみきげん',
+            'shoumikigen',
+            'Hạn sử dụng',
+            '箱に賞味期限を印刷します。',
+            'In hạn sử dụng lên hộp.'
+          ),
+          (
+            '温度',
+            'おんど',
+            'ondo',
+            'Nhiệt độ',
+            '冷蔵庫の温度を記録します。',
+            'Ghi lại nhiệt độ của tủ lạnh.'
+          ),
+        ]),
+    ..._lessonWords(
+        'ind_food',
+        'les_ind_food_2',
+        11,
+        level: Category.industryLevel,
+        const [
+          (
+            '材料',
+            'ざいりょう',
+            'zairyou',
+            'Nguyên liệu',
+            '材料の量を量ります。',
+            'Cân lượng nguyên liệu.'
+          ),
+          (
+            '計量',
+            'けいりょう',
+            'keiryou',
+            'Cân đo',
+            '計量を間違えないでください。',
+            'Đừng cân đo sai.'
+          ),
+          (
+            '加熱',
+            'かねつ',
+            'kanetsu',
+            'Gia nhiệt, làm chín',
+            '肉は中までしっかり加熱します。',
+            'Làm chín thịt kỹ đến tận bên trong.'
+          ),
+          (
+            '冷却',
+            'れいきゃく',
+            'reikyaku',
+            'Làm nguội',
+            '焼いたパンを冷却します。',
+            'Làm nguội bánh mì vừa nướng.'
+          ),
+          (
+            '包装',
+            'ほうそう',
+            'housou',
+            'Đóng gói',
+            '包装する前に重さを確認します。',
+            'Kiểm tra trọng lượng trước khi đóng gói.'
+          ),
+          (
+            '検品',
+            'けんぴん',
+            'kenpin',
+            'Kiểm hàng',
+            '出荷の前に検品をします。',
+            'Kiểm hàng trước khi xuất.'
+          ),
+          (
+            '不良品',
+            'ふりょうひん',
+            'furyouhin',
+            'Hàng lỗi',
+            '不良品はこの箱に入れてください。',
+            'Hãy bỏ hàng lỗi vào thùng này.'
+          ),
+          (
+            '出荷',
+            'しゅっか',
+            'shukka',
+            'Xuất hàng',
+            '午後三時に出荷します。',
+            'Xuất hàng lúc 3 giờ chiều.'
+          ),
+          (
+            '',
+            'ライン',
+            'rain',
+            'Dây chuyền',
+            '今日は二番のラインで働きます。',
+            'Hôm nay tôi làm ở dây chuyền số 2.'
+          ),
+          (
+            '休憩',
+            'きゅうけい',
+            'kyuukei',
+            'Giờ giải lao',
+            '十時から十五分休憩です。',
+            'Nghỉ giải lao 15 phút từ 10 giờ.'
+          ),
+        ]),
+    ..._lessonWords(
+        'ind_build',
+        'les_ind_build_1',
+        1,
+        level: Category.industryLevel,
+        const [
+          (
+            '現場',
+            'げんば',
+            'genba',
+            'Công trường',
+            '現場には七時半に集まります。',
+            'Tập trung ở công trường lúc 7 giờ rưỡi.'
+          ),
+          (
+            '安全',
+            'あんぜん',
+            'anzen',
+            'An toàn',
+            '安全第一で作業しましょう。',
+            'Hãy làm việc với an toàn là trên hết.'
+          ),
+          (
+            '',
+            'ヘルメット',
+            'herumetto',
+            'Mũ bảo hộ',
+            '現場ではヘルメットをかぶってください。',
+            'Ở công trường hãy đội mũ bảo hộ.'
+          ),
+          (
+            '安全帯',
+            'あんぜんたい',
+            'anzentai',
+            'Dây đai an toàn',
+            '高い所では安全帯を使います。',
+            'Làm ở chỗ cao phải dùng dây đai an toàn.'
+          ),
+          (
+            '足場',
+            'あしば',
+            'ashiba',
+            'Giàn giáo',
+            '足場の上では走らないでください。',
+            'Đừng chạy trên giàn giáo.'
+          ),
+          (
+            '朝礼',
+            'ちょうれい',
+            'chourei',
+            'Họp đầu giờ sáng',
+            '朝礼で今日の作業を確認します。',
+            'Xác nhận việc hôm nay trong buổi họp sáng.'
+          ),
+          (
+            '危ない',
+            'あぶない',
+            'abunai',
+            'Nguy hiểm',
+            '危ない！上から物が落ちます。',
+            'Nguy hiểm! Có đồ rơi từ trên xuống.'
+          ),
+          (
+            '立入禁止',
+            'たちいりきんし',
+            'tachiirikinshi',
+            'Cấm vào',
+            'ここは立入禁止です。',
+            'Khu vực này cấm vào.'
+          ),
+          (
+            '怪我',
+            'けが',
+            'kega',
+            'Vết thương, bị thương',
+            '怪我をしたら、すぐに言ってください。',
+            'Nếu bị thương hãy báo ngay.'
+          ),
+          (
+            '図面',
+            'ずめん',
+            'zumen',
+            'Bản vẽ',
+            '図面を見ながら作業します。',
+            'Vừa xem bản vẽ vừa làm.'
+          ),
+        ]),
+    ..._lessonWords(
+        'ind_build',
+        'les_ind_build_2',
+        11,
+        level: Category.industryLevel,
+        const [
+          (
+            '材木',
+            'ざいもく',
+            'zaimoku',
+            'Gỗ xây dựng',
+            '材木をトラックから降ろします。',
+            'Dỡ gỗ từ xe tải xuống.'
+          ),
+          (
+            '鉄筋',
+            'てっきん',
+            'tekkin',
+            'Cốt thép',
+            '鉄筋を図面どおりに並べます。',
+            'Xếp cốt thép theo đúng bản vẽ.'
+          ),
+          (
+            '',
+            'コンクリート',
+            'konkuriito',
+            'Bê tông',
+            'コンクリートが固まるまで待ちます。',
+            'Chờ đến khi bê tông đông cứng.'
+          ),
+          (
+            '',
+            'セメント',
+            'semento',
+            'Xi măng',
+            'セメントと砂と水を混ぜます。',
+            'Trộn xi măng với cát và nước.'
+          ),
+          (
+            '',
+            'ハンマー',
+            'hanmaa',
+            'Cái búa',
+            'ハンマーで釘を打ちます。',
+            'Đóng đinh bằng búa.'
+          ),
+          ('釘', 'くぎ', 'kugi', 'Cái đinh', '釘が足りません。', 'Không đủ đinh.'),
+          (
+            '運ぶ',
+            'はこぶ',
+            'hakobu',
+            'Khiêng, vận chuyển',
+            '二人でこの板を運んでください。',
+            'Hai người hãy khiêng tấm ván này.'
+          ),
+          (
+            '測る',
+            'はかる',
+            'hakaru',
+            'Đo',
+            'メジャーで長さを測ります。',
+            'Đo chiều dài bằng thước dây.'
+          ),
+          ('掘る', 'ほる', 'horu', 'Đào', 'スコップで土を掘ります。', 'Đào đất bằng xẻng.'),
+          (
+            '片付け',
+            'かたづけ',
+            'katazuke',
+            'Dọn dẹp',
+            '作業のあとは片付けをします。',
+            'Làm xong thì dọn dẹp.'
+          ),
+        ]),
+    ..._lessonWords(
+        'ind_care',
+        'les_ind_care_1',
+        1,
+        level: Category.industryLevel,
+        const [
+          (
+            '介護',
+            'かいご',
+            'kaigo',
+            'Chăm sóc, điều dưỡng',
+            '祖母は介護が必要です。',
+            'Bà tôi cần được chăm sóc.'
+          ),
+          (
+            '利用者',
+            'りようしゃ',
+            'riyousha',
+            'Người dùng dịch vụ',
+            '利用者の名前を早く覚えましょう。',
+            'Hãy sớm nhớ tên người dùng dịch vụ.'
+          ),
+          (
+            '食事介助',
+            'しょくじかいじょ',
+            'shokujikaijo',
+            'Hỗ trợ ăn uống',
+            '昼は食事介助をします。',
+            'Buổi trưa tôi hỗ trợ ăn uống.'
+          ),
+          (
+            '入浴',
+            'にゅうよく',
+            'nyuuyoku',
+            'Tắm rửa',
+            '入浴の前に体温を測ります。',
+            'Đo thân nhiệt trước khi tắm.'
+          ),
+          (
+            '着替え',
+            'きがえ',
+            'kigae',
+            'Thay quần áo',
+            '朝の着替えを手伝います。',
+            'Giúp thay quần áo buổi sáng.'
+          ),
+          (
+            '車いす',
+            'くるまいす',
+            'kurumaisu',
+            'Xe lăn',
+            '車いすで食堂へ行きます。',
+            'Đi đến nhà ăn bằng xe lăn.'
+          ),
+          (
+            '歩行',
+            'ほこう',
+            'hokou',
+            'Đi bộ, tập đi',
+            '一緒に歩行の練習をします。',
+            'Cùng nhau tập đi.'
+          ),
+          (
+            '',
+            'トイレ',
+            'toire',
+            'Nhà vệ sinh',
+            'トイレまでご案内します。',
+            'Tôi sẽ đưa bác đến nhà vệ sinh.'
+          ),
+          (
+            '声かけ',
+            'こえかけ',
+            'koekake',
+            'Lời hỏi han',
+            'やさしい声かけが大切です。',
+            'Lời hỏi han nhẹ nhàng rất quan trọng.'
+          ),
+          (
+            '見守り',
+            'みまもり',
+            'mimamori',
+            'Trông chừng',
+            '夜は利用者の見守りをします。',
+            'Buổi tối tôi trông chừng người dùng dịch vụ.'
+          ),
+        ]),
+    ..._lessonWords(
+        'ind_care',
+        'les_ind_care_2',
+        11,
+        level: Category.industryLevel,
+        const [
+          (
+            '体温',
+            'たいおん',
+            'taion',
+            'Thân nhiệt',
+            '毎朝体温を測ります。',
+            'Đo thân nhiệt mỗi sáng.'
+          ),
+          (
+            '血圧',
+            'けつあつ',
+            'ketsuatsu',
+            'Huyết áp',
+            '今日は血圧が少し高いです。',
+            'Hôm nay huyết áp hơi cao.'
+          ),
+          (
+            '熱',
+            'ねつ',
+            'netsu',
+            'Sốt',
+            '熱があるので、休んでください。',
+            'Bị sốt nên hãy nghỉ ngơi.'
+          ),
+          (
+            '薬',
+            'くすり',
+            'kusuri',
+            'Thuốc',
+            '食後に薬を飲みます。',
+            'Uống thuốc sau bữa ăn.'
+          ),
+          ('痛い', 'いたい', 'itai', 'Đau', 'どこが痛いですか。', 'Bác đau ở đâu ạ?'),
+          (
+            '転倒',
+            'てんとう',
+            'tentou',
+            'Té ngã',
+            '転倒しないように気をつけます。',
+            'Cẩn thận để không bị ngã.'
+          ),
+          (
+            '記録',
+            'きろく',
+            'kiroku',
+            'Ghi chép',
+            '毎日介護の記録を書きます。',
+            'Mỗi ngày tôi viết nhật ký chăm sóc.'
+          ),
+          (
+            '報告',
+            'ほうこく',
+            'houkoku',
+            'Báo cáo',
+            'いつもと違うことはすぐ報告します。',
+            'Có gì khác thường thì báo cáo ngay.'
+          ),
+          (
+            '看護師',
+            'かんごし',
+            'kangoshi',
+            'Y tá',
+            '看護師に相談します。',
+            'Trao đổi với y tá.'
+          ),
+          (
+            '様子',
+            'ようす',
+            'yousu',
+            'Tình trạng',
+            '今日の様子はどうですか。',
+            'Hôm nay tình trạng của bác thế nào?'
+          ),
+        ]),
   ];
 
   /// Sinh từ vựng cho một bài từ danh sách dòng gọn. Id nối tiếp theo chủ đề
@@ -1140,8 +1716,9 @@ class MockLearningData {
     String topic,
     String lessonId,
     int start,
-    List<_WordRow> rows,
-  ) {
+    List<_WordRow> rows, {
+    String level = 'N5',
+  }) {
     return [
       for (final (i, (kanji, kana, romaji, meaning, exampleJp, exampleVi))
           in rows.indexed)
@@ -1154,7 +1731,7 @@ class MockLearningData {
           meaning: meaning,
           exampleJapanese: exampleJp,
           exampleVietnamese: exampleVi,
-          jlptLevel: 'N5',
+          jlptLevel: level,
           order: i + 1,
         ),
     ];

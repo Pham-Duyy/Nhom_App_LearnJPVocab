@@ -10,7 +10,8 @@ import '../utils/app_error.dart';
 class LessonProvider extends ChangeNotifier {
   LessonProvider(this._repository);
 
-  static const jlptLevels = ['N5', 'N4', 'N3'];
+  /// Các cấp độ JLPT và mục từ vựng chuyên ngành.
+  static const levels = ['N5', 'N4', 'N3', Category.industryLevel];
 
   final CategoryRepository _repository;
 
@@ -18,7 +19,7 @@ class LessonProvider extends ChangeNotifier {
   List<Lesson> _lessons = [];
   Category? _selectedCategory;
   Lesson? _selectedLesson;
-  String _selectedLevel = jlptLevels.first;
+  String _selectedLevel = levels.first;
   bool _isLoading = false;
   String? _errorMessage;
 

@@ -1,4 +1,5 @@
 import 'package:chibakanji/data/mock/mock_learning_data.dart';
+import 'package:chibakanji/models/category.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -33,15 +34,18 @@ void main() {
     expect(progress.length - dueCount, 6);
   });
 
-  group('nội dung N5', () {
+  group('nội dung học mẫu', () {
     const categories = MockLearningData.categories;
     const lessons = MockLearningData.lessons;
     final words = MockLearningData.vocabulary;
 
-    test('đủ 9 chủ đề, 18 bài và 150 từ', () {
-      expect(categories, hasLength(9));
-      expect(lessons, hasLength(18));
-      expect(words, hasLength(150));
+    test('9 chủ đề N5 và 3 chủ đề ngành: 24 bài, 210 từ', () {
+      final industry =
+          categories.where((c) => c.jlptLevel == Category.industryLevel).length;
+      expect(industry, 3);
+      expect(categories, hasLength(12));
+      expect(lessons, hasLength(24));
+      expect(words, hasLength(210));
     });
 
     test('id không trùng, mỗi bài và mỗi từ đều thuộc về một mục có thật', () {
@@ -86,7 +90,8 @@ void main() {
           everyElement(isNotEmpty),
           reason: word.id,
         );
-        expect(word.jlptLevel, 'N5', reason: word.id);
+        final lesson = lessons.firstWhere((l) => l.id == word.lessonId);
+        expect(word.jlptLevel, lesson.jlptLevel, reason: word.id);
       }
     });
   });

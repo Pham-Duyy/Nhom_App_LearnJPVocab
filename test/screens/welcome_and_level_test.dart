@@ -63,10 +63,28 @@ void main() {
       await tester.tap(find.text('Học mới'));
       await tester.pumpAndSettle();
 
+      final n5Count = MockLearningData.categories
+          .where((category) => category.jlptLevel == 'N5')
+          .length;
       expect(find.text('Chủ đề N5'), findsOneWidget);
-      expect(find.text('${MockLearningData.categories.length} chủ đề'),
-          findsOneWidget);
+      expect(find.text('$n5Count chủ đề'), findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsOneWidget);
+    });
+
+    testWidgets('chọn "Ngành" thì hiện các chủ đề từ vựng chuyên ngành', (
+      tester,
+    ) async {
+      await pumpTestApp(tester);
+      await tester.tap(find.text('Học mới'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ngành'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Từ vựng chuyên ngành'), findsOneWidget);
+      expect(find.text('3 chủ đề'), findsOneWidget);
+      expect(find.text('Chế biến thực phẩm'), findsOneWidget);
+      expect(find.text('Chào hỏi và giao tiếp'), findsNothing);
     });
 
     testWidgets('chọn cấp chưa có nội dung thì báo đang biên soạn', (

@@ -38,6 +38,9 @@ class CategoryScreen extends GenericListScreen<Category> {
     'cat_places': '駅',
     'cat_home': '部',
     'cat_nature': '山',
+    'cat_ind_food': '製',
+    'cat_ind_build': '建',
+    'cat_ind_care': '介',
   };
 
   @override
@@ -86,7 +89,7 @@ class CategoryScreen extends GenericListScreen<Category> {
         ),
         const SizedBox(height: 24),
         ChoiceSegments<String>(
-          options: LessonProvider.jlptLevels,
+          options: LessonProvider.levels,
           selected: provider.selectedLevel,
           onChanged: provider.selectLevel,
         ),
@@ -95,7 +98,9 @@ class CategoryScreen extends GenericListScreen<Category> {
           children: [
             Expanded(
               child: Text(
-                'Chủ đề ${provider.selectedLevel}',
+                provider.selectedLevel == Category.industryLevel
+                    ? 'Từ vựng chuyên ngành'
+                    : 'Chủ đề ${provider.selectedLevel}',
                 style: const TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.w600,

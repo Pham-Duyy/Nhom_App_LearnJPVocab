@@ -3,6 +3,10 @@ import 'learning_content.dart';
 /// Chủ đề học. id, name, description, order, isPublished và các phương thức
 /// chung (getName, matches, toString...) kế thừa từ [LearningContent].
 class Category extends LearningContent {
+  /// "Cấp độ" của các chủ đề từ vựng chuyên ngành (thực phẩm, xây dựng...),
+  /// hiện cạnh N5, N4, N3.
+  static const industryLevel = 'Ngành';
+
   final String? imageUrl;
   final String jlptLevel;
 
