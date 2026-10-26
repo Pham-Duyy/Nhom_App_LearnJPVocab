@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:chibakanji/screens/my_vocabulary/import_words_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -46,13 +50,14 @@ void main() {
   ) async {
     await _openStore(tester);
 
-    await _tap(tester, find.text('Tạo chủ đề'));
-    await _enter(tester, 'Tên chủ đề', 'Công việc');
+    // Tạo chủ đề bằng bảng nhỏ, không phải mở form.
+    await _tap(tester, find.text('Tạo chủ đề mới'));
+    await tester.enterText(find.byType(TextField).last, 'Công việc');
     await _tap(tester, find.widgetWithText(ElevatedButton, 'Tạo chủ đề'));
-    expect(find.text('Đã tạo chủ đề.'), findsOneWidget);
-    await _waitSnackBar(tester);
+    expect(find.text('Công việc'), findsOneWidget);
+    expect(find.text('0 từ'), findsOneWidget);
 
-    await _tap(tester, find.text('Thêm từ vựng mới'));
+    await _tap(tester, find.text('Từ mới'));
     await _enter(tester, 'Chữ Hán (không bắt buộc)', '工場');
     await _enter(tester, 'Cách đọc kana', 'こうじょう');
     await _enter(tester, 'Nghĩa tiếng Việt', 'Nhà máy');
@@ -61,22 +66,42 @@ void main() {
     await _tap(tester, find.text('Thêm vào kho'));
     expect(find.text('Đã thêm "こうじょう".'), findsOneWidget);
     await _waitSnackBar(tester);
-
-    await _tap(tester, find.text('Quản lý chủ đề'));
-    await _tap(tester, find.text('Công việc'));
     expect(find.text('1 từ'), findsOneWidget);
-    expect(find.text('Nhà máy'), findsOneWidget);
 
-    await _tap(tester, find.widgetWithText(ElevatedButton, 'Học'));
+    // Bấm "Học" ngay trên thẻ chủ đề là vào flashcard.
+    await _tap(tester, find.text('Học'));
     expect(find.text('工場'), findsOneWidget);
     expect(find.text('Từ 1/1'), findsOneWidget);
+  });
+
+  testWidgets('US22: mở chủ đề thì thấy các từ trong đó', (tester) async {
+    await _openStore(tester);
+    await _tap(tester, find.text('Tạo chủ đề mới'));
+    await tester.enterText(find.byType(TextField).last, 'Chào hỏi');
+    await _tap(tester, find.widgetWithText(ElevatedButton, 'Tạo chủ đề'));
+
+    await _tap(tester, find.text('Chào hỏi'));
+
+    expect(find.text('0 từ'), findsOneWidget);
+    expect(find.textContaining('Chủ đề chưa có từ nào'), findsOneWidget);
+  });
+
+  testWidgets('US22: tên chủ đề trống thì báo lỗi ngay trong bảng', (
+    tester,
+  ) async {
+    await _openStore(tester);
+    await _tap(tester, find.text('Tạo chủ đề mới'));
+
+    await _tap(tester, find.widgetWithText(ElevatedButton, 'Tạo chủ đề'));
+
+    expect(find.text('Hãy nhập tên chủ đề.'), findsOneWidget);
   });
 
   testWidgets('US22: form báo lỗi ngay khi thiếu cách đọc và nghĩa', (
     tester,
   ) async {
     await _openStore(tester);
-    await _tap(tester, find.text('Thêm từ vựng mới'));
+    await _tap(tester, find.text('Từ mới'));
 
     await _tap(tester, find.text('Thêm vào kho'));
 
@@ -84,29 +109,118 @@ void main() {
     expect(find.text('Hãy nhập nghĩa.'), findsOneWidget);
   });
 
-  testWidgets('US23: import 2 từ rồi thấy chúng trong "Của tôi"', (
+  testWidgets('US23: import tạo luôn chủ đề mới đặt theo tên file', (
+    tester,
+  ) async {
+    await _importFile(
+      tester,
+      'tu-vung-cong-viec.txt',
+      '工場 | こうじょう | koujou | Nhà máy\n'
+          '安全 | あんぜん | anzen | An toàn\n'
+          'dòng lỗi',
+    );
+
+    expect(find.text('XEM TRƯỚC · 2/3 DÒNG HỢP LỆ'), findsOneWidget);
+    expect(find.text('Cong viec'), findsOneWidget);
+    await _tap(tester, find.text('Import 2 từ'));
+    expect(find.text('Đã thêm 2 từ.'), findsOneWidget);
+
+    // Import xong vào học ngay bằng flashcard, tiêu đề là tên chủ đề mới.
+    expect(find.text('Cong viec'), findsOneWidget);
+    expect(find.text('Từ 1/2'), findsOneWidget);
+    expect(find.text('工場'), findsOneWidget);
+  });
+
+  testWidgets('US23: không chọn chủ đề vẫn học ngay các từ vừa import', (
+    tester,
+  ) async {
+    await _importFile(
+      tester,
+      'tu-vung.txt',
+      '工場 | こうじょう | koujou | Nhà máy',
+    );
+
+    await _tap(tester, find.text('Chủ đề có sẵn'));
+    await _tap(tester, find.text('Import 1 từ'));
+
+    expect(find.text('Từ vừa import'), findsOneWidget);
+    expect(find.text('Từ 1/1'), findsOneWidget);
+  });
+
+  testWidgets('US22: chủ đề tự tạo hiện ở tab Học mới, mục "Của tôi"', (
     tester,
   ) async {
     await _openStore(tester);
-    await _tap(tester, find.text('Import từ vựng'));
-
-    await tester.enterText(
-      find.byType(TextField).first,
-      '工場 | こうじょう | koujou | Nhà máy\n'
-      '安全 | あんぜん | anzen | An toàn\n'
-      'dòng lỗi',
+    await _tap(tester, find.text('Tạo chủ đề mới'));
+    await tester.enterText(find.byType(TextField).last, 'Công việc');
+    await _tap(tester, find.widgetWithText(ElevatedButton, 'Tạo chủ đề'));
+    await _tap(tester, find.byTooltip('Back'));
+    await _tap(
+      tester,
+      find.descendant(
+        of: find.byType(BottomNavigationBar),
+        matching: find.text('Học mới'),
+      ),
     );
-    await tester.pump();
-    expect(find.text('XEM TRƯỚC · 2/3 DÒNG HỢP LỆ'), findsOneWidget);
-    await _tap(tester, find.text('Import 2 từ'));
-    expect(find.text('Đã thêm 2 từ.'), findsOneWidget);
-    await _waitSnackBar(tester);
 
-    await _tap(tester, find.text('Xem tất cả từ vựng'));
-    await _tap(tester, find.text('Của tôi (2)'));
-    expect(find.text('Nhà máy'), findsOneWidget);
-    expect(find.text('An toàn'), findsOneWidget);
+    await _tap(tester, find.text('Của tôi'));
+
+    expect(find.text('1 chủ đề'), findsOneWidget);
+    expect(find.text('Công việc'), findsOneWidget);
+    expect(find.text('0/0'), findsOneWidget);
   });
+
+  testWidgets('US23: chọn file CSV thì hiện tên file và xem trước', (
+    tester,
+  ) async {
+    await _importFile(
+      tester,
+      'tu-vung.csv',
+      'Kanji,Kana,Romaji,Nghĩa\n'
+          '工場,こうじょう,koujou,"Nhà máy, xưởng"\n'
+          ',マスク,masuku,Khẩu trang\n',
+    );
+
+    expect(find.text('tu-vung.csv'), findsOneWidget);
+    expect(find.text('2 dòng'), findsOneWidget);
+    expect(find.text('XEM TRƯỚC · 2/2 DÒNG HỢP LỆ'), findsOneWidget);
+    expect(find.text('工場 · Nhà máy, xưởng'), findsOneWidget);
+    expect(find.text('マスク · Khẩu trang'), findsOneWidget);
+    await _tap(tester, find.text('Import 2 từ'));
+    expect(find.text('Từ 1/2'), findsOneWidget);
+  });
+
+  testWidgets('US23: file sai định dạng thì báo lỗi, không đổi gì', (
+    tester,
+  ) async {
+    await _importFile(tester, 'tu-vung.xlsx', 'không phải excel');
+
+    expect(find.textContaining('File Excel bị hỏng'), findsOneWidget);
+    expect(find.text('Chọn file từ vựng'), findsOneWidget);
+    expect(find.text('Chưa có dòng hợp lệ'), findsOneWidget);
+  });
+}
+
+/// Mở màn Import với một file giả [name] có nội dung [content], rồi bấm vùng
+/// chọn file (thay cho hộp thoại chọn file thật).
+Future<void> _importFile(
+  WidgetTester tester,
+  String name,
+  String content,
+) async {
+  await pumpTestApp(tester);
+  tester.state<NavigatorState>(find.byType(Navigator).first).push(
+        MaterialPageRoute(
+          builder: (_) => ImportWordsScreen(
+            pickFile: () async => (
+              name: name,
+              bytes: Uint8List.fromList(utf8.encode(content)),
+            ),
+          ),
+        ),
+      );
+  await tester.pumpAndSettle();
+  await _tap(tester, find.text('Chọn file từ vựng'));
 }
 
 /// Chờ SnackBar thông báo tự tắt để nó không che nút ở cuối màn hình.

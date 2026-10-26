@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Thanh chọn một trong vài lựa chọn kiểu [T]: cấp độ JLPT (`String`), đăng
-/// nhập/đăng ký (`bool`), mặt trước thẻ (`CardFront`), số câu quiz (`int`).
+/// Thanh chọn một trong vài lựa chọn kiểu [T]: cấp độ JLPT (`String`), mặt
+/// trước thẻ (`CardFront`), số câu quiz (`int`), phạm vi trong Kho từ (enum),
+/// chủ đề mới hay có sẵn khi import (`bool`).
 /// [labelOf] đổi một lựa chọn thành chữ; [onChanged] báo lựa chọn mới lên
 /// màn hình cha.
 class ChoiceSegments<T> extends StatelessWidget {

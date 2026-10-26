@@ -52,6 +52,15 @@ class MyVocabularyProvider extends ChangeNotifier {
     return null;
   }
 
+  /// Chủ đề cùng tên với [name] (không phân biệt hoa thường), nếu có.
+  UserTopic? topicByName(String name) {
+    final lower = name.trim().toLowerCase();
+    for (final topic in _topicList) {
+      if (topic.name.toLowerCase() == lower) return topic;
+    }
+    return null;
+  }
+
   /// Từ của [topic] theo thứ tự đã thêm; bỏ qua id không còn tồn tại.
   List<Vocabulary> wordsOf(UserTopic topic) {
     final byId = {for (final word in _allWords) word.id: word};
@@ -190,7 +199,8 @@ class MyVocabularyProvider extends ChangeNotifier {
   }
 
   /// Thêm nhiều từ một lúc; từ trùng với từ đã có trong kho thì bỏ qua.
-  Future<({int added, int skipped, String? error})> importWords(
+  /// [words] là các từ vừa thêm, để học ngay sau khi import.
+  Future<({List<Vocabulary> words, int skipped, String? error})> importWords(
     List<WordDraft> drafts, {
     String? topicId,
   }) async {
@@ -218,7 +228,7 @@ class MyVocabularyProvider extends ChangeNotifier {
     }
     await _afterWordsChanged(error);
     return (
-      added: error == null ? fresh.length : 0,
+      words: error == null ? fresh : const <Vocabulary>[],
       skipped: drafts.length - fresh.length,
       error: error,
     );

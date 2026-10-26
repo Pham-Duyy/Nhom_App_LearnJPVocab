@@ -155,7 +155,7 @@ void main() {
         topicId: topicId,
       );
 
-      expect(result.added, 1);
+      expect(result.words.single.kana, 'あんぜん');
       expect(result.skipped, 2);
       expect(provider.myWords, hasLength(2));
       expect(provider.topicById(topicId)!.wordCount, 1);

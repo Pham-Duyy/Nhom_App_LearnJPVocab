@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user_topic.dart';
-import '../../models/vocabulary.dart';
 import '../../providers/my_vocabulary_provider.dart';
-import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/error_view.dart';
 import '../common/generic_screen.dart';
-import '../flashcard/flashcard_screen.dart';
 import '../quiz/quiz_screen.dart';
 import '../vocabulary/vocabulary_detail_screen.dart';
 import 'add_to_topic_screen.dart';
+import 'topic_actions.dart';
 import 'topic_form_screen.dart';
 import 'word_form_screen.dart';
 import 'word_tile.dart';
@@ -31,22 +29,6 @@ class TopicDetailScreen extends GenericScreen {
 
   void _open(BuildContext context, Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  Future<void> _study(
-    BuildContext context,
-    UserTopic topic,
-    List<Vocabulary> words,
-  ) async {
-    await context.read<VocabularyProvider>().loadWords(words);
-    if (!context.mounted) return;
-    _open(
-      context,
-      FlashcardScreen(
-        title: topic.name,
-        completionTitle: 'Đã học xong "${topic.name}"!',
-      ),
-    );
   }
 
   Future<void> _delete(BuildContext context, UserTopic topic) async {
@@ -117,7 +99,7 @@ class TopicDetailScreen extends GenericScreen {
             Expanded(
               child: ElevatedButton(
                 onPressed:
-                    words.isEmpty ? null : () => _study(context, topic, words),
+                    words.isEmpty ? null : () => studyTopic(context, topic),
                 child: const Text('Học'),
               ),
             ),
