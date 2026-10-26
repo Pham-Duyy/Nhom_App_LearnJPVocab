@@ -10,8 +10,6 @@ import '../../theme/app_colors.dart';
 import '../../services/welcome_store.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
-import '../../widgets/chibi_mascot.dart';
-import '../../widgets/choice_segments.dart';
 import '../common/generic_screen.dart';
 import '../auth_gate.dart';
 import '../main_screen.dart';
@@ -171,59 +169,41 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
   Widget buildBody(BuildContext context) {
     final palette = context.palette;
     return Scaffold(
-      backgroundColor: palette.backgroundTinted,
+      backgroundColor: palette.background,
       body: SafeArea(
         child: Form(
           key: _formKey,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
             children: [
-              _buildTopBar(palette),
-              const SizedBox(height: 20),
-              _buildIntro(palette),
-              const SizedBox(height: 22),
-              ChoiceSegments<bool>(
-                options: const [false, true],
-                selected: _isRegister,
-                labelOf: (register) => register ? 'Đăng ký' : 'Đăng nhập',
-                onChanged: _switchMode,
-              ),
-              const SizedBox(height: 22),
-              OutlinedButton(
-                onPressed: _isSubmitting ? null : _signInWithGoogle,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(60),
-                  backgroundColor: palette.card,
-                  foregroundColor: palette.textPrimary,
-                  side: BorderSide(color: palette.accentBorder),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF4285F4),
-                      ),
-                    ),
-                    SizedBox(width: 14),
-                    Flexible(
-                      child: Text(
-                        'Tiếp tục với Google',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+              // Mở từ màn khởi động thì không có màn nào phía sau để quay lại.
+              SizedBox(
+                height: 48,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Navigator.of(context).canPop()
+                      ? IconButton(
+                          tooltip: 'Quay lại',
+                          onPressed: () => Navigator.of(context).maybePop(),
+                          icon: const Icon(Icons.arrow_back_rounded),
+                        )
+                      : null,
                 ),
               ),
-              const SizedBox(height: 22),
-              _buildDividerLabel(palette),
-              const SizedBox(height: 10),
+              const Center(child: BrandLogo(size: 34)),
+              const SizedBox(height: 36),
+              Text(
+                _isRegister ? 'Tạo tài khoản' : 'Đăng nhập',
+                style: AppTextStyles.pageTitle.copyWith(fontSize: 28),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _isRegister
+                    ? 'Lưu tiến độ học trên mọi thiết bị.'
+                    : 'Chào mừng bạn quay lại.',
+                style: palette.body.copyWith(fontSize: 15),
+              ),
+              const SizedBox(height: 28),
               ..._buildFields(),
               if (!_isRegister)
                 Align(
@@ -234,16 +214,63 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
                   ),
                 ),
               if (_formError != null) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 _FormErrorBanner(message: _formError!),
               ],
-              const SizedBox(height: 24),
-              _GradientButton(
-                label: _isRegister ? 'Tạo tài khoản' : 'Đăng nhập',
-                isLoading: _isSubmitting,
-                onPressed: _submit,
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isSubmitting ? null : _submit,
+                child: _isSubmitting
+                    ? SizedBox.square(
+                        dimension: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: palette.onPrimary,
+                          semanticsLabel: 'Đang xử lý',
+                        ),
+                      )
+                    : Text(_isRegister ? 'Tạo tài khoản' : 'Đăng nhập'),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('hoặc', style: TextStyle(color: palette.label)),
+                  ),
+                  const Expanded(child: Divider()),
+                ],
+              ),
+              const SizedBox(height: 20),
+              OutlinedButton(
+                onPressed: _isSubmitting ? null : _signInWithGoogle,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: palette.textPrimary,
+                  side: BorderSide(color: palette.cardBorder),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF4285F4),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        'Tiếp tục với Google',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               TextButton(
                 onPressed: () => _switchMode(!_isRegister),
                 child: Text.rich(
@@ -274,183 +301,83 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
     );
   }
 
-  Widget _buildTopBar(AppPalette palette) {
-    return Row(
-      children: [
-        Material(
-          color: palette.card,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: palette.accentBorder),
-          ),
-          child: IconButton(
-            tooltip: 'Quay lại',
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: Icon(Icons.arrow_back_rounded, color: palette.primarySoft),
-          ),
-        ),
-        const Spacer(),
-        const BrandLogo(size: 30),
-      ],
-    );
-  }
-
-  Widget _buildIntro(AppPalette palette) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _isRegister ? 'MỘT KHỞI ĐẦU MỚI' : 'CHÀO MỪNG TRỞ LẠI',
-              style: palette.sectionLabel,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _isRegister
-                  ? 'Bắt đầu\nchuyện học của bạn.'
-                  : 'Học tiếp\ncùng Chibi nhé.',
-              style: AppTextStyles.pageTitle.copyWith(
-                fontSize: 27,
-                height: 1.3,
-                color: palette.primaryStrong,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text('Từng từ nhỏ, một hành trình lớn.', style: palette.body),
-          ],
-        ),
-        Positioned(
-          top: -10,
-          right: -6,
-          child: ChibiMascot(
-            size: 100,
-            mood: _isRegister ? ChibiMood.happy : ChibiMood.neutral,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDividerLabel(AppPalette palette) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: palette.accentBorder)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'hoặc bằng email',
-            style: TextStyle(color: palette.label),
-          ),
-        ),
-        Expanded(child: Divider(color: palette.accentBorder)),
-      ],
-    );
-  }
-
+  /// Nhãn nằm trong ô và nổi lên khi gõ, thay cho một dòng nhãn riêng ở
+  /// trên mỗi ô.
   List<Widget> _buildFields() {
+    const gap = SizedBox(height: 14);
     return [
-      if (_isRegister)
-        _LabeledField(
-          label: 'Tên hiển thị',
-          child: TextFormField(
-            controller: _displayNameController,
-            textInputAction: TextInputAction.next,
-            textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
-              hintText: 'Chibi nên gọi bạn là gì?',
-              prefixIcon: Icon(Icons.person_outline_rounded),
-            ),
-            maxLength: UserProfile.maxDisplayNameLength,
-            validator: (value) => UserProfile.validateDisplayName(value ?? ''),
-          ),
-        ),
-      _LabeledField(
-        label: 'Email',
-        child: TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
+      if (_isRegister) ...[
+        TextFormField(
+          controller: _displayNameController,
           textInputAction: TextInputAction.next,
-          autocorrect: false,
-          autofillHints: const [AutofillHints.email],
+          textCapitalization: TextCapitalization.words,
           decoration: const InputDecoration(
-            hintText: 'Ví dụ: duy@gmail.com',
-            prefixIcon: Icon(Icons.alternate_email_rounded),
+            labelText: 'Tên hiển thị',
+            hintText: 'Chibi nên gọi bạn là gì?',
+            prefixIcon: Icon(Icons.person_outline_rounded),
           ),
-          validator: AuthValidators.email,
+          maxLength: UserProfile.maxDisplayNameLength,
+          validator: (value) => UserProfile.validateDisplayName(value ?? ''),
         ),
+        gap,
+      ],
+      TextFormField(
+        controller: _emailController,
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        autocorrect: false,
+        autofillHints: const [AutofillHints.email],
+        decoration: const InputDecoration(
+          labelText: 'Email',
+          hintText: 'Ví dụ: duy@gmail.com',
+          prefixIcon: Icon(Icons.alternate_email_rounded),
+        ),
+        validator: AuthValidators.email,
       ),
-      _LabeledField(
-        label: 'Mật khẩu',
-        child: TextFormField(
-          controller: _passwordController,
-          obscureText: _hidePassword,
-          textInputAction:
-              _isRegister ? TextInputAction.next : TextInputAction.done,
-          onFieldSubmitted: _isRegister ? null : (_) => _submit(),
+      gap,
+      TextFormField(
+        controller: _passwordController,
+        obscureText: _hidePassword,
+        textInputAction:
+            _isRegister ? TextInputAction.next : TextInputAction.done,
+        onFieldSubmitted: _isRegister ? null : (_) => _submit(),
+        decoration: InputDecoration(
+          labelText: 'Mật khẩu',
+          hintText: _isRegister ? 'Tạo mật khẩu' : 'Nhập mật khẩu',
+          prefixIcon: const Icon(Icons.lock_outline_rounded),
+          helperText: _isRegister
+              ? 'Ít nhất ${AuthValidators.minPasswordLength} ký tự.'
+              : null,
+          suffixIcon: _VisibilityToggle(
+            hidden: _hidePassword,
+            onPressed: () => setState(() => _hidePassword = !_hidePassword),
+          ),
+        ),
+        validator: AuthValidators.password,
+      ),
+      if (_isRegister) ...[
+        gap,
+        TextFormField(
+          controller: _confirmController,
+          obscureText: _hideConfirm,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _submit(),
           decoration: InputDecoration(
-            hintText: _isRegister ? 'Tạo mật khẩu' : 'Nhập mật khẩu',
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
-            helperText: _isRegister
-                ? 'Ít nhất ${AuthValidators.minPasswordLength} ký tự.'
-                : null,
+            labelText: 'Xác nhận mật khẩu',
+            hintText: 'Nhập lại mật khẩu',
+            prefixIcon: const Icon(Icons.verified_user_outlined),
             suffixIcon: _VisibilityToggle(
-              hidden: _hidePassword,
-              onPressed: () => setState(() => _hidePassword = !_hidePassword),
+              hidden: _hideConfirm,
+              onPressed: () => setState(() => _hideConfirm = !_hideConfirm),
             ),
           ),
-          validator: AuthValidators.password,
-        ),
-      ),
-      if (_isRegister)
-        _LabeledField(
-          label: 'Xác nhận mật khẩu',
-          child: TextFormField(
-            controller: _confirmController,
-            obscureText: _hideConfirm,
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (_) => _submit(),
-            decoration: InputDecoration(
-              hintText: 'Nhập lại mật khẩu',
-              prefixIcon: const Icon(Icons.verified_user_outlined),
-              suffixIcon: _VisibilityToggle(
-                hidden: _hideConfirm,
-                onPressed: () => setState(() => _hideConfirm = !_hideConfirm),
-              ),
-            ),
-            validator: (value) => AuthValidators.confirmPassword(
-              value,
-              _passwordController.text,
-            ),
+          validator: (value) => AuthValidators.confirmPassword(
+            value,
+            _passwordController.text,
           ),
         ),
+      ],
     ];
-  }
-}
-
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-          ),
-          const SizedBox(height: 10),
-          child,
-        ],
-      ),
-    );
   }
 }
 
@@ -498,70 +425,6 @@ class _FormErrorBanner extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _GradientButton extends StatelessWidget {
-  const _GradientButton({
-    required this.label,
-    required this.onPressed,
-    this.isLoading = false,
-  });
-
-  final String label;
-  final VoidCallback onPressed;
-
-  /// Hiện vòng xoay và khóa nút trong lúc chờ.
-  final bool isLoading;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          colors: [palette.primarySoft, palette.primary],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: palette.primary.withValues(alpha: 0.28),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          disabledBackgroundColor: Colors.transparent,
-          disabledForegroundColor: palette.onPrimary,
-          shadowColor: Colors.transparent,
-          minimumSize: const Size.fromHeight(62),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        child: isLoading
-            ? SizedBox.square(
-                dimension: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: palette.onPrimary,
-                  semanticsLabel: 'Đang xử lý',
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
       ),
     );
   }

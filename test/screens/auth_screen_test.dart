@@ -32,9 +32,15 @@ Future<void> _openLoginForm(
     userProfileRepository: profiles,
   ));
   await _pumpFrames(tester);
+  await passSplash(tester);
 
-  final loginLink = find.textContaining('Đã có tài khoản?');
-  await tester.ensureVisible(loginLink);
+  // Dòng chuyển sang đăng nhập nằm cuối form: cuộn tới rồi bấm.
+  final loginLink = find.textContaining('Bạn đã có tài khoản?');
+  await tester.scrollUntilVisible(
+    loginLink,
+    200,
+    scrollable: find.byType(Scrollable).first,
+  );
   await tester.tap(loginLink);
   await _pumpFrames(tester);
 }

@@ -10,6 +10,7 @@ import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_topic_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_word_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
+import 'package:chibakanji/screens/auth/welcome_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +52,12 @@ Widget buildTestApp({
     speaker: speaker ?? FakeSpeaker(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
+}
+
+/// Chờ hết màn khởi động (Chibi chuyển động) để sang màn đăng ký.
+Future<void> passSplash(WidgetTester tester) async {
+  await tester.pump(WelcomeScreen.duration);
+  await tester.pumpAndSettle();
 }
 
 /// Dựng ứng dụng và chờ qua bước đăng nhập + tải tiến độ.

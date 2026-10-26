@@ -75,7 +75,7 @@ void main() {
     final quiz = _read<QuizProvider>(tester);
     final question = quiz.currentQuestion!;
 
-    await _tap(
+    await _scrollAndTap(
       tester,
       find.text(question.options[(question.correctIndex + 1) % 4]),
     );

@@ -17,9 +17,7 @@ Future<void> _openRegisterForm(WidgetTester tester) async {
 
   await tester.pumpWidget(buildTestApp(showWelcome: true));
   await _pumpFrames(tester);
-
-  await tester.tap(find.text('Bắt đầu cùng Chibi →'));
-  await _pumpFrames(tester);
+  await passSplash(tester);
 }
 
 Future<void> _fillAndSubmit(
@@ -31,7 +29,7 @@ Future<void> _fillAndSubmit(
     await tester.ensureVisible(field);
     await tester.enterText(field, values[i]);
   }
-  final submit = find.text('Tạo tài khoản');
+  final submit = find.widgetWithText(ElevatedButton, 'Tạo tài khoản');
   await tester.ensureVisible(submit);
   await tester.tap(submit);
 }

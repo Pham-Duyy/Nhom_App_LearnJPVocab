@@ -1,5 +1,6 @@
 import 'package:chibakanji/auth/app_auth_user.dart';
 import 'package:chibakanji/data/mock/mock_learning_data.dart';
+import 'package:chibakanji/widgets/chibi_mascot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +16,7 @@ Future<void> _pumpFrames(WidgetTester tester) async {
 
 void main() {
   group('US01: xem giới thiệu ứng dụng', () {
-    testWidgets('mở app lần đầu thấy lời giới thiệu và hai lối vào', (
+    testWidgets('mở app thấy Chibi chuyển động, 7 giây sau sang đăng ký', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -25,24 +26,28 @@ void main() {
       await tester.pumpWidget(buildTestApp(showWelcome: true));
       await _pumpFrames(tester);
 
-      expect(find.text('ChibaKanji'), findsWidgets);
-      expect(find.textContaining('gần Nhật Bản hơn'), findsOneWidget);
-      expect(find.text('Bắt đầu cùng Chibi →'), findsOneWidget);
-      expect(find.textContaining('Đã có tài khoản?'), findsOneWidget);
+      expect(find.byType(ChibiMascot), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsNothing);
+
+      const registerSubtitle = 'Lưu tiến độ học trên mọi thiết bị.';
+      await tester.pump(const Duration(seconds: 6));
+      expect(find.text(registerSubtitle), findsNothing);
+
+      await passSplash(tester);
+      expect(find.text(registerSubtitle), findsOneWidget);
     });
 
-    testWidgets('bấm Bắt đầu thì sang màn đăng ký', (tester) async {
+    testWidgets('chạm vào màn hình thì vào đăng ký ngay', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.625;
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(buildTestApp(showWelcome: true));
       await _pumpFrames(tester);
-      await tester.tap(find.text('Bắt đầu cùng Chibi →'));
+      await tester.tap(find.byType(ChibiMascot));
       await _pumpFrames(tester);
 
-      // Tiêu đề đầu trang của chế độ đăng ký.
-      expect(find.text('MỘT KHỞI ĐẦU MỚI'), findsOneWidget);
+      expect(find.text('Lưu tiến độ học trên mọi thiết bị.'), findsOneWidget);
     });
   });
 
@@ -66,7 +71,6 @@ void main() {
       final n5Count = MockLearningData.categories
           .where((category) => category.jlptLevel == 'N5')
           .length;
-      expect(find.text('Chủ đề N5'), findsOneWidget);
       expect(find.text('$n5Count chủ đề'), findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsOneWidget);
     });
@@ -81,7 +85,6 @@ void main() {
       await tester.tap(find.text('Ngành'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Từ vựng chuyên ngành'), findsOneWidget);
       expect(find.text('3 chủ đề'), findsOneWidget);
       expect(find.text('Chế biến thực phẩm'), findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsNothing);
@@ -97,7 +100,6 @@ void main() {
       await tester.tap(find.text('N4'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Chủ đề N4'), findsOneWidget);
       expect(find.text('0 chủ đề'), findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsNothing);
       expect(
@@ -126,6 +128,6 @@ void main() {
     await _pumpFrames(tester);
 
     expect(auth.signOutCallCount, 1);
-    expect(find.text('Bắt đầu cùng Chibi →'), findsOneWidget);
+    expect(find.byType(ChibiMascot), findsOneWidget);
   });
 }

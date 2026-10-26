@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../providers/main_navigation_provider.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_styles.dart';
 import 'exam/exam_setup_screen.dart';
 import 'home/review_home_page.dart';
 import 'lesson/category_screen.dart';
@@ -24,11 +23,31 @@ class MainScreen extends StatelessWidget {
   ];
 
   static const _items = <BottomNavigationBarItem>[
-    BottomNavigationBarItem(icon: _KanjiIcon('復'), label: 'Ôn tập'),
-    BottomNavigationBarItem(icon: _KanjiIcon('学'), label: 'Học mới'),
-    BottomNavigationBarItem(icon: _KanjiIcon('試'), label: 'Thi thử'),
-    BottomNavigationBarItem(icon: _KanjiIcon('辞'), label: 'Sổ từ'),
-    BottomNavigationBarItem(icon: _KanjiIcon('私'), label: 'Cá nhân'),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.alarm_outlined),
+      activeIcon: Icon(Icons.alarm),
+      label: 'Ôn tập',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.menu_book_outlined),
+      activeIcon: Icon(Icons.menu_book),
+      label: 'Học mới',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.assignment_outlined),
+      activeIcon: Icon(Icons.assignment),
+      label: 'Thi thử',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.bookmark_border_rounded),
+      activeIcon: Icon(Icons.bookmark_rounded),
+      label: 'Sổ từ',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person_outline_rounded),
+      activeIcon: Icon(Icons.person_rounded),
+      label: 'Cá nhân',
+    ),
   ];
 
   @override
@@ -46,32 +65,6 @@ class MainScreen extends StatelessWidget {
           currentIndex: navigation.selectedIndex,
           onTap: navigation.selectTab,
           items: _items,
-        ),
-      ),
-    );
-  }
-}
-
-/// Biểu tượng tab là một chữ Hán; lấy màu từ IconTheme nên tự đổi màu theo
-/// tab đang chọn như Icon thường.
-class _KanjiIcon extends StatelessWidget {
-  const _KanjiIcon(this.kanji);
-
-  final String kanji;
-
-  @override
-  Widget build(BuildContext context) {
-    final iconTheme = IconTheme.of(context);
-    return SizedBox.square(
-      dimension: 26,
-      child: Center(
-        child: Text(
-          kanji,
-          style: AppTextStyles.japaneseDisplay.copyWith(
-            fontSize: iconTheme.size,
-            color: iconTheme.color,
-            height: 1,
-          ),
         ),
       ),
     );

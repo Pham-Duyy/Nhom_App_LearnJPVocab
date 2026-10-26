@@ -1,4 +1,5 @@
 import 'package:chibakanji/auth/app_auth_user.dart';
+import 'package:chibakanji/widgets/chibi_mascot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,10 +34,16 @@ void main() {
       await _pumpFrames(tester);
 
       expect(authService.signOutCallCount, 1);
-      expect(find.text('Bắt đầu cùng Chibi →'), findsOneWidget);
+      expect(find.byType(ChibiMascot), findsOneWidget);
+      await passSplash(tester);
 
-      final loginLink = find.textContaining('Đã có tài khoản?');
-      await tester.ensureVisible(loginLink);
+      // Dòng chuyển sang đăng nhập nằm cuối form: cuộn tới rồi bấm.
+      final loginLink = find.textContaining('Bạn đã có tài khoản?');
+      await tester.scrollUntilVisible(
+        loginLink,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(loginLink);
       await _pumpFrames(tester);
 

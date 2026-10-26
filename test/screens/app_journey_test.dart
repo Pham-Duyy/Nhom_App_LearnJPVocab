@@ -14,7 +14,16 @@ Future<void> _pumpFrames(WidgetTester tester) async {
   }
 }
 
+/// Bấm [finder]; ListView chỉ dựng mục gần màn hình (vd. đáp án dưới một
+/// đề bài cao) nên cuộn tới trước nếu chưa thấy.
 Future<void> _tap(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      finder,
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+  }
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -34,13 +43,12 @@ void main() {
       initialProfile: const UserProfile(),
     );
 
-    // US01: màn chào.
+    // US01: màn khởi động rồi tự sang đăng ký.
     await tester.pumpWidget(
       buildTestApp(showWelcome: true, userProfileRepository: profiles),
     );
     await _pumpFrames(tester);
-    await tester.tap(find.text('Bắt đầu cùng Chibi →'));
-    await _pumpFrames(tester);
+    await passSplash(tester);
 
     // US03: đăng ký bằng email, đặt tên hiển thị.
     final fields = find.byType(TextFormField);
