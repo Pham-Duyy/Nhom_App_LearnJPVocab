@@ -18,7 +18,7 @@ Future<void> main() async {
     runApp(const _StartupErrorApp());
     return;
   }
-  if (kDebugMode) await _seedContentIfEmpty();
+  if (kDebugMode) await _seedMissingContent();
   runApp(const AppProviders(child: ChibaKanjiApp()));
 }
 
@@ -58,18 +58,18 @@ Future<bool> _initFirebase() async {
   }
 }
 
-/// Chỉ ở bản debug: đẩy dữ liệu mẫu lên Firestore lần đầu chạy. Đăng nhập ẩn
+/// Chỉ ở bản debug: đẩy nội dung mẫu còn thiếu lên Firestore. Đăng nhập ẩn
 /// danh trước vì rules yêu cầu đăng nhập (AuthController sau đó dùng lại
 /// đúng người dùng này). Có timeout vì khi mất mạng, Firestore chờ kết nối
 /// vô thời hạn.
-Future<void> _seedContentIfEmpty() async {
+Future<void> _seedMissingContent() async {
   try {
     final auth = FirebaseAuth.instance;
     if (auth.currentUser == null) await auth.signInAnonymously();
-    final seeded = await FirestoreSeeder()
-        .seedIfEmpty()
+    final added = await FirestoreSeeder()
+        .seedMissing()
         .timeout(const Duration(seconds: 10));
-    if (seeded) debugPrint('Đã nạp dữ liệu mẫu lên Firestore.');
+    if (added > 0) debugPrint('Đã nạp $added document mẫu lên Firestore.');
   } catch (e) {
     // Rules đã khóa quyền ghi hoặc đang mất mạng: bỏ qua, app vẫn chạy.
     debugPrint('Không nạp được dữ liệu mẫu: $e');

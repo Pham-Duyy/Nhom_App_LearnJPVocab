@@ -7,12 +7,12 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 244 test
+flutter test                 # chạy toàn bộ 264 test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
 
-Kết quả hiện tại: **244/244 test qua**, độ phủ code **89.6%**.
+Kết quả hiện tại: **264/264 test qua**, độ phủ code **89.6%**.
 
 ## Cấu trúc thư mục
 
@@ -49,7 +49,7 @@ thử của đề bài (`8a`, `8c`, `8e`), nên lọc được bằng `--plain-n
 | US13 | Là người học, tôi có thể tìm kiếm từ đã học | 9 | `models/vocabulary_test.dart`, `screens/vocabulary_book_test.dart` |
 | US14 | Là người học, tôi có thể đánh dấu từ yêu thích và lọc theo yêu thích | 2 | `screens/vocabulary_book_test.dart` |
 | US15 | Là người học, tôi có thể xem chi tiết và câu ví dụ của một từ | 2 | `screens/vocabulary_book_test.dart` |
-| US16 | Là người học, tôi có thể làm quiz trắc nghiệm từ vựng | 15 | `data/quiz_generator_test.dart`, `providers/quiz_provider_test.dart`, `screens/quiz_flow_test.dart` |
+| US16 | Là người học, tôi có thể làm quiz trắc nghiệm từ vựng | 20 | `data/quiz_generator_test.dart`, `providers/quiz_provider_test.dart`, `screens/quiz_flow_test.dart`, `screens/listening_quiz_test.dart` |
 | US17 | Là người học, tôi có thể xem điểm và lịch sử các lần làm quiz | 5 | `providers/quiz_provider_test.dart`, `screens/quiz_flow_test.dart` |
 | US18 | Là người học, tôi có thể đặt mục tiêu số từ mỗi ngày | 4 | `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart` |
 | US19 | Là người học, tôi có thể xem chuỗi ngày học liên tiếp | 15 | `models/user_profile_test.dart`, `providers/progress_provider_test.dart`, `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart` |

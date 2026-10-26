@@ -1,4 +1,5 @@
 import 'package:chibakanji/auth/app_auth_user.dart';
+import 'package:chibakanji/data/mock/mock_learning_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -57,13 +58,14 @@ void main() {
   });
 
   group('US06: chủ đề theo cấp độ JLPT', () {
-    testWidgets('mặc định là N5 với đủ 3 chủ đề', (tester) async {
+    testWidgets('mặc định là N5 với đủ các chủ đề mẫu', (tester) async {
       await pumpTestApp(tester);
       await tester.tap(find.text('Học mới'));
       await tester.pumpAndSettle();
 
       expect(find.text('Chủ đề N5'), findsOneWidget);
-      expect(find.text('3 chủ đề'), findsOneWidget);
+      expect(find.text('${MockLearningData.categories.length} chủ đề'),
+          findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsOneWidget);
     });
 
