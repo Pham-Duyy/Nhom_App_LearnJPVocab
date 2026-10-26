@@ -28,6 +28,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.dangerBorder,
     required this.favorite,
     required this.stamp,
+    required this.chartColors,
     required this.memoryLevelColors,
     required this.topicBackgrounds,
     required this.topicForegrounds,
@@ -39,26 +40,31 @@ class AppPalette extends ThemeExtension<AppPalette> {
     onPrimary: Color(0xFFF7F3EA),
     primaryStrong: Color(0xFF152A46),
     primarySoft: Color(0xFF4D6F9A),
-    secondary: Color(0xFFDDE5EC),
-    background: Color(0xFFF3EEE3),
-    backgroundTinted: Color(0xFFEFE8DA),
-    card: Color(0xFFFBF8F1),
-    raised: Color(0xFFFFFDF8),
+    secondary: Color(0xFFE2EAF3),
+    background: Color(0xFFFCFAF6),
+    backgroundTinted: Color(0xFFF7F3EC),
+    card: Color(0xFFFFFFFF),
+    raised: Color(0xFFFFFFFF),
     textPrimary: Color(0xFF22201C),
     textSecondary: Color(0xFF5F5849),
     textMuted: Color(0xFF857D6E),
     label: Color(0xFF6B6458),
-    cardBorder: Color(0xFFDDD3BF),
-    divider: Color(0xFFE4DCCB),
-    accentSurface: Color(0xFFE3E8EE),
-    accentBorder: Color(0xFFC9D4E3),
-    mutedSurface: Color(0xFFEBE4D5),
-    progressTrack: Color(0xFFE4DCCB),
+    cardBorder: Color(0xFFECE6DB),
+    divider: Color(0xFFF0EBE2),
+    accentSurface: Color(0xFFEEF3F8),
+    accentBorder: Color(0xFFD3DEEB),
+    mutedSurface: Color(0xFFF5F1EA),
+    progressTrack: Color(0xFFEDE7DC),
     danger: Color(0xFFA8341F),
     dangerSurface: Color(0xFFF6E2DC),
     dangerBorder: Color(0xFFE6B9AD),
     favorite: Color(0xFFC23A24),
     stamp: Color(0xFFC8442F),
+    chartColors: [
+      Color(0xFFE8553E),
+      Color(0xFFF2A93B),
+      Color(0xFF4FA36B),
+    ],
     memoryLevelColors: [
       Color(0xFFD9472F),
       Color(0xFFC98A2B),
@@ -67,10 +73,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
       Color(0xFF1F3A5F),
     ],
     topicBackgrounds: [
-      Color(0xFFE3E8EE),
-      Color(0xFFF6E2DC),
-      Color(0xFFE6EAD9),
-      Color(0xFFF3E7D2),
+      Color(0xFFEEF3F8),
+      Color(0xFFFBECE8),
+      Color(0xFFEFF3E6),
+      Color(0xFFFAF1E2),
     ],
     topicForegrounds: [
       Color(0xFF1F3A5F),
@@ -106,6 +112,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
     dangerBorder: Color(0xFF5A2E25),
     favorite: Color(0xFFF08F78),
     stamp: Color(0xFFE8644B),
+    chartColors: [
+      Color(0xFFF07A63),
+      Color(0xFFF5BE5E),
+      Color(0xFF6FC18A),
+    ],
     memoryLevelColors: [
       Color(0xFFE8644B),
       Color(0xFFD9A44A),
@@ -153,6 +164,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   /// Màu dấu triện hanko (chuỗi ngày, thành tích, đáp án đúng).
   final Color stamp;
+
+  /// Màu 3 cột biểu đồ ghi nhớ: đỏ son (mới học), vàng hoa mai (đang nhớ),
+  /// xanh lá tre (đã nhớ).
+  final List<Color> chartColors;
   final List<Color> memoryLevelColors;
   final List<Color> topicBackgrounds;
   final List<Color> topicForegrounds;

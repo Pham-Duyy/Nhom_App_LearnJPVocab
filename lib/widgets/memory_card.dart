@@ -1,15 +1,11 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
-import '../models/progress.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
-import 'app_card.dart';
 
-/// Hiển thị tổng số từ đã học và phân bố theo 5 mức ghi nhớ. Chỉ nhận dữ
-/// liệu qua constructor — không tự đọc Provider — để widget dễ test và tái
-/// sử dụng.
+/// Tổng số từ đã học và biểu đồ cột theo 3 giai đoạn ghi nhớ: Mới học (mức
+/// 1), Đang nhớ (mức 2) và Đã nhớ (mức 3 trở lên). Chỉ nhận dữ liệu qua
+/// constructor, không tự đọc Provider, để widget dễ test và tái sử dụng.
 class MemoryCard extends StatelessWidget {
   const MemoryCard({
     Key? key,
@@ -18,129 +14,174 @@ class MemoryCard extends StatelessWidget {
     this.onViewAll,
   }) : super(key: key);
 
+  static const _chartHeight = 110.0;
+
   final int totalLearned;
 
-  /// Số từ ở mỗi mức ghi nhớ, index 0 ứng với mức 1. Nếu thiếu phần tử,
-  /// mức tương ứng được coi là 0 thay vì gây lỗi.
+  /// Số từ ở mỗi mức ghi nhớ 1–5, index 0 ứng với mức 1. Thiếu phần tử thì
+  /// mức đó coi là 0 thay vì gây lỗi.
   final List<int> levelCounts;
 
   final VoidCallback? onViewAll;
 
-  int _countForLevel(int level) {
+  int _count(int level) {
     final index = level - 1;
-    if (index < 0 || index >= levelCounts.length) return 0;
-    return levelCounts[index];
+    return index >= 0 && index < levelCounts.length ? levelCounts[index] : 0;
   }
 
-  double _barHeight(int count) {
-    final maxCount = levelCounts.fold<int>(0, math.max);
-    if (maxCount == 0) return 24;
-    return 24 + 44 * count / maxCount;
-  }
+  /// (tên giai đoạn, số từ): mức 3, 4, 5 gộp chung thành "Đã nhớ".
+  List<(String, int)> get _stages => [
+        ('Mới học', _count(1)),
+        ('Đang nhớ', _count(2)),
+        ('Đã nhớ', _count(3) + _count(4) + _count(5)),
+      ];
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return AppCard(
-      radius: AppRadius.cardLarge,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 20, 22),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('TIẾN ĐỘ GHI NHỚ', style: palette.sectionLabel),
-                      const SizedBox(height: 12),
-                      Text(
-                        '$totalLearned từ vựng',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                        ),
+    final stages = _stages;
+    final maxCount = stages.fold<int>(1, (max, s) => s.$2 > max ? s.$2 : max);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+      decoration: BoxDecoration(
+        color: palette.card,
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        border: Border.all(color: palette.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('GHI NHỚ', style: palette.sectionLabel),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$totalLearned từ vựng',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              if (onViewAll != null)
+                TextButton(
+                  onPressed: onViewAll,
+                  child: const Text('Xem tất cả ›'),
+                ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          // Cột: số ở trên, cột đứng trên đường nền, tên ở dưới.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final (index, (label, count)) in stages.indexed)
+                Expanded(
+                  child: MemoryBar(
+                    label: label,
+                    count: count,
+                    height: _chartHeight * count / maxCount,
+                    maxHeight: _chartHeight,
+                    color: palette.chartColors[index],
                   ),
                 ),
-                if (onViewAll != null)
-                  TextButton(
-                    onPressed: onViewAll,
-                    child: const Text(
-                      'Xem tất cả →',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+            ],
+          ),
+          Divider(height: 1, thickness: 1, color: palette.divider),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              for (final (label, _) in stages)
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: palette.textSecondary,
                     ),
                   ),
-              ],
-            ),
-            const SizedBox(height: 22),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                for (var level = 1; level <= 5; level++)
-                  MemoryBar(
-                    level: level,
-                    count: _countForLevel(level),
-                    height: _barHeight(_countForLevel(level)),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Từ mới học đến nhớ vững qua từng lần ôn.',
-              style: palette.body.copyWith(fontSize: 13),
-            ),
-          ],
-        ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
+/// Một cột: số từ ở trên; cột màu chuyển nhẹ từ trên xuống, đứng trước một
+/// cột nền nhạt cùng màu cao bằng cả biểu đồ; lớn dần lên khi hiện ra.
 class MemoryBar extends StatelessWidget {
   const MemoryBar({
     Key? key,
-    required this.level,
+    required this.label,
     required this.count,
     required this.height,
+    required this.maxHeight,
+    required this.color,
   }) : super(key: key);
 
-  final int level;
+  final String label;
   final int count;
   final double height;
+  final double maxHeight;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Expanded(
+    return Semantics(
+      label: '$label: $count từ',
+      excludeSemantics: true,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$count', style: const TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: height),
-            duration: Duration(milliseconds: 500 + level * 80),
-            curve: Curves.easeOutBack,
-            builder: (context, animatedHeight, _) => Container(
-              height: math.max(0, animatedHeight),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: palette.memoryLevelColors[level - 1],
-                borderRadius: BorderRadius.circular(8),
-              ),
+          Text(
+            '$count',
+            style: AppTextStyles.cardTitle.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          const SizedBox(height: 10),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              Progress.levelLabels[level]!,
-              style: TextStyle(fontSize: 13, color: palette.textSecondary),
+          const SizedBox(height: 6),
+          Container(
+            width: 44,
+            height: maxHeight,
+            alignment: Alignment.bottomCenter,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(8)),
+            ),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(
+                begin: 0,
+                end: count == 0 ? 0 : height.clamp(8, maxHeight),
+              ),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, _) => Container(
+                height: value,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.lerp(color, Colors.white, 0.2)!,
+                      color,
+                    ],
+                  ),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(8)),
+                ),
+              ),
             ),
           ),
         ],

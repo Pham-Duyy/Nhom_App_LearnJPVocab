@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/category.dart';
-import '../../providers/lesson_provider.dart';
-import '../../providers/library_provider.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
@@ -11,18 +8,14 @@ import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
-import '../../widgets/chibi_mascot.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
-import '../../widgets/seigaiha_pattern.dart';
 import '../../widgets/skeleton.dart';
 import '../../widgets/streak_chip.dart';
 import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
-import '../lesson/category_progress.dart';
-import '../lesson/category_screen.dart';
 import '../quiz/quiz_screen.dart';
 
 class ReviewHomePage extends StatefulWidget {
@@ -75,15 +68,6 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
     );
   }
 
-  ChibiMood _moodFor(ProgressProvider provider, int dailyGoal) {
-    if (provider.isLoading) return ChibiMood.neutral;
-    if (provider.getReviewedTodayCount() >= dailyGoal) {
-      return ChibiMood.happy;
-    }
-    if (provider.getDueForReview().isEmpty) return ChibiMood.sleepy;
-    return ChibiMood.neutral;
-  }
-
   @override
   String getTitle(BuildContext context) => 'Ôn tập';
 
@@ -103,38 +87,20 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
         28,
       ),
       children: [
-        Stack(
+        Row(
           children: [
-            Positioned.fill(
-              child: SeigaihaPattern(
-                color: context.palette.primary.withValues(alpha: 0.09),
+            const Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: BrandLogo(size: 30),
               ),
             ),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: BrandLogo(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    StreakChip(days: profile.streak),
-                  ],
-                ),
-                const SizedBox(height: 28),
-                GreetingSection(
-                  name: profile.displayName,
-                  mood: _moodFor(progressProvider, profile.dailyGoal),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+            StreakChip(days: profile.streak),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
+        GreetingSection(name: profile.displayName),
+        const SizedBox(height: 22),
         _buildProgressSection(progressProvider),
       ],
     );
@@ -177,9 +143,11 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           dueCount: dueCount,
           estimatedMinutes: estimatedMinutes,
           isLoading: _isStartingReview,
+          reviewedToday: provider.getReviewedTodayCount(),
+          dailyGoal: profile.dailyGoal,
           onReview: () => _startReview(provider),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 28),
         MemoryCard(
           totalLearned: provider.totalLearned,
           levelCounts: [
@@ -193,73 +161,13 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
               .read<MainNavigationProvider>()
               .selectTab(MainNavigationProvider.wordsTab),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 28),
         _ActionTile(
           kanji: '問',
           title: 'Quiz nhanh',
           subtitle: 'Kiểm tra ${provider.totalLearned} từ bạn đã học',
           onTap: () => openQuickQuiz(context),
         ),
-        const SizedBox(height: 12),
-        _ActionTile(
-          kanji: '試',
-          title: 'Thi thử',
-          subtitle: 'Làm bài có giờ như đề JLPT',
-          onTap: () => context
-              .read<MainNavigationProvider>()
-              .selectTab(MainNavigationProvider.examTab),
-        ),
-        const SizedBox(height: 32),
-        _buildDailyGoal(provider),
-      ],
-    );
-  }
-
-  Widget _buildDailyGoal(ProgressProvider provider) {
-    final palette = context.palette;
-    final lessonProvider = context.watch<LessonProvider>();
-    final nextCategory = findNextCategory(
-      lessonProvider.categories,
-      provider.progressList,
-      context.watch<LibraryProvider>(),
-    );
-    final reviewedToday = provider.getReviewedTodayCount();
-    final dailyGoal = context.watch<UserProfileProvider>().dailyGoal;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            const Expanded(
-              child: Text(
-                'Mục tiêu hôm nay',
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-              decoration: BoxDecoration(
-                color: palette.accentSurface,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '$reviewedToday / $dailyGoal từ',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: palette.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (nextCategory != null) ...[
-          const SizedBox(height: 14),
-          _ContinueLearningTile(
-            category: nextCategory,
-            onTap: () => openCategory(context, nextCategory),
-          ),
-        ],
       ],
     );
   }
@@ -301,7 +209,7 @@ class _StudyReminder extends StatelessWidget {
   }
 }
 
-/// Một lối vào trên trang chủ (Quiz nhanh, Thi thử): chữ Hán đại diện, tên
+/// Một lối vào trên trang chủ (vd. Quiz nhanh): chữ Hán đại diện, tên
 /// và mô tả ngắn.
 class _ActionTile extends StatelessWidget {
   const _ActionTile({
@@ -344,63 +252,6 @@ class _ActionTile extends StatelessWidget {
         title: Text(title, style: AppTextStyles.cardTitle),
         subtitle: Text(subtitle),
         trailing: Icon(Icons.chevron_right_rounded, color: palette.textMuted),
-      ),
-    );
-  }
-}
-
-class _ContinueLearningTile extends StatelessWidget {
-  const _ContinueLearningTile({required this.category, required this.onTap});
-
-  final Category category;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Material(
-      color: palette.card,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-        side: BorderSide(color: palette.cardBorder),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: palette.accentSurface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(Icons.spa_outlined, color: palette.label),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Tiếp tục học từ mới',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(category.name, style: palette.body),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right_rounded, color: palette.textPrimary),
-            ],
-          ),
-        ),
       ),
     );
   }
