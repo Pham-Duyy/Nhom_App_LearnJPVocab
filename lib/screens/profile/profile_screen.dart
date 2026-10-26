@@ -8,6 +8,7 @@ import '../../models/user_profile.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../services/welcome_store.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/animated_progress_bar.dart';
 import '../../widgets/tab_header.dart';
@@ -68,6 +69,7 @@ class ProfileScreen extends GenericScreen {
     );
     if (confirmed != true || !context.mounted) return;
 
+    WelcomeStore.setSeen(false);
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const WelcomeScreen()),
       (_) => false,

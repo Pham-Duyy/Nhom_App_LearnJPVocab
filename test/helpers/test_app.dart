@@ -12,6 +12,7 @@ import 'package:chibakanji/repositories/mock/mock_user_word_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../fakes/fake_auth_service.dart';
 import '../fakes/fake_speaker.dart';
@@ -27,6 +28,8 @@ Widget buildTestApp({
   MockUserWordRepository? userWordRepository,
   FakeSpeaker? speaker,
 }) {
+  // Bộ nhớ thiết bị giả (màn chào đã xem...), trống ở mỗi test.
+  SharedPreferences.setMockInitialValues({});
   return AppProviders(
     authService: authService ??
         FakeAuthService(

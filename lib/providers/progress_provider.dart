@@ -11,10 +11,15 @@ import '../utils/app_error.dart';
 class ProgressProvider extends ChangeNotifier {
   /// [onStudyActivity] được gọi sau mỗi lần trả lời một thẻ (đúng hoặc sai),
   /// để ghi nhận chuỗi ngày học mà provider này không cần biết đến hồ sơ.
-  ProgressProvider(this._repository, {this.onStudyActivity});
+  ProgressProvider(
+    this._repository, {
+    this.onStudyActivity,
+    DateTime Function()? clock,
+  }) : _clock = clock ?? DateTime.now;
 
   final ProgressRepository _repository;
   final Future<void> Function()? onStudyActivity;
+  final DateTime Function() _clock;
 
   List<Progress> _progressList = [];
   bool _isLoading = false;
@@ -66,11 +71,11 @@ class ProgressProvider extends ChangeNotifier {
   /// Ném lỗi nếu lưu thất bại, để màn hình flashcard giữ nguyên thẻ hiện tại
   /// cho người học thử lại (xem FlashcardScreen).
   Future<void> markCorrect(String vocabularyId) =>
-      _answer(vocabularyId, (p) => p.markCorrect());
+      _answer(vocabularyId, (p) => p.markCorrect(_clock()));
 
   /// Ném lỗi nếu lưu thất bại, như [markCorrect].
   Future<void> markWrong(String vocabularyId) =>
-      _answer(vocabularyId, (p) => p.markWrong());
+      _answer(vocabularyId, (p) => p.markWrong(_clock()));
 
   Future<void> _answer(
     String vocabularyId,

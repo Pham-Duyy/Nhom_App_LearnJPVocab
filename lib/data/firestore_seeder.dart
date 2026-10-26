@@ -7,9 +7,9 @@ import 'mock/mock_learning_data.dart';
 /// những document còn thiếu, nên khi bổ sung từ mới vào [MockLearningData]
 /// thì chạy lại là đủ. Document id trùng với id của model.
 ///
-/// Chỉ chạy được khi rules cho phép ghi vào các collection nội dung — tức là
-/// trước khi publish bản cuối của `firestore.rules`, vốn chặn mọi thao tác
-/// ghi từ app.
+/// Chỉ chạy khi app được mở với `--dart-define=SEED_CONTENT=true` và Rules
+/// tạm cho phép ghi vào các collection nội dung (xem README, mục "Nạp nội
+/// dung lên Firestore").
 class FirestoreSeeder {
   FirestoreSeeder({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;

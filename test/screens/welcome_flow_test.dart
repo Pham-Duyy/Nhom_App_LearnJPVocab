@@ -1,3 +1,4 @@
+import 'package:chibakanji/services/welcome_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -48,6 +49,8 @@ void main() {
 
     expect(find.text('Chào Lan!'), findsOneWidget);
     expect(find.text('3 từ đến hạn · Khoảng 2 phút'), findsOneWidget);
+    // Lần sau mở app sẽ vào thẳng trang chủ.
+    expect(await WelcomeStore.hasSeen(), isTrue);
   });
 
   testWidgets('US03: mật khẩu xác nhận không khớp thì ở lại màn đăng ký', (
@@ -60,6 +63,7 @@ void main() {
     );
     await _pumpFrames(tester);
 
+    expect(await WelcomeStore.hasSeen(), isFalse);
     expect(find.text('Mật khẩu xác nhận chưa khớp.'), findsOneWidget);
     expect(find.text('Chào Lan!'), findsNothing);
   });

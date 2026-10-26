@@ -7,12 +7,12 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 300 test
+flutter test                 # chạy toàn bộ 304 test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
 
-Kết quả hiện tại: **300/300 test qua**, độ phủ code **89.6%**.
+Kết quả hiện tại: **304/304 test qua**, độ phủ code **89.6%**.
 
 ## Cấu trúc thư mục
 
@@ -23,6 +23,7 @@ Kết quả hiện tại: **300/300 test qua**, độ phủ code **89.6%**.
 | `repositories/` | Unit test | Repository tổng quát `Repository<T, ID>` |
 | `providers/` | Unit test | Trạng thái và quy tắc nghiệp vụ của từng màn hình |
 | `auth/` | Unit test | Đăng nhập, đăng ký, kiểm tra dữ liệu nhập |
+| `services/` | Unit test | Lưu trên thiết bị (đã xem màn chào) |
 | `utils/` | Unit test | Đổi lỗi kỹ thuật thành thông báo dễ hiểu |
 | `widgets/` | Widget test | Widget dùng chung, vd. thanh chọn generic `ChoiceSegments<T>` |
 | `screens/` | Widget test | Thao tác trên giao diện như người dùng thật |

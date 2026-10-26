@@ -7,6 +7,7 @@ import '../../models/user_profile.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../services/welcome_store.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
 import '../../widgets/chibi_mascot.dart';
@@ -129,6 +130,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
   }
 
   void _openHome() {
+    WelcomeStore.setSeen(true);
     context.read<MainNavigationProvider>().goHome();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(

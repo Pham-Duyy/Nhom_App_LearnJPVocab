@@ -63,10 +63,11 @@ class Progress {
     );
   }
 
-  /// Trả lời đúng: lên một mức ghi nhớ (tối đa 5) và giãn lịch ôn.
-  Progress markCorrect() {
+  /// Trả lời đúng lúc [now] (mặc định là bây giờ): lên một mức ghi nhớ
+  /// (tối đa 5) và giãn lịch ôn. Truyền [now] để test cho kết quả cố định.
+  Progress markCorrect([DateTime? now]) {
     final newLevel = memoryLevel < 5 ? memoryLevel + 1 : 5;
-    final now = DateTime.now();
+    now ??= DateTime.now();
     return copyWith(
       memoryLevel: newLevel,
       correctCount: correctCount + 1,
@@ -77,9 +78,10 @@ class Progress {
     );
   }
 
-  /// Trả lời sai: về mức 1, ôn lại sau 1 ngày; vẫn tính là đã học.
-  Progress markWrong() {
-    final now = DateTime.now();
+  /// Trả lời sai lúc [now]: về mức 1, ôn lại sau 1 ngày; vẫn tính là đã
+  /// học.
+  Progress markWrong([DateTime? now]) {
+    now ??= DateTime.now();
     return copyWith(
       memoryLevel: 1,
       wrongCount: wrongCount + 1,

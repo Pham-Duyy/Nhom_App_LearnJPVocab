@@ -7,8 +7,14 @@ import 'app.dart';
 import 'data/firestore_seeder.dart';
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
+import 'services/welcome_store.dart';
 import 'utils/app_error.dart';
 import 'widgets/error_view.dart';
+
+/// Chỉ nạp nội dung mẫu lên Firestore khi chạy với
+/// `--dart-define=SEED_CONTENT=true`, vì Rules chặn app ghi vào nội dung học
+/// (xem README, mục "Nạp nội dung lên Firestore").
+const _seedContent = bool.fromEnvironment('SEED_CONTENT');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +24,9 @@ Future<void> main() async {
     runApp(const _StartupErrorApp());
     return;
   }
-  if (kDebugMode) await _seedMissingContent();
-  runApp(const AppProviders(child: ChibaKanjiApp()));
+  if (_seedContent) await _seedMissingContent();
+  final seenWelcome = await WelcomeStore.hasSeen();
+  runApp(AppProviders(child: ChibaKanjiApp(showWelcome: !seenWelcome)));
 }
 
 /// Lưới an toàn cuối cùng: lỗi không được nơi nào bắt (khi dựng giao diện,

@@ -1,6 +1,8 @@
 import 'package:chibakanji/models/progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+final _now = DateTime(2026, 1, 15, 9);
+
 void main() {
   group('US09: Progress.markCorrect', () {
     test('tăng memoryLevel lên 1 mỗi lần trả lời đúng', () {
@@ -40,6 +42,17 @@ void main() {
   });
 
   group('US11: nextReviewAt được tính theo mức ghi nhớ', () {
+    test('lịch ôn tính từ thời điểm trả lời được truyền vào', () {
+      const progress = Progress(vocabularyId: 'v1', memoryLevel: 2);
+
+      final correct = progress.markCorrect(_now);
+      final wrong = progress.markWrong(_now);
+
+      expect(correct.lastReviewedAt, _now);
+      expect(correct.nextReviewAt, DateTime(2026, 1, 22, 9));
+      expect(wrong.nextReviewAt, DateTime(2026, 1, 16, 9));
+    });
+
     test('mức 1: ôn lại sau 1 ngày', () {
       const progress = Progress(vocabularyId: 'v1', memoryLevel: 3);
       final updated = progress.markWrong();
