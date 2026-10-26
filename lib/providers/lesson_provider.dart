@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' hide Category;
 
 import '../models/category.dart';
 import '../models/lesson.dart';
+import '../models/vocabulary.dart';
 import '../repositories/category_repository.dart';
 import '../utils/app_error.dart';
 
@@ -10,8 +11,14 @@ import '../utils/app_error.dart';
 class LessonProvider extends ChangeNotifier {
   LessonProvider(this._repository);
 
-  /// Các cấp độ JLPT và mục từ vựng chuyên ngành.
-  static const levels = ['N5', 'N4', 'N3', Category.industryLevel];
+  /// Các cấp độ JLPT, mục từ vựng chuyên ngành và mục chủ đề tự tạo.
+  static const levels = [
+    'N5',
+    'N4',
+    'N3',
+    Category.industryLevel,
+    Vocabulary.personalLevel,
+  ];
 
   final CategoryRepository _repository;
 
