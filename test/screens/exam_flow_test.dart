@@ -36,12 +36,50 @@ Future<void> _startExam(WidgetTester tester) async {
       matching: find.text('Thi thử'),
     ),
   );
-  expect(find.text('Thi thử như đề JLPT'), findsOneWidget);
+  expect(find.text('PHẠM VI'), findsOneWidget);
   await _tap(tester, find.text('10 câu'));
   await _tap(tester, find.text('Bắt đầu làm bài'));
 }
 
+/// Mở tab Thi thử, chưa bắt đầu làm bài.
+Future<void> _openExamTab(WidgetTester tester) async {
+  await pumpTestApp(tester);
+  await _tap(
+    tester,
+    find.descendant(
+      of: find.byType(BottomNavigationBar),
+      matching: find.text('Thi thử'),
+    ),
+  );
+}
+
 void main() {
+  testWidgets('US21: thi riêng một chủ đề, tên chủ đề thành tên bài thi', (
+    tester,
+  ) async {
+    await _openExamTab(tester);
+
+    await _tap(tester, find.text('Gia đình và con người'));
+    await _tap(tester, find.text('10 câu'));
+    expect(find.text('Lấy ngẫu nhiên từ 10 từ'), findsOneWidget);
+    await _tap(tester, find.text('Bắt đầu làm bài'));
+
+    expect(find.text('Thi thử Gia đình và con người'), findsOneWidget);
+  });
+
+  testWidgets('US21: phạm vi "Từ đã học" ít từ thì đề tự rút số câu', (
+    tester,
+  ) async {
+    await _openExamTab(tester);
+
+    await _tap(tester, find.text('Từ đã học'));
+
+    // Dữ liệu mẫu có 9 từ đã học: đề 20 câu rút còn 9 câu.
+    expect(find.text('CHỦ ĐỀ'), findsNothing);
+    expect(find.text('Lấy ngẫu nhiên từ 9 từ'), findsOneWidget);
+    expect(find.textContaining('9 câu · 4 phút'), findsOneWidget);
+  });
+
   testWidgets('US21: làm đúng hết 10 câu, nộp bài thì đạt 合格', (tester) async {
     await _startExam(tester);
     final exam = _read<ExamProvider>(tester);
@@ -71,16 +109,6 @@ void main() {
     );
   });
 
-  testWidgets('US21: ô Thi thử ở trang chủ chuyển sang tab Thi thử', (
-    tester,
-  ) async {
-    await pumpTestApp(tester);
-
-    await _tap(tester, find.text('Làm bài có giờ như đề JLPT'));
-
-    expect(find.text('Thi thử như đề JLPT'), findsOneWidget);
-  });
-
   testWidgets('US21: hết giờ thì tự nộp, chưa làm câu nào là 不合格', (
     tester,
   ) async {
@@ -103,7 +131,7 @@ void main() {
     expect(find.text('Thoát bài thi?'), findsOneWidget);
     await _tap(tester, find.text('Thoát'));
 
-    expect(find.text('Thi thử như đề JLPT'), findsOneWidget);
+    expect(find.text('PHẠM VI'), findsOneWidget);
     expect(_read<QuizProvider>(tester).history, isEmpty);
   });
 }
