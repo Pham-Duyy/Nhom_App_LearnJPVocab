@@ -19,7 +19,7 @@ Các chức năng khác:
 - **Flashcard:** lật thẻ, vuốt hoặc bấm Nhớ/Chưa nhớ, nghe phát âm, xem kết quả phiên học.
 - **Quiz:** 4 dạng câu hỏi (kana → nghĩa, nghĩa → kana, kanji → nghĩa, nghe → từ), giải thích đáp án, lưu lịch sử.
 - **Ôn tập ngắt quãng:** 5 mức ghi nhớ, lịch ôn 1/3/7/14/30 ngày.
-- **Kho từ của tôi:** tự tạo chủ đề, thêm từ, import danh sách từ Excel/Google Sheets; từ tự thêm học được như từ có sẵn.
+- **Kho từ của tôi:** tự tạo chủ đề, thêm từ, import từ file Excel, CSV, PDF hoặc dán danh sách; từ tự thêm học được như từ có sẵn.
 - **Tài khoản:** dùng thử không cần đăng ký (khách), đăng ký/đăng nhập bằng email hoặc Google; tài khoản khách được liên kết nên không mất tiến độ.
 - **Nội dung:** 150 từ N5 (9 chủ đề) và 60 từ chuyên ngành (Chế biến thực phẩm, Xây dựng, Điều dưỡng).
 

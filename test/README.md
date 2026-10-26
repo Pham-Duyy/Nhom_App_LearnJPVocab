@@ -7,12 +7,12 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 304 test
+flutter test                 # chạy toàn bộ 322 test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
 
-Kết quả hiện tại: **304/304 test qua**, độ phủ code **89.6%**.
+Kết quả hiện tại: **322/322 test qua**, độ phủ code **89.6%**.
 
 ## Cấu trúc thư mục
 
@@ -25,7 +25,7 @@ Kết quả hiện tại: **304/304 test qua**, độ phủ code **89.6%**.
 | `auth/` | Unit test | Đăng nhập, đăng ký, kiểm tra dữ liệu nhập |
 | `services/` | Unit test | Lưu trên thiết bị (đã xem màn chào) |
 | `utils/` | Unit test | Đổi lỗi kỹ thuật thành thông báo dễ hiểu |
-| `widgets/` | Widget test | Widget dùng chung, vd. thanh chọn generic `ChoiceSegments<T>` |
+| `widgets/` | Widget test | Widget dùng chung, vd. thanh chọn generic `ChoiceSegments<T>`, `PillChoices<T>` |
 | `screens/` | Widget test | Thao tác trên giao diện như người dùng thật |
 | `fakes/`, `helpers/` | Hỗ trợ | Dịch vụ giả, repository bật/tắt lỗi được, dựng app để test |
 
@@ -56,9 +56,9 @@ thử của đề bài (`8a`, `8c`, `8e`), nên lọc được bằng `--plain-n
 | US18 | Là người học, tôi có thể đặt mục tiêu số từ mỗi ngày | 4 | `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart` |
 | US19 | Là người học, tôi có thể xem chuỗi ngày học liên tiếp | 15 | `models/user_profile_test.dart`, `providers/progress_provider_test.dart`, `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart` |
 | US20 | Là người học, tôi có thể đổi tên hiển thị và chế độ sáng/tối | 13 | `models/user_profile_test.dart`, `providers/user_profile_provider_test.dart`, `screens/profile_settings_test.dart`, `screens/theme_mode_test.dart` |
-| US21 | Là người học, tôi có thể làm bài thi thử trắc nghiệm có giới hạn thời gian | 15 | `providers/exam_provider_test.dart`, `screens/exam_flow_test.dart` |
-| US22 | Là người học, tôi có thể tạo chủ đề và thêm từ vựng của riêng mình để học | 9 | `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
-| US23 | Là người học, tôi có thể import danh sách từ vựng từ Excel hoặc Google Sheets | 6 | `data/vocabulary_import_parser_test.dart`, `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
+| US21 | Là người học, tôi có thể làm bài thi thử trắc nghiệm có giới hạn thời gian | 16 | `providers/exam_provider_test.dart`, `screens/exam_flow_test.dart` |
+| US22 | Là người học, tôi có thể tạo chủ đề và thêm từ vựng của riêng mình để học | 12 | `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
+| US23 | Là người học, tôi có thể import từ vựng từ file Excel, CSV hoặc PDF | 18 | `data/vocabulary_file_reader_test.dart`, `data/vocabulary_import_parser_test.dart`, `providers/my_vocabulary_provider_test.dart`, `screens/my_vocabulary_flow_test.dart` |
 
 Một test có thể thuộc nhiều story (vd. `US06, US07`) nên tổng cột "Số test"
 lớn hơn số test chỉ gắn một mã.
