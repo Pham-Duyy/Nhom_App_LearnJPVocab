@@ -34,7 +34,6 @@ class ErrorView extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: onRetry,
-              // Nút vừa với chữ thay vì kéo hết chiều ngang như nút mặc định.
               style: ElevatedButton.styleFrom(minimumSize: const Size(160, 48)),
               child: Text(actionLabel),
             ),

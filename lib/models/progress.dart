@@ -63,7 +63,7 @@ class Progress {
     );
   }
 
-  // Trả lời đúng: tăng mức ghi nhớ (tối đa 5) và giãn lịch ôn tiếp theo.
+  /// Trả lời đúng: lên một mức ghi nhớ (tối đa 5) và giãn lịch ôn.
   Progress markCorrect() {
     final newLevel = memoryLevel < 5 ? memoryLevel + 1 : 5;
     final now = DateTime.now();
@@ -77,8 +77,7 @@ class Progress {
     );
   }
 
-  // Trả lời sai: quay về mức 1, ôn lại sớm nhất. Từ đã được nhìn thấy và
-  // trả lời (dù sai) vẫn tính là đã học, nên vẫn đánh dấu isLearned.
+  /// Trả lời sai: về mức 1, ôn lại sau 1 ngày; vẫn tính là đã học.
   Progress markWrong() {
     final now = DateTime.now();
     return copyWith(
@@ -91,7 +90,7 @@ class Progress {
     );
   }
 
-  // Từ chưa từng được ôn (`nextReviewAt` null) luôn coi là đến hạn.
+  /// Từ chưa từng ôn (`nextReviewAt` null) luôn đến hạn.
   bool isDueForReview([DateTime? now]) {
     if (nextReviewAt == null) return true;
     final reference = now ?? DateTime.now();

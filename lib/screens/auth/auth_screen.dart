@@ -81,7 +81,6 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
     final auth = context.read<AuthController>();
     return _runSignIn(
       auth.signInWithGoogle,
-      // Lấy tên Google làm tên hiển thị, trừ khi người học đã tự đặt tên.
       onSuccess: () =>
           _applyDisplayName(auth.user?.displayName, onlyIfUnset: true),
     );

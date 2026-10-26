@@ -79,8 +79,6 @@ class ProgressProvider extends ChangeNotifier {
     final updated = await _updateAndSave(vocabularyId, update);
     _replaceInList(updated);
     notifyListeners();
-    // Không chờ: lưu chuỗi ngày không được làm chậm việc chuyển thẻ, và lỗi
-    // của nó đã được UserProfileProvider tự xử lý.
     final record = onStudyActivity;
     if (record != null) unawaited(record());
   }

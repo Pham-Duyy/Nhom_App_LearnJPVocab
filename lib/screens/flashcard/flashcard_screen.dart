@@ -39,14 +39,8 @@ class FlashcardScreen extends StatefulWidget {
 class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
   final _cardKey = GlobalKey<SwipeFlashcardState>();
 
-  // Chặn bấm đúp trong lúc markCorrect()/markWrong() đang chờ lưu — nếu
-  // không, một cú bấm kép có thể lưu một từ hai lần, nhảy qua từ tiếp theo,
-  // sai số liệu phiên, hoặc mở màn hình kết quả nhiều lần.
   bool _isSubmitting = false;
 
-  // Đếm số lần đúng/sai của riêng phiên học này để hiển thị ở màn hình kết
-  // quả. Đây là số liệu tạm thời của UI, khác với memoryLevel tích lũy lâu
-  // dài mà ProgressProvider/ProgressRepository lưu trữ.
   int _correctCount = 0;
   int _wrongCount = 0;
 
@@ -129,7 +123,6 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
           );
         }
 
-        // Tùy chọn học quyết định mặt nào ở trước và có hiện romaji không.
         final preferences = context.watch<UserProfileProvider>().preferences;
         final japaneseFirst = preferences.cardFront == CardFront.japanese;
         final tapHint = _CardHint(
@@ -147,7 +140,6 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
             );
         Widget meaning(_CardHint hint) => _MeaningFace(
               word: word,
-              // Nghĩa ở mặt trước thì chưa được lộ cách viết tiếng Nhật.
               revealJapanese: japaneseFirst,
               hint: hint,
             );
@@ -216,8 +208,6 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
                         children: [
                           Icon(Icons.replay_rounded, size: 20),
                           SizedBox(width: 8),
-                          // Flexible: không tràn nút khi người dùng phóng to
-                          // cỡ chữ của hệ thống trên màn hình hẹp.
                           Flexible(
                             child: Text(
                               'Chưa nhớ',

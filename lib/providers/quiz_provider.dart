@@ -157,8 +157,6 @@ class QuizProvider extends ChangeNotifier {
     final vocabularyId = question.vocabularyId;
     final callback = onAnswer;
     if (vocabularyId != null && callback != null) {
-      // Không chờ để giao diện phản hồi ngay; lỗi (vd. mất mạng khi đưa từ
-      // về lịch ôn) chỉ ghi log, không làm hỏng lượt quiz đang làm.
       unawaited(
         callback(vocabularyId, question.isCorrect(optionIndex)).catchError(
           (Object e, StackTrace stack) =>

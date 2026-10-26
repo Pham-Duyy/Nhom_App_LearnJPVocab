@@ -105,7 +105,6 @@ class UserProfileProvider extends ChangeNotifier {
       await _repository.save(next);
     } catch (e, stack) {
       AppError.log('UserProfileProvider.save', e, stack);
-      // Chỉ hoàn tác nếu chưa có thay đổi nào mới hơn ghi đè lên [next].
       if (identical(_profile, next)) _profile = previous;
       _errorMessage = AppError.message(e, action: 'lưu thay đổi');
       notifyListeners();

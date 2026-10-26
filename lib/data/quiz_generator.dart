@@ -147,14 +147,11 @@ class QuizGenerator {
     int order,
   ) {
     final usable = builders.where((builder) => builder.canAsk(word)).toList();
-    // Không dạng nào hỏi được từ này (vd. chỉ dùng Kanji → Nghĩa mà từ không
-    // có chữ Hán): bỏ qua từ.
     if (usable.isEmpty) return null;
     final builder = usable[_random.nextInt(usable.length)];
     final answer = builder.answerOf(word);
 
-    // Đáp án sai lấy từ các từ khác, không trùng nhau và không trùng đáp án
-    // đúng (hai từ cùng nghĩa sẽ khiến câu hỏi có hai đáp án đúng).
+    // Bỏ trùng: hai từ cùng nghĩa sẽ thành hai đáp án đúng.
     final wrongAnswers = allWords
         .map(builder.answerOf)
         .where((option) => option != answer)

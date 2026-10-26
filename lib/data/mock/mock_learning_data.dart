@@ -235,7 +235,6 @@ class MockLearningData {
   ];
 
   static final List<Vocabulary> _vocabulary = [
-    // les_greetings_1 — Chào hỏi cơ bản
     const Vocabulary(
       id: 'v_greet_1',
       lessonId: 'les_greetings_1',
@@ -296,8 +295,6 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 5,
     ),
-
-    // les_greetings_2 — Giao tiếp hằng ngày
     const Vocabulary(
       id: 'v_greet_6',
       lessonId: 'les_greetings_2',
@@ -358,8 +355,6 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 5,
     ),
-
-    // les_family_1 — Thành viên gia đình
     const Vocabulary(
       id: 'v_family_1',
       lessonId: 'les_family_1',
@@ -420,8 +415,6 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 5,
     ),
-
-    // les_family_2 — Con người và ngoại hình
     const Vocabulary(
       id: 'v_family_6',
       lessonId: 'les_family_2',
@@ -482,8 +475,6 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 5,
     ),
-
-    // les_school_1 — Đồ dùng học tập
     const Vocabulary(
       id: 'v_school_1',
       lessonId: 'les_school_1',
@@ -544,8 +535,6 @@ class MockLearningData {
       jlptLevel: 'N5',
       order: 5,
     ),
-
-    // les_school_2 — Cuộc sống hằng ngày
     const Vocabulary(
       id: 'v_school_6',
       lessonId: 'les_school_2',
@@ -1171,43 +1160,8 @@ class MockLearningData {
     ];
   }
 
-  /// Danh sách từ vựng hiện tại (dùng cho học mới và ôn tập)
+  /// Toàn bộ từ vựng mẫu, xếp theo bài.
   static List<Vocabulary> get vocabulary => _vocabulary;
-
-  /// Hàm tiện ích để thêm một từ vựng mới vào dữ liệu học / ôn tập.
-  /// Bạn có thể gọi hàm này từ bất kỳ đâu để thêm từ mới.
-  static Vocabulary addWord({
-    String? id,
-    String lessonId = 'les_school_2',
-    required String kanji,
-    required String kana,
-    required String romaji,
-    required String meaning,
-    String exampleJapanese = '',
-    String exampleVietnamese = '',
-    String jlptLevel = 'N5',
-    int? order,
-  }) {
-    final word = Vocabulary(
-      id: id ?? 'v_custom_${DateTime.now().microsecondsSinceEpoch}',
-      lessonId: lessonId,
-      kanji: kanji,
-      kana: kana,
-      romaji: romaji,
-      meaning: meaning,
-      exampleJapanese: exampleJapanese,
-      exampleVietnamese: exampleVietnamese,
-      jlptLevel: jlptLevel,
-      order: order ?? (_vocabulary.length + 1),
-    );
-    _vocabulary.add(word);
-    return word;
-  }
-
-  /// Hàm tiện ích để thêm nhiều từ vựng mới cùng lúc
-  static void addWords(List<Vocabulary> words) {
-    _vocabulary.addAll(words);
-  }
 
   /// Sinh 9 Progress mẫu (phân bố mức 3-3-1-1-1, tất cả đã học) để trang chủ
   /// và phiên ôn tập có dữ liệu ngay khi mở app, trước khi có Firestore.
@@ -1238,7 +1192,6 @@ class MockLearningData {
     }
 
     return [
-      // Mức 1 (hạn ôn 1 ngày, ôn lần cuối 2 ngày trước) -> đã đến hạn.
       buildProgress(
         vocabularyId: 'v_greet_1',
         memoryLevel: 1,
@@ -1254,7 +1207,6 @@ class MockLearningData {
         memoryLevel: 1,
         reviewedAgo: const Duration(days: 2),
       ),
-      // Mức 2 (hạn ôn 3 ngày, ôn lần cuối 1 ngày trước) -> chưa đến hạn.
       buildProgress(
         vocabularyId: 'v_greet_6',
         memoryLevel: 2,
@@ -1270,19 +1222,16 @@ class MockLearningData {
         memoryLevel: 2,
         reviewedAgo: const Duration(days: 1),
       ),
-      // Mức 3 (hạn ôn 7 ngày, ôn lần cuối 2 ngày trước) -> chưa đến hạn.
       buildProgress(
         vocabularyId: 'v_family_6',
         memoryLevel: 3,
         reviewedAgo: const Duration(days: 2),
       ),
-      // Mức 4 (hạn ôn 14 ngày, ôn lần cuối 3 ngày trước) -> chưa đến hạn.
       buildProgress(
         vocabularyId: 'v_school_1',
         memoryLevel: 4,
         reviewedAgo: const Duration(days: 3),
       ),
-      // Mức 5 (hạn ôn 30 ngày, ôn lần cuối 5 ngày trước) -> chưa đến hạn.
       buildProgress(
         vocabularyId: 'v_school_6',
         memoryLevel: 5,

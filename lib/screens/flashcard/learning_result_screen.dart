@@ -47,7 +47,6 @@ class LearningResultScreen extends GenericScreen {
     final lessonIds = words.map((word) => word.lessonId).toSet();
     openQuiz(
       context,
-      // Phiên ôn tập gồm từ của nhiều bài thì gộp chung một mã.
       quizId: lessonIds.length == 1 ? 'lesson-${lessonIds.first}' : 'review',
       title: title,
       words: words,

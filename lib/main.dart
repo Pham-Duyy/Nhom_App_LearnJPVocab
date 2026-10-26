@@ -34,8 +34,6 @@ void _catchUnexpectedErrors() {
     AppError.log('Uncaught', error, stack);
     return true;
   };
-  // Bản phát hành: phần giao diện bị lỗi hiện một dòng thông báo, thay cho
-  // khung xám không rõ nghĩa.
   if (kReleaseMode) {
     ErrorWidget.builder = (_) => const Center(
           child: Text(
@@ -71,7 +69,6 @@ Future<void> _seedMissingContent() async {
         .timeout(const Duration(seconds: 10));
     if (added > 0) debugPrint('Đã nạp $added document mẫu lên Firestore.');
   } catch (e) {
-    // Rules đã khóa quyền ghi hoặc đang mất mạng: bỏ qua, app vẫn chạy.
     debugPrint('Không nạp được dữ liệu mẫu: $e');
   }
 }

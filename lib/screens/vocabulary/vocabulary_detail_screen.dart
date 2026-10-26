@@ -150,8 +150,6 @@ class VocabularyDetailScreen extends GenericScreen {
                       style: const TextStyle(fontSize: 18),
                     ),
                   ),
-                  // Cả câu có ngữ cảnh nên giọng đọc đọc kanji đúng hơn khi
-                  // đứng riêng một từ.
                   SpeakButton(text: word.exampleJapanese, size: 22),
                 ],
               ),

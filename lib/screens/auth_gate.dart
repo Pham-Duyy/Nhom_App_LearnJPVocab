@@ -51,14 +51,12 @@ class _AuthGateState extends State<AuthGate> {
   void _loadUserDataFor(String uid) {
     if (_loadedUid == uid) return;
     _loadedUid = uid;
-    // loadProgress() gọi notifyListeners(), nên phải chờ build hiện tại xong.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<LessonProvider>().loadCategories();
       context.read<LibraryProvider>().load();
       context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
-      // Lịch sử quiz cần cho cả trang Lịch sử lẫn Thành tích.
       context.read<QuizProvider>().loadHistory();
     });
   }

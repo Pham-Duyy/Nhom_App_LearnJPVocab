@@ -19,8 +19,6 @@ class SpeakerUnavailableException implements Exception {
 /// Đọc bằng giọng đọc có sẵn của hệ điều hành hoặc trình duyệt.
 class TtsSpeaker implements Speaker {
   TtsSpeaker({FlutterTts? tts}) : _tts = tts ?? FlutterTts() {
-    // Theo dõi trạng thái thật của giọng đọc: flutter_tts bỏ qua lệnh đọc
-    // mới khi nó vẫn coi là đang đọc câu trước.
     _tts.setStartHandler(() => _isSpeaking = true);
     _tts.setCompletionHandler(_markStopped);
     _tts.setCancelHandler(_markStopped);
@@ -41,8 +39,6 @@ class TtsSpeaker implements Speaker {
   @override
   Future<void> speak(String text) async {
     await _ensureSetup();
-    // Bấm lại khi đang đọc: dừng câu cũ và chờ xác nhận đã dừng hẳn, nếu
-    // không câu mới sẽ bị bỏ qua.
     if (_isSpeaking) await stop();
     await _tts.speak(text);
   }
@@ -52,7 +48,6 @@ class TtsSpeaker implements Speaker {
     if (!_isSpeaking) return;
     final stopped = _stopped = Completer<void>();
     await _tts.stop();
-    // Có nền tảng không báo sự kiện khi dừng: chờ tối đa một chút rồi thôi.
     await stopped.future.timeout(_stopTimeout, onTimeout: () {});
     _isSpeaking = false;
   }
@@ -72,16 +67,12 @@ class TtsSpeaker implements Speaker {
   }
 
   Future<void> _configure() async {
-    // Trên web, chọn giọng khi danh sách còn rỗng thì flutter_tts lặng lẽ bỏ
-    // qua và đọc bằng giọng mặc định (tiếng Việt/Anh), giọng đó im lặng trước
-    // chữ Nhật. Phải chờ trình duyệt nạp xong danh sách giọng trước.
+    // Web: chờ nạp xong giọng đọc, nếu không setLanguage bị bỏ qua.
     if (kIsWeb) await _waitForVoices();
     if (await _tts.isLanguageAvailable(language) != true) {
       throw const SpeakerUnavailableException();
     }
     await _tts.setLanguage(language);
-    // Thang tốc độ khác nhau: web lấy 1.0 làm bình thường, điện thoại lấy
-    // 0.5. Đọc chậm hơn bình thường một chút cho dễ nghe.
     await _tts.setSpeechRate(kIsWeb ? 0.85 : 0.42);
   }
 

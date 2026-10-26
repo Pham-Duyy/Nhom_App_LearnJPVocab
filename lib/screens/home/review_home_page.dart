@@ -32,8 +32,6 @@ class ReviewHomePage extends StatefulWidget {
 }
 
 class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
-  // Khoá nút "Ôn ngay" trong lúc loadReviewWords() đang chờ, để tránh bấm
-  // nhiều lần mở nhiều phiên ôn tập chồng lên nhau.
   bool _isStartingReview = false;
 
   Future<void> _startReview(ProgressProvider progressProvider) async {

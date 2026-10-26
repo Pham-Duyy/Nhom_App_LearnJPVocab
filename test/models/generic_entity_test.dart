@@ -3,7 +3,6 @@ import 'package:chibakanji/models/generic_entity.dart';
 import 'package:chibakanji/models/learning_content.dart';
 import 'package:chibakanji/models/lesson.dart';
 import 'package:chibakanji/models/quiz.dart';
-import 'package:chibakanji/models/user.dart';
 import 'package:chibakanji/models/vocabulary.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -184,44 +183,6 @@ void main() {
       expect(restored.title, quiz.title);
       expect(restored.lessonId, quiz.lessonId);
       expect(restored.questionCount, 5);
-    });
-  });
-
-  group('User kế thừa GenericEntity<int>', () {
-    final user = User(
-      id: 7,
-      username: 'duy',
-      email: 'duy@example.com',
-      passwordHash: 'hash',
-    );
-
-    test('id có kiểu int, username thành name, email thành description', () {
-      expect(user, isA<GenericEntity<int>>());
-      expect(user, isNot(isA<LearningContent>()));
-
-      final int id = user.getId();
-      expect(id, 7);
-      expect(user.getName(), 'duy');
-      expect(user.getDescription(), 'duy@example.com');
-    });
-
-    test('các phương thức riêng của User vẫn hoạt động', () {
-      expect(user.isValidEmail(), isTrue);
-      expect(user.getDisplayName(), 'Duy');
-      expect(user.matches('example'), isTrue);
-      expect(user.toString(), 'User(duy, duy@example.com)');
-    });
-
-    test('toMap() giữ key username/email, fromMap() đọc lại đúng', () {
-      final map = user.toMap();
-      expect(map['username'], 'duy');
-      expect(map['email'], 'duy@example.com');
-      expect(map.containsKey('name'), isFalse);
-
-      final restored = User.fromMap(map);
-      expect(restored.id, 7);
-      expect(restored.username, 'duy');
-      expect(restored.passwordHash, 'hash');
     });
   });
 }

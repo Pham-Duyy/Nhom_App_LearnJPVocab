@@ -635,7 +635,6 @@ class _ProfileMenuItem extends StatelessWidget {
                   ),
                 ),
                 if (value != null)
-                  // Giá trị dài (vd. email) tự rút gọn thay vì làm tràn dòng.
                   Flexible(
                     child: Text(
                       value!,

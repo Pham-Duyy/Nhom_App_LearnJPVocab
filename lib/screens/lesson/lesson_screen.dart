@@ -49,7 +49,6 @@ class LessonScreen extends GenericListScreen<Lesson> {
     await vocabularyProvider.loadByLesson(item.id);
     if (!context.mounted) return;
 
-    // Tải thất bại thì ở lại danh sách bài học thay vì mở flashcard rỗng/lỗi.
     if (vocabularyProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(vocabularyProvider.errorMessage!)),

@@ -49,7 +49,6 @@ class AchievementsScreen extends GenericScreen {
         const SizedBox(height: 16),
         GridView.count(
           crossAxisCount: 2,
-          // Lưới nằm trong ListView nên tự co theo nội dung, không tự cuộn.
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 12,

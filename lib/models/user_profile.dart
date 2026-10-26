@@ -138,7 +138,6 @@ class UserProfile {
       ),
       currentStreak: currentStreak,
       lastStudyDate: lastDate is String ? DateTime.tryParse(lastDate) : null,
-      // Dữ liệu cũ chưa có longestStreak: ít nhất bằng chuỗi hiện tại.
       longestStreak:
           longest is int && longest > currentStreak ? longest : currentStreak,
       preferences: preferences is Map

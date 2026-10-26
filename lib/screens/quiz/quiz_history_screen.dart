@@ -21,7 +21,6 @@ class _QuizHistoryScreenState extends GenericScreenState<QuizHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    // loadHistory() gọi notifyListeners(), nên chờ khung hình đầu dựng xong.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) context.read<QuizProvider>().loadHistory();
     });

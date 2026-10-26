@@ -94,8 +94,6 @@ class AuthController extends ChangeNotifier {
     Future<AppAuthUser> Function() action,
   ) async {
     try {
-      // Cập nhật ngay từ kết quả: khi gắn email vào tài khoản khách, uid không
-      // đổi nên authStateChanges() không phát sự kiện mới.
       _user = await action();
       _status = AuthStatus.authenticated;
       _errorMessage = null;
@@ -137,9 +135,7 @@ class AuthController extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _notify();
     } else if (_status == AuthStatus.authenticated) {
-      // Chỉ coi là đã đăng xuất khi trước đó đang đăng nhập. Firebase phát
-      // null ngay khi bắt đầu nghe trên máy mới; lúc đó (đang loading) hoặc
-      // sau lỗi (failure) không được ghi đè trạng thái hiện tại.
+      // Firebase phát null khi mới bắt đầu nghe: chưa phải đăng xuất.
       _user = null;
       _status = AuthStatus.unauthenticated;
       _notify();
@@ -176,8 +172,6 @@ class AuthController extends ChangeNotifier {
     final code = _codeOf(error);
     switch (code) {
       case 'operation-not-allowed':
-      // Firebase trả mã này thay cho operation-not-allowed khi project chưa
-      // bật nhà cung cấp Anonymous.
       case 'admin-restricted-operation':
         return 'Đăng nhập ẩn danh chưa được bật trong Firebase.';
       default:
@@ -196,15 +190,12 @@ class AuthController extends ChangeNotifier {
         return 'Email không đúng định dạng.';
       case 'weak-password':
         return 'Mật khẩu quá yếu, cần ít nhất 6 ký tự.';
-      // Firebase gộp "sai mật khẩu" và "không có tài khoản" thành
-      // invalid-credential để không lộ email nào đã đăng ký.
       case 'invalid-credential':
       case 'wrong-password':
       case 'user-not-found':
         return 'Email hoặc mật khẩu không đúng.';
       case 'operation-not-allowed':
         return 'Phương thức đăng nhập này chưa được bật trong Firebase.';
-      // Người dùng đóng cửa sổ Google (web: popup; Android: trình duyệt).
       case 'popup-closed-by-user':
       case 'cancelled-popup-request':
       case 'web-context-canceled':
@@ -223,8 +214,6 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  // Một lần initialize() có thể còn đang chờ khi controller bị dispose (vd.
-  // đóng app giữa lúc đăng nhập); notifyListeners() sau dispose sẽ ném lỗi.
   void _notify() {
     if (!_disposed) notifyListeners();
   }

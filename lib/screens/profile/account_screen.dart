@@ -17,7 +17,6 @@ class AccountScreen extends GenericScreen {
   String getTitle(BuildContext context) => 'Tài khoản';
 
   void _linkWithEmail(BuildContext context) {
-    // Đăng ký khi đang là khách sẽ gắn email vào chính tài khoản này.
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const AuthScreen(startWithRegister: true),

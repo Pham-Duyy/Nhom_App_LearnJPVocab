@@ -40,8 +40,6 @@ class LibraryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Đọc song song; Future.wait ném ra đúng lỗi gốc (vd. mất mạng) để
-      // AppError chọn được câu báo phù hợp.
       final results = await Future.wait<List<Object>>([
         _categories.getCategories(),
         _categories.getAllLessons(),
@@ -55,8 +53,6 @@ class LibraryProvider extends ChangeNotifier {
         for (final lesson in lessons) lesson.id: lesson.categoryId,
       };
 
-      // Thứ hạng của mỗi bài trong toàn bộ khóa học, để xếp từ theo đúng
-      // thứ tự người học gặp chúng.
       final categoryRank = {
         for (var i = 0; i < categories.length; i++) categories[i].id: i,
       };

@@ -76,7 +76,6 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<AppAuthUser> signInWithGoogle() {
     return _guard(() async {
-      // Luôn cho chọn tài khoản, kể cả khi trình duyệt đã đăng nhập sẵn.
       final provider = fb.GoogleAuthProvider()
         ..setCustomParameters({'prompt': 'select_account'});
 
@@ -92,8 +91,6 @@ class FirebaseAuthService implements AuthService {
             ? await current.linkWithPopup(provider)
             : await current.linkWithProvider(provider));
       } on fb.FirebaseAuthException catch (e) {
-        // Tài khoản Google này đã gắn với một người dùng khác trong app:
-        // đăng nhập vào người dùng đó thay vì báo lỗi.
         final credential = e.credential;
         if (e.code != 'credential-already-in-use' || credential == null) {
           rethrow;

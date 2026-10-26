@@ -165,7 +165,6 @@ class QuizScreen extends GenericScreen {
             letter: String.fromCharCode(65 + i),
             label: question.options[i],
             status: _statusOf(question, i, selected),
-            // Đã chọn thì khóa lại: mỗi câu chỉ được trả lời một lần.
             onSelected: selected == null ? () => quiz.answer(i) : null,
           ),
         if (selected != null) ...[
@@ -237,7 +236,6 @@ class _PromptCard extends StatelessWidget {
             Text(question.instruction ?? '', style: palette.body),
             const SizedBox(height: 12),
             if (question.isListening)
-              // ObjectKey: mỗi câu mới là một State mới, nên tự đọc lại.
               _ListeningPrompt(
                 key: ObjectKey(question),
                 text: question.pronunciation!,
@@ -279,7 +277,6 @@ class _ListeningPromptState extends State<_ListeningPrompt> {
   @override
   void initState() {
     super.initState();
-    // Đợi khung hình đầu vẽ xong để context hiện được SnackBar nếu lỗi.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _speak();
     });

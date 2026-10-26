@@ -47,7 +47,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
   @override
   void didUpdateWidget(covariant FlashcardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Khi chuyển sang từ mới (next card), tự động reset về mặt trước ngay lập tức
     if (oldWidget.word.id != widget.word.id) {
       _controller.reset();
     }
@@ -82,9 +81,8 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
           final angle = value * math.pi;
           final isBack = value >= 0.5;
 
-          // Hiệu ứng lật 3D theo trục Y với phối cảnh chiều sâu
           final transform = Matrix4.identity()
-            ..setEntry(3, 2, 0.001) // perspective
+            ..setEntry(3, 2, 0.001)
             ..rotateY(angle);
 
           return Transform(

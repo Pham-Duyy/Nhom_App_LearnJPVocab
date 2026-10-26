@@ -78,12 +78,6 @@ class VocabularyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void previousCard() {
-    if (_words.isEmpty || _currentIndex == 0) return;
-    _currentIndex--;
-    notifyListeners();
-  }
-
   void resetSession() {
     _currentIndex = 0;
     _sessionStatus = _words.isEmpty

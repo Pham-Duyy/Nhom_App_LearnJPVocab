@@ -54,7 +54,6 @@ class MainScreen extends StatelessWidget {
           border: Border(top: BorderSide(color: context.palette.divider)),
         ),
         child: BottomNavigationBar(
-          // fixed: đủ 4 tab luôn hiện nhãn, không đổi màu nền theo tab.
           type: BottomNavigationBarType.fixed,
           currentIndex: navigation.selectedIndex,
           onTap: navigation.selectTab,

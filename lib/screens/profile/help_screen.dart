@@ -41,7 +41,6 @@ class HelpScreen extends GenericScreen {
                   _Cell('Ôn lại sau', bold: true)
                 ],
               ),
-              // Lấy từ chính thuật toán ôn tập để luôn khớp với app.
               for (final MapEntry(key: level, value: days)
                   in Progress.reviewIntervalDays.entries)
                 TableRow(

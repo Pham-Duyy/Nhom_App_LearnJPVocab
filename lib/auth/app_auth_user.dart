@@ -1,8 +1,5 @@
 /// Người dùng đã xác thực, ở dạng độc lập với Firebase. UI và Provider chỉ
 /// dùng model này, không bao giờ nhận `firebase_auth.User` trực tiếp.
-///
-/// Khác với `models/user.dart` cũ (có passwordHash, chưa được dùng ở đâu):
-/// model đó sẽ được refactor ở giai đoạn hồ sơ người dùng sau này.
 class AppAuthUser {
   /// Mã nhà cung cấp của Firebase cho đăng nhập bằng email và Google.
   static const passwordProvider = 'password';
