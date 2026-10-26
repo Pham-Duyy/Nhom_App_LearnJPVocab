@@ -19,6 +19,9 @@ class Question {
   /// vì đọc to lên sẽ lộ đáp án.
   final String? pronunciation;
 
+  /// Câu hỏi nghe: đề bài không hiện chữ, chỉ được nghe [pronunciation].
+  final bool isListening;
+
   const Question({
     required this.id,
     required this.quizId,
@@ -30,7 +33,8 @@ class Question {
     this.instruction,
     this.vocabularyId,
     this.pronunciation,
-  });
+    this.isListening = false,
+  }) : assert(!isListening || pronunciation != null);
 
   String get correctAnswer => options[correctIndex];
 
@@ -50,6 +54,7 @@ class Question {
     String? instruction,
     String? vocabularyId,
     String? pronunciation,
+    bool? isListening,
   }) {
     return Question(
       id: id ?? this.id,
@@ -62,6 +67,7 @@ class Question {
       instruction: instruction ?? this.instruction,
       vocabularyId: vocabularyId ?? this.vocabularyId,
       pronunciation: pronunciation ?? this.pronunciation,
+      isListening: isListening ?? this.isListening,
     );
   }
 
@@ -78,6 +84,7 @@ class Question {
         'instruction': instruction,
         'vocabularyId': vocabularyId,
         'pronunciation': pronunciation,
+        'isListening': isListening,
       };
 
   factory Question.fromMap(Map<String, dynamic> map) => Question(
@@ -91,6 +98,7 @@ class Question {
         instruction: map['instruction'] as String?,
         vocabularyId: map['vocabularyId'] as String?,
         pronunciation: map['pronunciation'] as String?,
+        isListening: map['isListening'] as bool? ?? false,
       );
 
   @override

@@ -15,7 +15,9 @@ class SpeakButton extends StatelessWidget {
   final String text;
   final double size;
 
-  Future<void> _speak(BuildContext context) async {
+  /// Đọc [text] và báo lỗi bằng SnackBar; dùng chung cho cả chỗ tự phát âm
+  /// (vd. câu hỏi nghe trong quiz).
+  static Future<void> speak(BuildContext context, String text) async {
     try {
       await context.read<Speaker>().speak(text);
     } on SpeakerUnavailableException {
@@ -38,7 +40,7 @@ class SpeakButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       tooltip: 'Nghe phát âm',
-      onPressed: () => _speak(context),
+      onPressed: () => speak(context, text),
       icon: Icon(
         Icons.volume_up_rounded,
         size: size,

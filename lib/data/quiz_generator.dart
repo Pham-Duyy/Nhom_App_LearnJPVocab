@@ -15,6 +15,9 @@ abstract class QuestionBuilder {
   /// đọc to lên sẽ lộ đáp án.
   bool get promptIsJapanese;
 
+  /// Đề bài chỉ được nghe, không hiện chữ.
+  bool get isListening => false;
+
   /// Dạng câu hỏi này có hỏi được về [word] không (vd. từ không có kanji thì
   /// không hỏi được dạng Kanji → Nghĩa).
   bool canAsk(Vocabulary word) => true;
@@ -75,21 +78,47 @@ class KanjiToMeaning extends QuestionBuilder {
   String answerOf(Vocabulary word) => word.meaning;
 }
 
+/// Nghe phát âm rồi chọn cách viết đúng. Đề bài không hiện chữ (xem
+/// [Question.isListening]), nên phải có giọng đọc mới làm được.
+class ListenToWord extends QuestionBuilder {
+  const ListenToWord();
+
+  @override
+  String get instruction => 'Nghe và chọn từ đúng';
+
+  @override
+  bool get promptIsJapanese => true;
+
+  @override
+  bool get isListening => true;
+
+  @override
+  String promptOf(Vocabulary word) => word.kana;
+
+  @override
+  String answerOf(Vocabulary word) => word.kana;
+}
+
 /// Tạo bộ câu hỏi trắc nghiệm 4 đáp án từ một danh sách từ vựng.
 class QuizGenerator {
-  QuizGenerator({Random? random}) : _random = random ?? Random();
+  QuizGenerator({Random? random, this.builders = defaultBuilders})
+      : assert(builders.isNotEmpty),
+        _random = random ?? Random();
 
   static const optionCount = 4;
 
   /// Cần ít nhất chừng này từ để có đủ 3 đáp án sai cho mỗi câu.
   static const minWords = optionCount;
 
-  static const builders = <QuestionBuilder>[
+  static const defaultBuilders = <QuestionBuilder>[
     KanaToMeaning(),
     MeaningToKana(),
     KanjiToMeaning(),
+    ListenToWord(),
   ];
 
+  /// Các dạng câu hỏi được dùng; mỗi câu chọn ngẫu nhiên một dạng hợp lệ.
+  final List<QuestionBuilder> builders;
   final Random _random;
 
   /// Trả về danh sách rỗng nếu có ít hơn [minWords] từ. Câu nào không tìm
@@ -118,6 +147,9 @@ class QuizGenerator {
     int order,
   ) {
     final usable = builders.where((builder) => builder.canAsk(word)).toList();
+    // Không dạng nào hỏi được từ này (vd. chỉ dùng Kanji → Nghĩa mà từ không
+    // có chữ Hán): bỏ qua từ.
+    if (usable.isEmpty) return null;
     final builder = usable[_random.nextInt(usable.length)];
     final answer = builder.answerOf(word);
 
@@ -144,6 +176,7 @@ class QuizGenerator {
       order: order,
       vocabularyId: word.id,
       pronunciation: builder.promptIsJapanese ? word.kana : null,
+      isListening: builder.isListening,
     );
   }
 

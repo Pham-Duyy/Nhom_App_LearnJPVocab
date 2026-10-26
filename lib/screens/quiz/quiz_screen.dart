@@ -236,22 +236,72 @@ class _PromptCard extends StatelessWidget {
           children: [
             Text(question.instruction ?? '', style: palette.body),
             const SizedBox(height: 12),
-            Text(
-              question.prompt,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w700,
-                color: palette.primaryStrong,
+            if (question.isListening)
+              // ObjectKey: mỗi câu mới là một State mới, nên tự đọc lại.
+              _ListeningPrompt(
+                key: ObjectKey(question),
+                text: question.pronunciation!,
+              )
+            else ...[
+              Text(
+                question.prompt,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: palette.primaryStrong,
+                ),
               ),
-            ),
-            if (question.pronunciation != null) ...[
-              const SizedBox(height: 4),
-              SpeakButton(text: question.pronunciation!),
+              if (question.pronunciation != null) ...[
+                const SizedBox(height: 4),
+                SpeakButton(text: question.pronunciation!),
+              ],
             ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Đề bài câu hỏi nghe: không hiện chữ (chữ chính là đáp án), tự đọc một lần
+/// khi câu hiện ra và có nút loa lớn để nghe lại.
+class _ListeningPrompt extends StatefulWidget {
+  const _ListeningPrompt({super.key, required this.text});
+
+  final String text;
+
+  @override
+  State<_ListeningPrompt> createState() => _ListeningPromptState();
+}
+
+class _ListeningPromptState extends State<_ListeningPrompt> {
+  @override
+  void initState() {
+    super.initState();
+    // Đợi khung hình đầu vẽ xong để context hiện được SnackBar nếu lỗi.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _speak();
+    });
+  }
+
+  void _speak() => SpeakButton.speak(context, widget.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Column(
+      children: [
+        IconButton.filled(
+          tooltip: 'Nghe lại',
+          iconSize: 44,
+          padding: const EdgeInsets.all(18),
+          onPressed: _speak,
+          icon: const Icon(Icons.volume_up_rounded),
+        ),
+        const SizedBox(height: 8),
+        Text('Nhấn loa để nghe lại', style: palette.body),
+      ],
     );
   }
 }

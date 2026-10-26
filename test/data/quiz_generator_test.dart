@@ -38,6 +38,40 @@ void main() {
       expect(const KanjiToMeaning().canAsk(word), isTrue);
       expect(const KanjiToMeaning().canAsk(_word('a', 'あ', 'A')), isFalse);
     });
+
+    test('Nghe → Từ: đề là cách đọc để phát âm, đáp án là chữ kana', () {
+      const listen = ListenToWord();
+
+      expect(listen.isListening, isTrue);
+      expect(listen.promptOf(word), 'かぞく');
+      expect(listen.answerOf(word), 'かぞく');
+      expect(const KanaToMeaning().isListening, isFalse);
+    });
+  });
+
+  group('chọn dạng câu hỏi qua tham số builders', () {
+    test('chỉ dùng dạng nghe thì mọi câu đều là câu nghe, đọc đúng đáp án', () {
+      final questions =
+          QuizGenerator(random: Random(4), builders: const [ListenToWord()])
+              .generate(words, quizId: 'q');
+
+      expect(questions, isNotEmpty);
+      for (final question in questions) {
+        expect(question.isListening, isTrue);
+        expect(question.pronunciation, question.correctAnswer);
+      }
+    });
+
+    test('từ không hỏi được bằng dạng nào thì bị bỏ qua', () {
+      final noKanji = [
+        for (final kana in ['あ', 'い', 'う', 'え']) _word(kana, kana, kana),
+      ];
+
+      final questions = QuizGenerator(builders: const [KanjiToMeaning()])
+          .generate(noKanji, quizId: 'q');
+
+      expect(questions, isEmpty);
+    });
   });
 
   group('US16: tạo bộ câu hỏi', () {
