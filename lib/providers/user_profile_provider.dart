@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/study_preferences.dart';
 import '../models/user_profile.dart';
 import '../repositories/user_profile_repository.dart';
 import '../utils/app_error.dart';
@@ -33,6 +34,11 @@ class UserProfileProvider extends ChangeNotifier {
   int get dailyGoal => _profile.dailyGoal;
   ThemeMode get themeMode => _profile.themeMode;
   int get streak => _profile.streakOn(_clock());
+  int get longestStreak => _profile.longestStreak;
+  StudyPreferences get preferences => _profile.preferences;
+
+  /// Hôm nay đã trả lời ít nhất một thẻ hay câu quiz chưa.
+  bool get hasStudiedToday => _profile.hasStudiedOn(_clock());
 
   Future<void> load() async {
     final generation = ++_loadGeneration;
@@ -73,6 +79,9 @@ class UserProfileProvider extends ChangeNotifier {
 
   Future<void> setThemeMode(ThemeMode mode) =>
       _update(_profile.copyWith(themeMode: mode));
+
+  Future<void> setPreferences(StudyPreferences preferences) =>
+      _update(_profile.copyWith(preferences: preferences));
 
   /// Gọi mỗi khi người học trả lời một thẻ. Chỉ lưu lần đầu trong ngày.
   Future<void> recordStudyActivity() =>

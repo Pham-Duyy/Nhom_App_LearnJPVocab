@@ -149,10 +149,17 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
 
     final dueCount = provider.getDueForReview().length;
     final estimatedMinutes = dueCount == 0 ? 0 : (dueCount / 2).ceil();
+    final profile = context.watch<UserProfileProvider>();
+    final showReminder =
+        profile.preferences.dailyReminder && !profile.hasStudiedToday;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (showReminder) ...[
+          _StudyReminder(streak: profile.streak),
+          const SizedBox(height: 16),
+        ],
         ReviewCard(
           dueCount: dueCount,
           estimatedMinutes: estimatedMinutes,
@@ -228,6 +235,42 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Lời nhắc khi hôm nay chưa học (tắt được trong Tùy chọn học).
+class _StudyReminder extends StatelessWidget {
+  const _StudyReminder({required this.streak});
+
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: palette.lavenderSurface,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: palette.lavenderBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.notifications_active_outlined, color: palette.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              streak > 0
+                  ? 'Hôm nay bạn chưa học. Ôn vài thẻ để giữ chuỗi '
+                      '$streak ngày nhé!'
+                  : 'Hôm nay bạn chưa học. Chỉ cần vài thẻ là bắt đầu '
+                      'một chuỗi ngày mới!',
+              style: palette.body,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

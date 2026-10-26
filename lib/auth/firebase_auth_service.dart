@@ -19,6 +19,7 @@ class FirebaseAuthService implements AuthService {
       displayName: user.displayName,
       email: user.email,
       photoUrl: user.photoURL,
+      providers: [for (final info in user.providerData) info.providerId],
     );
   }
 

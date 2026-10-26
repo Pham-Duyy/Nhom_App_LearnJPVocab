@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../data/quiz_generator.dart';
 import '../models/question.dart';
 import '../models/quiz_attempt.dart';
+import '../models/study_preferences.dart';
 import '../models/vocabulary.dart';
 import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/vocabulary_repository.dart';
@@ -37,6 +38,7 @@ class QuizProvider extends ChangeNotifier {
   String _quizId = '';
   String _title = '';
   List<Vocabulary> _words = [];
+  int _maxQuestions = StudyPreferences.defaultQuizLength;
   List<Question> _questions = [];
   int _index = 0;
 
@@ -82,18 +84,25 @@ class QuizProvider extends ChangeNotifier {
     return selected != null && question.isCorrect(selected);
   }
 
-  /// Bắt đầu quiz từ [words]. Trả về false nếu không đủ từ để ra đề.
+  /// Bắt đầu quiz từ [words], tối đa [maxQuestions] câu. Trả về false nếu
+  /// không đủ từ để ra đề.
   bool start({
     required String quizId,
     required String title,
     required List<Vocabulary> words,
+    int maxQuestions = StudyPreferences.defaultQuizLength,
   }) {
-    final questions = _generator.generate(words, quizId: quizId);
+    final questions = _generator.generate(
+      words,
+      quizId: quizId,
+      maxQuestions: maxQuestions,
+    );
     if (questions.isEmpty) return false;
 
     _quizId = quizId;
     _title = title;
     _words = words;
+    _maxQuestions = maxQuestions;
     _questions = questions;
     _index = 0;
     _answers.clear();
@@ -110,10 +119,16 @@ class QuizProvider extends ChangeNotifier {
     required String quizId,
     required String title,
     required List<String> vocabularyIds,
+    int maxQuestions = StudyPreferences.defaultQuizLength,
   }) async {
     try {
       final words = await _vocabulary.getByIds(vocabularyIds);
-      final started = start(quizId: quizId, title: title, words: words);
+      final started = start(
+        quizId: quizId,
+        title: title,
+        words: words,
+        maxQuestions: maxQuestions,
+      );
       return started
           ? null
           : 'Hãy học ít nhất ${QuizGenerator.minWords} từ để làm quiz.';
@@ -123,8 +138,13 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  /// Làm lại với cùng bộ từ, câu hỏi được tạo mới.
-  bool restart() => start(quizId: _quizId, title: _title, words: _words);
+  /// Làm lại với cùng bộ từ và số câu, câu hỏi được tạo mới.
+  bool restart() => start(
+        quizId: _quizId,
+        title: _title,
+        words: _words,
+        maxQuestions: _maxQuestions,
+      );
 
   /// Chọn đáp án cho câu hiện tại. Mỗi câu chỉ được chọn một lần.
   void answer(int optionIndex) {

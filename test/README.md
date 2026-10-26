@@ -7,12 +7,12 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 224 test
+flutter test                 # chạy toàn bộ 244 test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
 
-Kết quả hiện tại: **224/224 test qua**, độ phủ code **89%**.
+Kết quả hiện tại: **244/244 test qua**, độ phủ code **89.6%**.
 
 ## Cấu trúc thư mục
 

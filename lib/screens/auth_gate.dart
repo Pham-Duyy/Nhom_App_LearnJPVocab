@@ -6,6 +6,7 @@ import '../auth/auth_status.dart';
 import '../providers/lesson_provider.dart';
 import '../providers/library_provider.dart';
 import '../providers/progress_provider.dart';
+import '../providers/quiz_provider.dart';
 import '../providers/user_profile_provider.dart';
 import '../widgets/error_view.dart';
 
@@ -57,6 +58,8 @@ class _AuthGateState extends State<AuthGate> {
       context.read<LibraryProvider>().load();
       context.read<UserProfileProvider>().load();
       context.read<ProgressProvider>().loadProgress();
+      // Lịch sử quiz cần cho cả trang Lịch sử lẫn Thành tích.
+      context.read<QuizProvider>().loadHistory();
     });
   }
 }

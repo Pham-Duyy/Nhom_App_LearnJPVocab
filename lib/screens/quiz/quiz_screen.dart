@@ -6,6 +6,7 @@ import '../../models/question.dart';
 import '../../models/vocabulary.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/quiz_provider.dart';
+import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../common/generic_screen.dart';
@@ -18,9 +19,12 @@ void openQuiz(
   required String title,
   required List<Vocabulary> words,
 }) {
-  final started = context
-      .read<QuizProvider>()
-      .start(quizId: quizId, title: title, words: words);
+  final started = context.read<QuizProvider>().start(
+        quizId: quizId,
+        title: title,
+        words: words,
+        maxQuestions: _quizLength(context),
+      );
   if (!started) {
     _showMessage(
       context,
@@ -45,6 +49,7 @@ Future<void> openQuickQuiz(BuildContext context) async {
         quizId: 'quick',
         title: 'Quiz nhanh',
         vocabularyIds: learnedIds,
+        maxQuestions: _quizLength(context),
       );
   if (!context.mounted) return;
   if (error != null) {
@@ -55,6 +60,10 @@ Future<void> openQuickQuiz(BuildContext context) async {
     MaterialPageRoute(builder: (_) => const QuizScreen()),
   );
 }
+
+/// Số câu mỗi lượt theo Tùy chọn học của người dùng.
+int _quizLength(BuildContext context) =>
+    context.read<UserProfileProvider>().preferences.quizLength;
 
 void _showMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context)

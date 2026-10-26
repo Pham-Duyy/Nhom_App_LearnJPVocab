@@ -56,9 +56,20 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
 
-      // Sổ từ và Cá nhân (cuộn hết danh sách).
+      // Sổ từ, Cá nhân và các màn con của Cá nhân.
       await open('Sổ từ');
       await open('Cá nhân');
+      for (final title in [
+        'Thành tích',
+        'Tùy chọn học',
+        'Tài khoản',
+        'Hướng dẫn sử dụng',
+      ]) {
+        await tester.scrollUntilVisible(find.text(title), 300);
+        await open(title);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      }
       await tester.scrollUntilVisible(find.text('Đăng xuất'), 300);
 
       // Quiz nhanh từ trang chủ.

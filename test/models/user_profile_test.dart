@@ -1,3 +1,4 @@
+import 'package:chibakanji/models/study_preferences.dart';
 import 'package:chibakanji/models/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -120,7 +121,14 @@ void main() {
         dailyGoal: 20,
         themeMode: ThemeMode.dark,
         currentStreak: 7,
+        longestStreak: 12,
         lastStudyDate: DateTime(2026, 10, 5),
+        preferences: const StudyPreferences(
+          cardFront: CardFront.meaning,
+          showRomaji: false,
+          quizLength: 15,
+          dailyReminder: false,
+        ),
       );
 
       expect(UserProfile.fromMap(profile.toMap()), profile);
@@ -151,6 +159,49 @@ void main() {
     test('tên có khoảng trắng thừa được cắt gọn khi đọc', () {
       expect(
           UserProfile.fromMap({'displayName': '  Duy  '}).displayName, 'Duy');
+    });
+
+    test('dữ liệu cũ chưa có longestStreak thì lấy bằng chuỗi hiện tại', () {
+      final profile = UserProfile.fromMap({
+        'currentStreak': 5,
+        'lastStudyDate': '2026-10-25',
+      });
+
+      expect(profile.longestStreak, 5);
+      expect(profile.preferences, const StudyPreferences());
+    });
+
+    test('tùy chọn học sai kiểu hoặc ngoài phạm vi dùng mặc định', () {
+      final preferences = StudyPreferences.fromMap({
+        'cardFront': 'ngược',
+        'showRomaji': 'có',
+        'quizLength': 7,
+        'dailyReminder': null,
+      });
+
+      expect(preferences, const StudyPreferences());
+    });
+  });
+
+  group('chuỗi dài nhất và ngày học (cho Thành tích, Nhắc học)', () {
+    test('chuỗi dài nhất được giữ lại khi chuỗi hiện tại bị đứt', () {
+      var profile = const UserProfile();
+      for (var day = 1; day <= 4; day++) {
+        profile = profile.recordStudyDay(DateTime(2026, 10, day));
+      }
+      profile = profile.recordStudyDay(DateTime(2026, 10, 10));
+
+      expect(profile.currentStreak, 1);
+      expect(profile.longestStreak, 4);
+    });
+
+    test('hasStudiedOn chỉ đúng trong chính ngày đã học', () {
+      final profile =
+          const UserProfile().recordStudyDay(DateTime(2026, 10, 25, 8));
+
+      expect(profile.hasStudiedOn(DateTime(2026, 10, 25, 23)), isTrue);
+      expect(profile.hasStudiedOn(DateTime(2026, 10, 26, 1)), isFalse);
+      expect(const UserProfile().hasStudiedOn(DateTime(2026, 10, 25)), isFalse);
     });
   });
 }

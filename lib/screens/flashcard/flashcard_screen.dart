@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/study_preferences.dart';
 import '../../models/vocabulary.dart';
 import '../../providers/progress_provider.dart';
+import '../../providers/user_profile_provider.dart';
 import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
@@ -126,6 +128,29 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
           );
         }
 
+        // Tùy chọn học quyết định mặt nào ở trước và có hiện romaji không.
+        final preferences = context.watch<UserProfileProvider>().preferences;
+        final japaneseFirst = preferences.cardFront == CardFront.japanese;
+        final tapHint = _CardHint(
+          icon: Icons.touch_app_outlined,
+          text: japaneseFirst ? 'Chạm để xem nghĩa' : 'Chạm để xem cách viết',
+        );
+        const swipeHint = _CardHint(
+          icon: Icons.swipe_outlined,
+          text: 'Vuốt phải nếu đã nhớ, trái nếu chưa',
+        );
+        Widget japanese(_CardHint hint) => _JapaneseFace(
+              word: word,
+              showRomaji: preferences.showRomaji,
+              hint: hint,
+            );
+        Widget meaning(_CardHint hint) => _MeaningFace(
+              word: word,
+              // Nghĩa ở mặt trước thì chưa được lộ cách viết tiếng Nhật.
+              revealJapanese: japaneseFirst,
+              hint: hint,
+            );
+
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.page,
@@ -162,8 +187,10 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
                     key: _cardKey,
                     cardId: word.id,
                     enabled: !_isSubmitting,
-                    front: _FlashcardFront(word: word),
-                    back: _FlashcardBack(word: word),
+                    front: japaneseFirst ? japanese(tapHint) : meaning(tapHint),
+                    back: japaneseFirst
+                        ? meaning(swipeHint)
+                        : japanese(swipeHint),
                     onSwiped: (remembered) =>
                         remembered ? _markCorrect(word) : _markWrong(word),
                   ),
@@ -254,10 +281,43 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
   }
 }
 
-class _FlashcardFront extends StatelessWidget {
-  const _FlashcardFront({required this.word});
+/// Dòng gợi ý thao tác ở cuối mỗi mặt thẻ.
+class _CardHint extends StatelessWidget {
+  const _CardHint({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 18, color: palette.textMuted),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 13, color: palette.textMuted),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Mặt chữ Nhật của thẻ: kanji (nếu có), kana và romaji (tùy chọn học).
+class _JapaneseFace extends StatelessWidget {
+  const _JapaneseFace({
+    required this.word,
+    required this.showRomaji,
+    required this.hint,
+  });
 
   final Vocabulary word;
+  final bool showRomaji;
+  final _CardHint hint;
 
   @override
   Widget build(BuildContext context) {
@@ -321,34 +381,33 @@ class _FlashcardFront extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            word.romaji,
-            style: TextStyle(fontSize: 16, color: palette.textMuted),
-          ),
+          if (showRomaji) ...[
+            const SizedBox(height: 8),
+            Text(
+              word.romaji,
+              style: TextStyle(fontSize: 16, color: palette.textMuted),
+            ),
+          ],
           const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.touch_app_outlined,
-                  size: 18, color: palette.textMuted),
-              const SizedBox(width: 6),
-              Text(
-                'Chạm để xem nghĩa',
-                style: TextStyle(fontSize: 13, color: palette.textMuted),
-              ),
-            ],
-          ),
+          hint,
         ],
       ),
     );
   }
 }
 
-class _FlashcardBack extends StatelessWidget {
-  const _FlashcardBack({required this.word});
+/// Mặt nghĩa của thẻ. [revealJapanese] thì kèm cách viết và câu ví dụ; tắt
+/// khi mặt này nằm trước để không lộ đáp án.
+class _MeaningFace extends StatelessWidget {
+  const _MeaningFace({
+    required this.word,
+    required this.revealJapanese,
+    required this.hint,
+  });
 
   final Vocabulary word;
+  final bool revealJapanese;
+  final _CardHint hint;
 
   @override
   Widget build(BuildContext context) {
@@ -365,48 +424,42 @@ class _FlashcardBack extends StatelessWidget {
         children: [
           Text('NGHĨA', style: palette.sectionLabel),
           const Spacer(),
-          Text(
-            word.name,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, color: palette.textSecondary),
-          ),
-          const SizedBox(height: 10),
+          if (revealJapanese) ...[
+            Text(
+              word.name,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, color: palette.textSecondary),
+            ),
+            const SizedBox(height: 10),
+          ],
           Text(
             word.meaning,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: palette.card,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(word.exampleJapanese,
-                    style: const TextStyle(fontSize: 17)),
-                const SizedBox(height: 6),
-                Text(word.exampleVietnamese, style: palette.body),
-              ],
-            ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.swipe_outlined, size: 18, color: palette.textMuted),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  'Vuốt phải nếu đã nhớ, trái nếu chưa',
-                  style: TextStyle(fontSize: 13, color: palette.textMuted),
-                ),
+          if (revealJapanese) ...[
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: palette.card,
+                borderRadius: BorderRadius.circular(18),
               ),
-            ],
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    word.exampleJapanese,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(word.exampleVietnamese, style: palette.body),
+                ],
+              ),
+            ),
+          ],
+          const Spacer(),
+          hint,
         ],
       ),
     );

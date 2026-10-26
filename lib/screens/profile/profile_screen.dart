@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../auth/auth_controller.dart';
+import '../../models/achievement.dart';
+import '../../models/study_preferences.dart';
 import '../../models/user_profile.dart';
 import '../../providers/progress_provider.dart';
 import '../../providers/user_profile_provider.dart';
@@ -12,6 +14,10 @@ import '../../widgets/tab_header.dart';
 import '../auth/welcome_screen.dart';
 import '../common/generic_screen.dart';
 import '../quiz/quiz_history_screen.dart';
+import 'account_screen.dart';
+import 'achievements_screen.dart';
+import 'help_screen.dart';
+import 'study_preferences_screen.dart';
 
 class ProfileScreen extends GenericScreen {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -95,6 +101,19 @@ class ProfileScreen extends GenericScreen {
     if (context.mounted) _showSaveError(context);
   }
 
+  void _open(BuildContext context, Widget screen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
+  Future<void> _toggleReminder(BuildContext context) async {
+    final profile = context.read<UserProfileProvider>();
+    final preferences = profile.preferences;
+    await profile.setPreferences(
+      preferences.copyWith(dailyReminder: !preferences.dailyReminder),
+    );
+    if (context.mounted) _showSaveError(context);
+  }
+
   Future<void> _pickDailyGoal(BuildContext context) async {
     final profile = context.read<UserProfileProvider>();
     final goal = await _showOptionsSheet<int>(
@@ -127,7 +146,11 @@ class ProfileScreen extends GenericScreen {
     final profile = context.watch<UserProfileProvider>();
     final themeMode = profile.themeMode;
     final streak = profile.streak;
+    final preferences = profile.preferences;
     final email = context.watch<AuthController>().user?.email;
+    final stats = watchLearningStats(context);
+    final unlockedCount =
+        Achievement.all.where((a) => a.isUnlocked(stats)).length;
     final reviewedToday = progress.getReviewedTodayCount();
 
     return ListView(
@@ -172,24 +195,27 @@ class ProfileScreen extends GenericScreen {
         _ProfileMenuItem(
           icon: Icons.workspace_premium_outlined,
           title: 'Thành tích',
-          value: streak > 0 ? '$streak ngày đều đặn' : 'Chưa có',
+          value: '$unlockedCount/${Achievement.all.length} huy hiệu',
+          onTap: () => _open(context, const AchievementsScreen()),
         ),
         _ProfileMenuItem(
           icon: Icons.history_rounded,
           title: 'Lịch sử quiz',
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const QuizHistoryScreen()),
-          ),
+          onTap: () => _open(context, const QuizHistoryScreen()),
         ),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
           icon: Icons.notifications_none_rounded,
           title: 'Nhắc học mỗi ngày',
-          value: '20:00',
+          value: preferences.dailyReminder ? 'Bật' : 'Tắt',
+          onTap: () => _toggleReminder(context),
         ),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
           icon: Icons.tune_rounded,
           title: 'Tùy chọn học',
-          value: 'Thẻ & cách đọc',
+          value: preferences.cardFront == CardFront.japanese
+              ? 'Chữ Nhật trước'
+              : 'Nghĩa trước',
+          onTap: () => _open(context, const StudyPreferencesScreen()),
           showDivider: false,
         ),
         const SizedBox(height: 28),
@@ -205,10 +231,12 @@ class ProfileScreen extends GenericScreen {
           icon: Icons.person_outline_rounded,
           title: 'Tài khoản',
           value: email ?? 'Khách',
+          onTap: () => _open(context, const AccountScreen()),
         ),
-        const _ProfileMenuItem(
+        _ProfileMenuItem(
           icon: Icons.help_outline_rounded,
           title: 'Hướng dẫn sử dụng',
+          onTap: () => _open(context, const HelpScreen()),
           showDivider: false,
         ),
         const SizedBox(height: 28),
@@ -236,14 +264,6 @@ class ProfileScreen extends GenericScreen {
       ],
     );
   }
-}
-
-void _showComingSoon(BuildContext context, String feature) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text('$feature sẽ được hoàn thiện ở giai đoạn sau.')),
-    );
 }
 
 /// Bottom sheet chọn một giá trị trong [options]; trả về giá trị được chọn,
@@ -573,14 +593,14 @@ class _ProfileMenuItem extends StatelessWidget {
     required this.icon,
     required this.title,
     this.value,
-    this.onTap,
+    required this.onTap,
     this.showDivider = true,
   });
 
   final IconData icon;
   final String title;
   final String? value;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
   final bool showDivider;
 
   @override
@@ -589,7 +609,7 @@ class _ProfileMenuItem extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-          onTap: onTap ?? () => _showComingSoon(context, title),
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppRadius.card),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 14),

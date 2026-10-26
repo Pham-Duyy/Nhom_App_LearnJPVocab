@@ -78,7 +78,12 @@ class FakeAuthService implements AuthService {
     final uid = isLinking ? current.uid : 'email-${_accounts.length + 1}';
     _accounts[key] = (password: password, uid: uid);
 
-    final user = AppAuthUser(uid: uid, isAnonymous: false, email: key);
+    final user = AppAuthUser(
+      uid: uid,
+      isAnonymous: false,
+      email: key,
+      providers: const [AppAuthUser.passwordProvider],
+    );
     // Giống Firebase: gắn email vào tài khoản khách không đổi uid nên không
     // phát sự kiện; tạo tài khoản mới thì có.
     if (isLinking) {
@@ -103,7 +108,12 @@ class FakeAuthService implements AuthService {
     if (account == null || account.password != password) {
       throw const AuthException('invalid-credential');
     }
-    final user = AppAuthUser(uid: account.uid, isAnonymous: false, email: key);
+    final user = AppAuthUser(
+      uid: account.uid,
+      isAnonymous: false,
+      email: key,
+      providers: const [AppAuthUser.passwordProvider],
+    );
     emitUser(user);
     return user;
   }
@@ -145,6 +155,7 @@ class FakeAuthService implements AuthService {
       isAnonymous: false,
       email: email,
       displayName: googleAccount.name,
+      providers: const [AppAuthUser.googleProvider],
     );
     if (isLinking) {
       _currentUser = user;

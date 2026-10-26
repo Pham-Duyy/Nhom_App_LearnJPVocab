@@ -3,9 +3,11 @@ import 'package:chibakanji/models/progress.dart';
 import 'package:chibakanji/providers/lesson_provider.dart';
 import 'package:chibakanji/providers/library_provider.dart';
 import 'package:chibakanji/providers/progress_provider.dart';
+import 'package:chibakanji/providers/quiz_provider.dart';
 import 'package:chibakanji/providers/user_profile_provider.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_quiz_attempt_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_user_profile_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:chibakanji/screens/auth_gate.dart';
@@ -38,6 +40,12 @@ Widget _buildGate(
         ),
       ),
       ChangeNotifierProvider.value(value: progress),
+      ChangeNotifierProvider(
+        create: (_) => QuizProvider(
+          MockQuizAttemptRepository(),
+          MockVocabularyRepository(),
+        ),
+      ),
     ],
     child: const MaterialApp(
       home: AuthGate(child: Text('Nội dung chính')),

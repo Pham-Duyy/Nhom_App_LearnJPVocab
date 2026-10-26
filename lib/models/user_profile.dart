@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' show StringCharacters, ThemeMode;
 
+import 'study_preferences.dart';
+
 /// Hồ sơ và tùy chọn của một người học, lưu tại document `users/{uid}`.
 ///
 /// Chuỗi ngày học được tính theo ngày lịch (năm-tháng-ngày) của máy, không
@@ -21,13 +23,26 @@ class UserProfile {
   /// Ngày học gần nhất, chỉ giữ phần ngày (giờ luôn là 00:00).
   final DateTime? lastStudyDate;
 
+  /// Chuỗi ngày dài nhất từng đạt, để thành tích không mất khi chuỗi đứt.
+  final int longestStreak;
+
+  final StudyPreferences preferences;
+
   const UserProfile({
     this.displayName = defaultDisplayName,
     this.dailyGoal = defaultDailyGoal,
     this.themeMode = ThemeMode.system,
     this.currentStreak = 0,
     this.lastStudyDate,
+    this.longestStreak = 0,
+    this.preferences = const StudyPreferences(),
   });
+
+  /// Hôm nay ([now]) đã học chưa.
+  bool hasStudiedOn(DateTime now) {
+    final last = lastStudyDate;
+    return last != null && _daysBetween(last, now) == 0;
+  }
 
   /// Chữ cái đầu cho ảnh đại diện; dùng `characters` để không cắt đôi một
   /// ký tự nhiều byte (emoji, chữ có dấu tổ hợp).
@@ -50,9 +65,11 @@ class UserProfile {
     if (last != null && _daysBetween(last, today) == 0) return this;
 
     final continuesStreak = last != null && _daysBetween(last, today) == 1;
+    final streak = continuesStreak ? currentStreak + 1 : 1;
     return copyWith(
-      currentStreak: continuesStreak ? currentStreak + 1 : 1,
+      currentStreak: streak,
       lastStudyDate: today,
+      longestStreak: streak > longestStreak ? streak : longestStreak,
     );
   }
 
@@ -72,6 +89,8 @@ class UserProfile {
     ThemeMode? themeMode,
     int? currentStreak,
     DateTime? lastStudyDate,
+    int? longestStreak,
+    StudyPreferences? preferences,
   }) {
     return UserProfile(
       displayName: displayName ?? this.displayName,
@@ -79,6 +98,8 @@ class UserProfile {
       themeMode: themeMode ?? this.themeMode,
       currentStreak: currentStreak ?? this.currentStreak,
       lastStudyDate: lastStudyDate ?? this.lastStudyDate,
+      longestStreak: longestStreak ?? this.longestStreak,
+      preferences: preferences ?? this.preferences,
     );
   }
 
@@ -90,6 +111,8 @@ class UserProfile {
         'currentStreak': currentStreak,
         'lastStudyDate':
             lastStudyDate == null ? null : _formatDate(lastStudyDate!),
+        'longestStreak': longestStreak,
+        'preferences': preferences.toMap(),
       };
 
   /// Đọc an toàn: trường thiếu hoặc sai kiểu được thay bằng giá trị mặc định,
@@ -98,7 +121,10 @@ class UserProfile {
     final name = map['displayName'];
     final goal = map['dailyGoal'];
     final streak = map['currentStreak'];
+    final longest = map['longestStreak'];
     final lastDate = map['lastStudyDate'];
+    final preferences = map['preferences'];
+    final currentStreak = streak is int && streak > 0 ? streak : 0;
 
     return UserProfile(
       displayName: name is String && validateDisplayName(name) == null
@@ -110,8 +136,14 @@ class UserProfile {
         (mode) => mode.name == map['themeMode'],
         orElse: () => ThemeMode.system,
       ),
-      currentStreak: streak is int && streak > 0 ? streak : 0,
+      currentStreak: currentStreak,
       lastStudyDate: lastDate is String ? DateTime.tryParse(lastDate) : null,
+      // Dữ liệu cũ chưa có longestStreak: ít nhất bằng chuỗi hiện tại.
+      longestStreak:
+          longest is int && longest > currentStreak ? longest : currentStreak,
+      preferences: preferences is Map
+          ? StudyPreferences.fromMap(Map<String, dynamic>.from(preferences))
+          : const StudyPreferences(),
     );
   }
 
@@ -122,7 +154,9 @@ class UserProfile {
       other.dailyGoal == dailyGoal &&
       other.themeMode == themeMode &&
       other.currentStreak == currentStreak &&
-      other.lastStudyDate == lastStudyDate;
+      other.lastStudyDate == lastStudyDate &&
+      other.longestStreak == longestStreak &&
+      other.preferences == preferences;
 
   @override
   int get hashCode => Object.hash(
@@ -131,6 +165,8 @@ class UserProfile {
         themeMode,
         currentStreak,
         lastStudyDate,
+        longestStreak,
+        preferences,
       );
 
   @override
