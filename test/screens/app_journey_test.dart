@@ -51,7 +51,7 @@ void main() {
     }
     await _tap(tester, find.widgetWithText(ElevatedButton, 'Tạo tài khoản'));
     expect(find.text('Chào Lan!'), findsOneWidget);
-    expect(find.text('0 ngày'), findsOneWidget);
+    expect(find.text('0日'), findsOneWidget);
 
     // US06-US10: chọn chủ đề, chọn bài, học hết 5 thẻ.
     await _tap(tester, find.text('Học mới'));
@@ -83,7 +83,7 @@ void main() {
 
     // US19: về trang chủ, chuỗi ngày đã lên 1.
     await _tap(tester, find.text('Về trang chủ'));
-    expect(find.text('1 ngày'), findsOneWidget);
+    expect(find.text('1日'), findsOneWidget);
 
     // US17 + US20: Cá nhân hiện đúng tên và lượt quiz vừa làm.
     await _tap(tester, find.text('Cá nhân'));

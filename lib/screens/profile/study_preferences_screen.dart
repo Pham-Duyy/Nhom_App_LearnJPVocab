@@ -5,6 +5,7 @@ import '../../models/study_preferences.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/choice_segments.dart';
 import '../../widgets/error_view.dart';
 import '../common/generic_screen.dart';
 
@@ -38,24 +39,13 @@ class StudyPreferencesScreen extends GenericScreen {
         const SizedBox(height: 12),
         const Text('Mặt trước của thẻ'),
         const SizedBox(height: 8),
-        SegmentedButton<CardFront>(
-          segments: const [
-            ButtonSegment(
-              value: CardFront.japanese,
-              label: Text('Chữ Nhật'),
-              icon: Icon(Icons.translate_rounded),
-            ),
-            ButtonSegment(
-              value: CardFront.meaning,
-              label: Text('Nghĩa'),
-              icon: Icon(Icons.menu_book_outlined),
-            ),
-          ],
-          selected: {preferences.cardFront},
-          onSelectionChanged: (selection) => _save(
-            context,
-            preferences.copyWith(cardFront: selection.single),
-          ),
+        ChoiceSegments<CardFront>(
+          options: CardFront.values,
+          selected: preferences.cardFront,
+          labelOf: (front) =>
+              front == CardFront.japanese ? 'Chữ Nhật' : 'Nghĩa',
+          onChanged: (front) =>
+              _save(context, preferences.copyWith(cardFront: front)),
         ),
         const SizedBox(height: 6),
         Text(
@@ -78,16 +68,12 @@ class StudyPreferencesScreen extends GenericScreen {
         const SizedBox(height: 12),
         const Text('Số câu mỗi lượt'),
         const SizedBox(height: 8),
-        SegmentedButton<int>(
-          segments: [
-            for (final length in StudyPreferences.quizLengthOptions)
-              ButtonSegment(value: length, label: Text('$length câu')),
-          ],
-          selected: {preferences.quizLength},
-          onSelectionChanged: (selection) => _save(
-            context,
-            preferences.copyWith(quizLength: selection.single),
-          ),
+        ChoiceSegments<int>(
+          options: StudyPreferences.quizLengthOptions,
+          selected: preferences.quizLength,
+          labelOf: (length) => '$length câu',
+          onChanged: (length) =>
+              _save(context, preferences.copyWith(quizLength: length)),
         ),
         const SizedBox(height: 24),
         Text('NHẮC NHỞ', style: palette.sectionLabel),

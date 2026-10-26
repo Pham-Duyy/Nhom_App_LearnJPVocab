@@ -13,7 +13,6 @@ import '../../widgets/error_view.dart';
 import '../../widgets/favorite_button.dart';
 import '../../widgets/memory_level_chip.dart';
 import '../../widgets/skeleton.dart';
-import '../../widgets/tab_header.dart';
 import '../common/generic_screen.dart';
 import 'vocabulary_detail_screen.dart';
 
@@ -65,22 +64,50 @@ class _VocabularyBookScreenState
             AppSpacing.page,
             16,
             AppSpacing.page,
-            20,
+            18,
           ),
-          child: TabHeader(
-            label: 'TỪ CỦA BẠN',
-            title: 'Sổ từ',
-            subtitle: '${progressProvider.totalLearned} từ đã học · '
-                'Tìm kiếm và lưu yêu thích',
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '単語帳',
+                      style: AppTextStyles.japaneseDisplay.copyWith(
+                        fontSize: 14,
+                        letterSpacing: 4,
+                        color: palette.stamp,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text('Sổ từ', style: AppTextStyles.pageTitle),
+                  ],
+                ),
+              ),
+              Text(
+                '${progressProvider.totalLearned} từ đã học',
+                style: palette.body,
+              ),
+            ],
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text('TÌM TỪ', style: palette.sectionLabel),
+          ),
+        ),
+        const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
           child: TextField(
             controller: _searchController,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              hintText: 'Tìm kanji, kana hoặc nghĩa...',
+              hintText: 'Kanji, kana, romaji hoặc nghĩa',
               prefixIcon: const Icon(Icons.search_rounded),
               suffixIcon: _searchController.text.isEmpty
                   ? null
@@ -92,10 +119,11 @@ class _VocabularyBookScreenState
                       },
                       icon: const Icon(Icons.close_rounded),
                     ),
-              fillColor: palette.mutedSurface,
+              fillColor: palette.card,
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(color: palette.divider),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: palette.cardBorder, width: 1.5),
               ),
             ),
           ),
@@ -128,7 +156,8 @@ class _VocabularyBookScreenState
                             24,
                           ),
                           itemCount: learnedWords.length,
-                          separatorBuilder: (_, __) => const Divider(),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final word = learnedWords[index];
                             return _VocabularyTile(
@@ -161,19 +190,18 @@ class _VocabularyBookScreenState
               label: Text(entry.value),
               selected: selected,
               onSelected: (_) => setState(() => _filter = entry.key),
-              selectedColor: palette.secondary,
+              selectedColor: palette.primary,
               backgroundColor: palette.card,
               labelStyle: TextStyle(
-                color: selected ? palette.primary : palette.textPrimary,
+                color: selected ? palette.onPrimary : palette.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
               side: BorderSide(
-                color: selected ? palette.secondary : palette.cardBorder,
+                color: selected ? palette.primary : palette.cardBorder,
+                width: 1.5,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
               showCheckmark: false,
             ),
           );
@@ -253,52 +281,60 @@ class _VocabularyTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return InkWell(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => VocabularyDetailScreen(word: word),
-        ),
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: palette.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        side: BorderSide(color: palette.cardBorder),
       ),
-      borderRadius: BorderRadius.circular(AppRadius.card),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  VocabularyHeroText(word: word, fontSize: 28),
-                  const SizedBox(height: 6),
-                  Text(
-                    word.romaji,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: palette.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    word.meaning,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  MemoryLevelChip(progress: progress),
-                ],
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => VocabularyDetailScreen(word: word),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 68,
+                child: VocabularyHeroText(
+                  word: word,
+                  fontSize: 26,
+                  alignment: Alignment.center,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 28),
-              child: FavoriteButton(
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      word.meaning,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${word.kana} · ${word.romaji}',
+                      style: TextStyle(fontSize: 13, color: palette.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+              MemoryLevelChip(progress: progress),
+              FavoriteButton(
                 vocabularyId: word.id,
                 isFavorite: progress.isFavorite,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

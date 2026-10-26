@@ -35,7 +35,7 @@ void main() {
       await _search(tester, 'chichi');
 
       expect(_visibleWordCount(tester), 1);
-      expect(_inResults('chichi'), findsOneWidget);
+      expect(_inResults('ちち · chichi'), findsOneWidget);
     });
 
     testWidgets('tìm theo nghĩa tiếng Việt, không phân biệt hoa thường', (
@@ -89,7 +89,7 @@ void main() {
     await _openBook(tester);
     await _search(tester, 'chichi');
 
-    await tester.tap(_inResults('chichi'));
+    await tester.tap(_inResults('ちち · chichi'));
     await tester.pumpAndSettle();
 
     expect(find.text('ちち · chichi'), findsOneWidget);

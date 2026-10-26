@@ -49,7 +49,7 @@ class GreetingSection extends StatelessWidget {
           height: 64,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: palette.lavenderSurface,
+            color: palette.accentSurface,
             shape: BoxShape.circle,
           ),
           child: ChibiMascot(size: 56, mood: mood),

@@ -26,9 +26,9 @@ class ReviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
       decoration: BoxDecoration(
-        color: palette.lavenderSurface,
+        color: palette.accentSurface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: palette.lavenderBorder),
+        border: Border.all(color: palette.accentBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

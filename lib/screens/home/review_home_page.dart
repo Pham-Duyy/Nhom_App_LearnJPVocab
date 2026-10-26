@@ -16,6 +16,7 @@ import '../../widgets/error_view.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
 import '../../widgets/review_card.dart';
+import '../../widgets/seigaiha_pattern.dart';
 import '../../widgets/skeleton.dart';
 import '../../widgets/streak_chip.dart';
 import '../common/generic_screen.dart';
@@ -102,24 +103,38 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
         28,
       ),
       children: [
-        Row(
+        Stack(
           children: [
-            const Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: BrandLogo(),
+            Positioned.fill(
+              child: SeigaihaPattern(
+                color: context.palette.primary.withValues(alpha: 0.09),
               ),
             ),
-            const SizedBox(width: 12),
-            StreakChip(days: profile.streak),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: BrandLogo(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    StreakChip(days: profile.streak),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                GreetingSection(
+                  name: profile.displayName,
+                  mood: _moodFor(progressProvider, profile.dailyGoal),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ],
         ),
-        const SizedBox(height: 36),
-        GreetingSection(
-          name: profile.displayName,
-          mood: _moodFor(progressProvider, profile.dailyGoal),
-        ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 16),
         _buildProgressSection(progressProvider),
       ],
     );
@@ -177,8 +192,10 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           onViewAll: () => context.read<MainNavigationProvider>().selectTab(2),
         ),
         const SizedBox(height: 20),
-        _QuickQuizTile(
-          learnedCount: provider.totalLearned,
+        _ActionTile(
+          kanji: '問',
+          title: 'Quiz nhanh',
+          subtitle: 'Kiểm tra ${provider.totalLearned} từ bạn đã học',
           onTap: () => openQuickQuiz(context),
         ),
         const SizedBox(height: 32),
@@ -212,7 +229,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
-                color: palette.lavenderSurface,
+                color: palette.accentSurface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -249,9 +266,9 @@ class _StudyReminder extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: palette.lavenderSurface,
+        color: palette.accentSurface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: palette.lavenderBorder),
+        border: Border.all(color: palette.accentBorder),
       ),
       child: Row(
         children: [
@@ -273,11 +290,19 @@ class _StudyReminder extends StatelessWidget {
   }
 }
 
-/// Lối vào quiz nhanh từ các từ đã học.
-class _QuickQuizTile extends StatelessWidget {
-  const _QuickQuizTile({required this.learnedCount, required this.onTap});
+/// Một lối vào trên trang chủ (vd. Quiz nhanh): chữ Hán đại diện, tên
+/// và mô tả ngắn.
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({
+    required this.kanji,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
-  final int learnedCount;
+  final String kanji;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -296,11 +321,17 @@ class _QuickQuizTile extends StatelessWidget {
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: palette.lavenderSurface,
-          child: Icon(Icons.quiz_outlined, color: palette.primary),
+          backgroundColor: palette.accentSurface,
+          child: Text(
+            kanji,
+            style: AppTextStyles.japaneseDisplay.copyWith(
+              fontSize: 20,
+              color: palette.primary,
+            ),
+          ),
         ),
-        title: const Text('Quiz nhanh', style: AppTextStyles.cardTitle),
-        subtitle: Text('Kiểm tra $learnedCount từ bạn đã học'),
+        title: Text(title, style: AppTextStyles.cardTitle),
+        subtitle: Text(subtitle),
         trailing: Icon(Icons.chevron_right_rounded, color: palette.textMuted),
       ),
     );
@@ -333,7 +364,7 @@ class _ContinueLearningTile extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: palette.lavenderSurface,
+                  color: palette.accentSurface,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(Icons.spa_outlined, color: palette.label),

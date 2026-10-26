@@ -8,12 +8,19 @@ import 'error_view.dart';
 
 /// Nút loa đọc to [text] bằng tiếng Nhật.
 class SpeakButton extends StatelessWidget {
-  const SpeakButton({Key? key, required this.text, this.size = 24})
-      : super(key: key);
+  const SpeakButton({
+    Key? key,
+    required this.text,
+    this.size = 24,
+    this.color,
+  }) : super(key: key);
 
   /// Nên là cách đọc kana: giọng đọc tự động hay đọc sai chữ Hán.
   final String text;
   final double size;
+
+  /// Màu biểu tượng loa; mặc định là màu chính.
+  final Color? color;
 
   /// Đọc [text] và báo lỗi bằng SnackBar; dùng chung cho cả chỗ tự phát âm
   /// (vd. câu hỏi nghe trong quiz).
@@ -44,7 +51,7 @@ class SpeakButton extends StatelessWidget {
       icon: Icon(
         Icons.volume_up_rounded,
         size: size,
-        color: context.palette.primary,
+        color: color ?? context.palette.primary,
       ),
     );
   }

@@ -72,6 +72,14 @@ class QuizProvider extends ChangeNotifier {
   bool get isAnswered => selectedIndex != null;
   bool get isLastQuestion => _index == _questions.length - 1;
 
+  /// Kết quả câu thứ [index]: true là đúng, false là sai, null là chưa trả
+  /// lời. Dùng để tô màu thanh tiến độ theo từng câu.
+  bool? resultAt(int index) {
+    final question = _questions[index];
+    final selected = _answers[question.id];
+    return selected == null ? null : question.isCorrect(selected);
+  }
+
   int get correctCount => _questions.where(_isAnsweredCorrectly).length;
 
   /// Các câu đã trả lời sai, để xem lại ở màn hình kết quả.

@@ -41,7 +41,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'chichi');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('chichi').last);
+    await tester.tap(find.text('ちち · chichi').last);
     await tester.pumpAndSettle();
 
     final buttons = find.byType(SpeakButton);

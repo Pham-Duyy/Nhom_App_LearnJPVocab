@@ -125,14 +125,9 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
 
         final preferences = context.watch<UserProfileProvider>().preferences;
         final japaneseFirst = preferences.cardFront == CardFront.japanese;
-        final tapHint = _CardHint(
-          icon: Icons.touch_app_outlined,
-          text: japaneseFirst ? 'Chạm để xem nghĩa' : 'Chạm để xem cách viết',
-        );
-        const swipeHint = _CardHint(
-          icon: Icons.swipe_outlined,
-          text: 'Vuốt phải nếu đã nhớ, trái nếu chưa',
-        );
+        const tapHint =
+            _CardHint('Chạm để lật thẻ · vuốt trái/phải để trả lời');
+        const swipeHint = _CardHint('Vuốt phải nếu đã nhớ, trái nếu chưa');
         Widget japanese(_CardHint hint) => _JapaneseFace(
               word: word,
               showRomaji: preferences.showRomaji,
@@ -176,16 +171,37 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: SwipeFlashcard(
-                    key: _cardKey,
-                    cardId: word.id,
-                    enabled: !_isSubmitting,
-                    front: japaneseFirst ? japanese(tapHint) : meaning(tapHint),
-                    back: japaneseFirst
-                        ? meaning(swipeHint)
-                        : japanese(swipeHint),
-                    onSwiped: (remembered) =>
-                        remembered ? _markCorrect(word) : _markWrong(word),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: _DeckLayer(
+                          angle: 0.05,
+                          color: palette.mutedSurface,
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: _DeckLayer(
+                          angle: 0.024,
+                          color: palette.backgroundTinted,
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: SwipeFlashcard(
+                          key: _cardKey,
+                          cardId: word.id,
+                          enabled: !_isSubmitting,
+                          front: japaneseFirst
+                              ? japanese(tapHint)
+                              : meaning(tapHint),
+                          back: japaneseFirst
+                              ? meaning(swipeHint)
+                              : japanese(swipeHint),
+                          onSwiped: (remembered) => remembered
+                              ? _markCorrect(word)
+                              : _markWrong(word),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -200,13 +216,13 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(58),
                         foregroundColor: palette.danger,
-                        backgroundColor: palette.dangerSurface,
-                        side: BorderSide(color: palette.dangerBorder),
+                        backgroundColor: palette.card,
+                        side: BorderSide(color: palette.stamp, width: 1.5),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.replay_rounded, size: 20),
+                          Icon(Icons.close_rounded, size: 20),
                           SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -274,31 +290,72 @@ class _FlashcardScreenState extends GenericScreenState<FlashcardScreen> {
 
 /// Dòng gợi ý thao tác ở cuối mỗi mặt thẻ.
 class _CardHint extends StatelessWidget {
-  const _CardHint({required this.icon, required this.text});
+  const _CardHint(this.text);
 
-  final IconData icon;
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, size: 18, color: palette.textMuted),
-        const SizedBox(width: 6),
-        Flexible(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 13, color: palette.textMuted),
-          ),
-        ),
-      ],
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 13, color: context.palette.textMuted),
     );
   }
 }
 
-/// Mặt chữ Nhật của thẻ: kanji (nếu có), kana và romaji (tùy chọn học).
+/// Một lớp giấy nằm dưới thẻ đang học, để thẻ trông như một xấp thẻ.
+class _DeckLayer extends StatelessWidget {
+  const _DeckLayer({required this.angle, required this.color});
+
+  final double angle;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: angle,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+          border: Border.all(color: context.palette.cardBorder),
+        ),
+      ),
+    );
+  }
+}
+
+/// Nhãn cấp độ viền đỏ son ở góc thẻ, vd. "N5".
+class _LevelBadge extends StatelessWidget {
+  const _LevelBadge(this.level);
+
+  final String level;
+
+  @override
+  Widget build(BuildContext context) {
+    final stamp = context.palette.stamp;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        border: Border.all(color: stamp, width: 1.5),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        level,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1,
+          color: stamp,
+        ),
+      ),
+    );
+  }
+}
+
+/// Mặt chữ Nhật của thẻ: kanji (nếu có), kana, romaji (tùy chọn học) và nút
+/// nghe phát âm.
 class _JapaneseFace extends StatelessWidget {
   const _JapaneseFace({
     required this.word,
@@ -315,74 +372,63 @@ class _JapaneseFace extends StatelessWidget {
     final palette = context.palette;
     final hasKanji = word.kanji.isNotEmpty;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
       decoration: BoxDecoration(
         color: palette.card,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
         border: Border.all(color: palette.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: palette.primary.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+            color: palette.primary.withValues(alpha: 0.12),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: palette.lavenderSurface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  word.jlptLevel,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: palette.primary,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              SpeakButton(text: word.kana),
-            ],
+          Align(
+            alignment: Alignment.centerLeft,
+            child: _LevelBadge(word.jlptLevel),
           ),
           const Spacer(),
-          if (hasKanji) ...[
+          if (hasKanji)
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
                 word.kanji,
-                style: const TextStyle(
-                  fontSize: 56,
-                  fontWeight: FontWeight.w700,
+                style: AppTextStyles.japaneseDisplay.copyWith(
+                  fontSize: 96,
+                  color: palette.textPrimary,
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-          ],
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               word.kana,
-              style: TextStyle(
-                fontSize: hasKanji ? 26 : 40,
-                fontWeight: hasKanji ? FontWeight.w500 : FontWeight.w700,
+              style: AppTextStyles.japaneseDisplay.copyWith(
+                fontSize: hasKanji ? 22 : 48,
+                letterSpacing: hasKanji ? 6 : 2,
+                color: hasKanji ? palette.primary : palette.textPrimary,
               ),
             ),
           ),
           if (showRomaji) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               word.romaji,
-              style: TextStyle(fontSize: 16, color: palette.textMuted),
+              style: TextStyle(fontSize: 15, color: palette.textMuted),
             ),
           ],
+          const SizedBox(height: 14),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: palette.primary, width: 1.5),
+            ),
+            child: SpeakButton(text: word.kana, size: 22),
+          ),
           const Spacer(),
           hint,
         ],
@@ -410,9 +456,9 @@ class _MeaningFace extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: palette.lavenderSurface,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: palette.lavenderBorder),
+        color: palette.accentSurface,
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        border: Border.all(color: palette.accentBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

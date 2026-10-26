@@ -9,7 +9,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/animated_progress_bar.dart';
 import '../../widgets/chibi_mascot.dart';
-import '../../widgets/segmented_tabs.dart';
+import '../../widgets/choice_segments.dart';
 import '../../widgets/tab_header.dart';
 import '../common/generic_list_screen.dart';
 import 'category_progress.dart';
@@ -26,11 +26,19 @@ Future<void> openCategory(BuildContext context, Category category) async {
 class CategoryScreen extends GenericListScreen<Category> {
   const CategoryScreen({Key? key}) : super(key: key);
 
-  static const _topicIcons = [
-    Icons.chat_bubble_outline_rounded,
-    Icons.people_outline_rounded,
-    Icons.school_outlined,
-  ];
+  /// Chữ Hán đại diện cho từng chủ đề; chủ đề mới chưa có thì lấy chữ đầu
+  /// của tên.
+  static const _topicKanji = {
+    'cat_greetings': '話',
+    'cat_family': '家',
+    'cat_school': '学',
+    'cat_food': '食',
+    'cat_time': '時',
+    'cat_shopping': '買',
+    'cat_places': '駅',
+    'cat_home': '部',
+    'cat_nature': '山',
+  };
 
   @override
   String getTitle(BuildContext context) => 'Học mới';
@@ -66,7 +74,6 @@ class CategoryScreen extends GenericListScreen<Category> {
   Widget buildHeader(BuildContext context) {
     final palette = context.palette;
     final provider = context.watch<LessonProvider>();
-    const levels = LessonProvider.jlptLevels;
     final topicCount = provider.categoriesForSelectedLevel.length;
 
     return Column(
@@ -78,11 +85,10 @@ class CategoryScreen extends GenericListScreen<Category> {
           subtitle: 'Chọn cấp độ và chủ đề để bắt đầu.',
         ),
         const SizedBox(height: 24),
-        SegmentedTabs(
-          labels: levels,
-          selectedIndex: levels.indexOf(provider.selectedLevel),
-          showCheck: true,
-          onChanged: (index) => provider.selectLevel(levels[index]),
+        ChoiceSegments<String>(
+          options: LessonProvider.jlptLevels,
+          selected: provider.selectedLevel,
+          onChanged: provider.selectLevel,
         ),
         const SizedBox(height: 28),
         Row(
@@ -156,9 +162,13 @@ class CategoryScreen extends GenericListScreen<Category> {
                 color: palette.topicBackgrounds[paletteIndex],
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(
-                _topicIcons[paletteIndex % _topicIcons.length],
-                color: palette.topicForegrounds[paletteIndex],
+              alignment: Alignment.center,
+              child: Text(
+                _topicKanji[item.id] ?? item.name.characters.first,
+                style: AppTextStyles.japaneseDisplay.copyWith(
+                  fontSize: 26,
+                  color: palette.topicForegrounds[paletteIndex],
+                ),
               ),
             ),
             const SizedBox(width: 18),

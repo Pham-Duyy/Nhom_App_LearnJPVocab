@@ -20,7 +20,18 @@ class AppTextStyles {
 
   static const fontFamily = 'BeVietnamPro';
 
-  static const fontFamilyFallback = ['Noto Sans JP'];
+  /// Font chữ Nhật kiểu bút lông. Be Vietnam Pro không có kana và kanji nên
+  /// mọi chữ Nhật trong app tự động hiện bằng font này.
+  static const japaneseFamily = 'ShipporiMincho';
+
+  static const fontFamilyFallback = [japaneseFamily];
+
+  /// Chữ Nhật cỡ lớn: chữ trên thẻ, đề quiz, dấu triện.
+  static const japaneseDisplay = TextStyle(
+    fontFamily: japaneseFamily,
+    fontWeight: FontWeight.w700,
+    height: 1.15,
+  );
 
   /// Tiêu đề trong một card dạng danh sách (chủ đề, bài học).
   static const cardTitle = TextStyle(

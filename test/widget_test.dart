@@ -29,8 +29,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Sổ từ'), findsNWidgets(2));
-    expect(
-        find.text('9 từ đã học · Tìm kiếm và lưu yêu thích'), findsOneWidget);
+    expect(find.text('9 từ đã học'), findsOneWidget);
     expect(find.text('Tất cả'), findsOneWidget);
     expect(find.text('Đến hạn · 3'), findsOneWidget);
 

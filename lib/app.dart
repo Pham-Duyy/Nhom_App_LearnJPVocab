@@ -79,7 +79,7 @@ class ChibaKanjiApp extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: palette.primary,
           foregroundColor: palette.onPrimary,
-          disabledBackgroundColor: palette.lavenderBorder,
+          disabledBackgroundColor: palette.accentBorder,
           disabledForegroundColor: palette.textMuted,
           elevation: 0,
           minimumSize: const Size.fromHeight(54),
@@ -91,7 +91,7 @@ class ChibaKanjiApp extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: palette.primary,
           minimumSize: const Size.fromHeight(54),
-          side: BorderSide(color: palette.lavenderBorder),
+          side: BorderSide(color: palette.accentBorder),
           shape: buttonShape,
           textStyle: font.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
         ),
@@ -141,7 +141,7 @@ class ChibaKanjiApp extends StatelessWidget {
         backgroundColor: palette.card,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        dragHandleColor: palette.lavenderBorder,
+        dragHandleColor: palette.accentBorder,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: palette.background,

@@ -10,7 +10,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
 import '../../widgets/chibi_mascot.dart';
-import '../../widgets/segmented_tabs.dart';
+import '../../widgets/choice_segments.dart';
 import '../common/generic_screen.dart';
 import '../auth_gate.dart';
 import '../main_screen.dart';
@@ -180,10 +180,11 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
               const SizedBox(height: 20),
               _buildIntro(palette),
               const SizedBox(height: 22),
-              SegmentedTabs(
-                labels: const ['Đăng nhập', 'Đăng ký'],
-                selectedIndex: _isRegister ? 1 : 0,
-                onChanged: (index) => _switchMode(index == 1),
+              ChoiceSegments<bool>(
+                options: const [false, true],
+                selected: _isRegister,
+                labelOf: (register) => register ? 'Đăng ký' : 'Đăng nhập',
+                onChanged: _switchMode,
               ),
               const SizedBox(height: 22),
               OutlinedButton(
@@ -192,7 +193,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
                   minimumSize: const Size.fromHeight(60),
                   backgroundColor: palette.card,
                   foregroundColor: palette.textPrimary,
-                  side: BorderSide(color: palette.lavenderBorder),
+                  side: BorderSide(color: palette.accentBorder),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
                   ),
@@ -278,7 +279,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
           color: palette.card,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: palette.lavenderBorder),
+            side: BorderSide(color: palette.accentBorder),
           ),
           child: IconButton(
             tooltip: 'Quay lại',
@@ -333,7 +334,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
   Widget _buildDividerLabel(AppPalette palette) {
     return Row(
       children: [
-        Expanded(child: Divider(color: palette.lavenderBorder)),
+        Expanded(child: Divider(color: palette.accentBorder)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
@@ -341,7 +342,7 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
             style: TextStyle(color: palette.label),
           ),
         ),
-        Expanded(child: Divider(color: palette.lavenderBorder)),
+        Expanded(child: Divider(color: palette.accentBorder)),
       ],
     );
   }

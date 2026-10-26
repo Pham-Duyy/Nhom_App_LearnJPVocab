@@ -88,9 +88,9 @@ class LearningResultScreen extends GenericScreen {
         Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: palette.lavenderSurface,
+            color: palette.accentSurface,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: palette.lavenderBorder),
+            border: Border.all(color: palette.accentBorder),
           ),
           child: Column(
             children: [

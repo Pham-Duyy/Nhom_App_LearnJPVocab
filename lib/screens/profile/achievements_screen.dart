@@ -9,6 +9,7 @@ import '../../providers/quiz_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/hanko_stamp.dart';
 import '../common/generic_screen.dart';
 import '../lesson/category_progress.dart';
 
@@ -75,26 +76,27 @@ class _AchievementCard extends StatelessWidget {
     final palette = context.palette;
     final isUnlocked = achievement.isUnlocked(stats);
     final progress = achievement.progressOf(stats);
-    final color = isUnlocked ? palette.primary : palette.textMuted;
+    final color = isUnlocked ? palette.stamp : palette.textMuted;
 
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
-      color: isUnlocked ? palette.lavenderSurface : palette.card,
+      color: isUnlocked ? palette.accentSurface : palette.card,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.card),
         side: BorderSide(
-          color: isUnlocked ? palette.lavenderBorder : palette.cardBorder,
+          color: isUnlocked ? palette.accentBorder : palette.cardBorder,
         ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: isUnlocked ? palette.card : palette.mutedSurface,
-              child: Icon(achievement.icon, color: color),
+            HankoStamp(
+              text: achievement.stamp,
+              size: 50,
+              shape: HankoShape.circle,
+              faded: !isUnlocked,
             ),
             const SizedBox(height: 10),
             Text(

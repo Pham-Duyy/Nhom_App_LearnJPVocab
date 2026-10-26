@@ -150,9 +150,9 @@ class SwipeFlashcardState extends State<SwipeFlashcard>
               bottom: -12,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: palette.lavenderSurface,
+                  color: palette.accentSurface,
                   borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: palette.lavenderBorder),
+                  border: Border.all(color: palette.accentBorder),
                 ),
               ),
             ),

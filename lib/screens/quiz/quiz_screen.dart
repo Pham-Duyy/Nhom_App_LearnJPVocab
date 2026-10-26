@@ -9,7 +9,8 @@ import '../../providers/quiz_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
-import '../../widgets/speak_button.dart';
+import '../../widgets/answer_option.dart';
+import '../../widgets/question_prompt_card.dart';
 import '../common/generic_screen.dart';
 import 'quiz_result_screen.dart';
 
@@ -155,13 +156,15 @@ class QuizScreen extends GenericScreen {
       children: [
         _QuizProgress(
           current: quiz.currentIndex + 1,
-          total: quiz.questions.length,
+          results: [
+            for (var i = 0; i < quiz.questions.length; i++) quiz.resultAt(i),
+          ],
         ),
         const SizedBox(height: 20),
-        _PromptCard(question: question),
+        QuestionPromptCard(question: question),
         const SizedBox(height: 20),
         for (var i = 0; i < question.options.length; i++)
-          _AnswerOption(
+          AnswerOption(
             letter: String.fromCharCode(65 + i),
             label: question.options[i],
             status: _statusOf(question, i, selected),
@@ -183,209 +186,52 @@ class QuizScreen extends GenericScreen {
     );
   }
 
-  static _OptionStatus _statusOf(Question question, int index, int? selected) {
-    if (selected == null) return _OptionStatus.idle;
-    if (index == question.correctIndex) return _OptionStatus.correct;
-    if (index == selected) return _OptionStatus.wrong;
-    return _OptionStatus.dimmed;
+  static AnswerStatus _statusOf(Question question, int index, int? selected) {
+    if (selected == null) return AnswerStatus.idle;
+    if (index == question.correctIndex) return AnswerStatus.correct;
+    if (index == selected) return AnswerStatus.wrong;
+    return AnswerStatus.dimmed;
   }
 }
 
+/// "Câu 3/10" và một vạch cho mỗi câu: chàm là đúng, đỏ son là sai, xám là
+/// chưa trả lời.
 class _QuizProgress extends StatelessWidget {
-  const _QuizProgress({required this.current, required this.total});
+  const _QuizProgress({required this.current, required this.results});
 
   final int current;
-  final int total;
+  final List<bool?> results;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    Color colorOf(bool? result) => switch (result) {
+          true => palette.primary,
+          false => palette.stamp,
+          null => palette.progressTrack,
+        };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Câu $current/$total', style: palette.sectionLabel),
+        Text('Câu $current/${results.length}', style: palette.sectionLabel),
         const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(value: current / total, minHeight: 8),
-        ),
-      ],
-    );
-  }
-}
-
-class _PromptCard extends StatelessWidget {
-  const _PromptCard({required this.question});
-
-  final Question question;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Card(
-      elevation: 0,
-      color: palette.lavenderSurface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-        side: BorderSide(color: palette.lavenderBorder),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-        child: Column(
+        Row(
           children: [
-            Text(question.instruction ?? '', style: palette.body),
-            const SizedBox(height: 12),
-            if (question.isListening)
-              _ListeningPrompt(
-                key: ObjectKey(question),
-                text: question.pronunciation!,
-              )
-            else ...[
-              Text(
-                question.prompt,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w700,
-                  color: palette.primaryStrong,
+            for (var i = 0; i < results.length; i++) ...[
+              if (i > 0) const SizedBox(width: 4),
+              Expanded(
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: colorOf(results[i]),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
               ),
-              if (question.pronunciation != null) ...[
-                const SizedBox(height: 4),
-                SpeakButton(text: question.pronunciation!),
-              ],
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Đề bài câu hỏi nghe: không hiện chữ (chữ chính là đáp án), tự đọc một lần
-/// khi câu hiện ra và có nút loa lớn để nghe lại.
-class _ListeningPrompt extends StatefulWidget {
-  const _ListeningPrompt({super.key, required this.text});
-
-  final String text;
-
-  @override
-  State<_ListeningPrompt> createState() => _ListeningPromptState();
-}
-
-class _ListeningPromptState extends State<_ListeningPrompt> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _speak();
-    });
-  }
-
-  void _speak() => SpeakButton.speak(context, widget.text);
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Column(
-      children: [
-        IconButton.filled(
-          tooltip: 'Nghe lại',
-          iconSize: 44,
-          padding: const EdgeInsets.all(18),
-          onPressed: _speak,
-          icon: const Icon(Icons.volume_up_rounded),
-        ),
-        const SizedBox(height: 8),
-        Text('Nhấn loa để nghe lại', style: palette.body),
       ],
-    );
-  }
-}
-
-enum _OptionStatus { idle, correct, wrong, dimmed }
-
-/// Một đáp án; [onSelected] là callback báo lựa chọn lên QuizProvider, null
-/// thì đáp án bị khóa.
-class _AnswerOption extends StatelessWidget {
-  const _AnswerOption({
-    required this.letter,
-    required this.label,
-    required this.status,
-    required this.onSelected,
-  });
-
-  final String letter;
-  final String label;
-  final _OptionStatus status;
-  final VoidCallback? onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    final success = palette.memoryLevelColors.last;
-    final (Color border, Color background, IconData? icon) = switch (status) {
-      _OptionStatus.correct => (
-          success,
-          success.withValues(alpha: 0.12),
-          Icons.check_circle_rounded,
-        ),
-      _OptionStatus.wrong => (
-          palette.danger,
-          palette.dangerSurface,
-          Icons.cancel_rounded,
-        ),
-      _ => (palette.cardBorder, palette.card, null),
-    };
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Opacity(
-        opacity: status == _OptionStatus.dimmed ? 0.55 : 1,
-        child: Card(
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          color: background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.card),
-            side: BorderSide(color: border, width: 1.5),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onSelected,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundColor: palette.mutedSurface,
-                    child: Text(
-                      letter,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: palette.label,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  if (icon != null) Icon(icon, color: border),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

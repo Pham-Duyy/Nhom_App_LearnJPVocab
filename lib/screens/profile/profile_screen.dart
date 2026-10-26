@@ -302,7 +302,7 @@ Future<T?> _showOptionsSheet<T>(
                       ? Icon(Icons.check_rounded, color: palette.primary)
                       : null,
                   selected: option == selected,
-                  selectedTileColor: palette.lavenderSurface,
+                  selectedTileColor: palette.accentSurface,
                   onTap: () => Navigator.pop(sheetContext, option),
                 ),
             ],
@@ -425,7 +425,7 @@ class _ProfileHeader extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(
-                      color: palette.lavenderSurface,
+                      color: palette.accentSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -471,11 +471,11 @@ class _StatisticsRow extends StatelessWidget {
         child: Row(
           children: [
             Expanded(child: _Statistic(value: '$learned', label: 'Từ đã học')),
-            VerticalDivider(color: palette.lavenderBorder),
+            VerticalDivider(color: palette.accentBorder),
             Expanded(
               child: _Statistic(value: '$streakDays', label: 'Ngày liên tiếp'),
             ),
-            VerticalDivider(color: palette.lavenderBorder),
+            VerticalDivider(color: palette.accentBorder),
             Expanded(
               child: _Statistic(value: '$favorites', label: 'Từ yêu thích'),
             ),
@@ -524,9 +524,9 @@ class _DailyGoalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
       decoration: BoxDecoration(
-        color: palette.lavenderSurface,
+        color: palette.accentSurface,
         borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-        border: Border.all(color: palette.lavenderBorder),
+        border: Border.all(color: palette.accentBorder),
       ),
       child: Column(
         children: [

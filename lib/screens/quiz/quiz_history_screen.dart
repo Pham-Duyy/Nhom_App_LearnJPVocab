@@ -84,7 +84,7 @@ class _AttemptTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         leading: CircleAvatar(
-          backgroundColor: palette.lavenderSurface,
+          backgroundColor: palette.accentSurface,
           child: Text(
             '$percent%',
             style: TextStyle(

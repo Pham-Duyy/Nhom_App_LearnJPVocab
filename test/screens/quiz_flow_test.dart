@@ -17,6 +17,16 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+/// ListView chỉ dựng các mục gần màn hình: cuộn tới [finder] rồi mới bấm.
+Future<void> _scrollAndTap(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    100,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await _tap(tester, finder);
+}
+
 /// Mở quiz nhanh từ trang chủ.
 Future<void> _openQuickQuiz(WidgetTester tester) async {
   await pumpTestApp(tester);
@@ -30,7 +40,7 @@ Future<void> _answer(WidgetTester tester, {required bool correct}) async {
   final index = correct
       ? question.correctIndex
       : (question.correctIndex + 1) % question.options.length;
-  await _tap(tester, find.text(question.options[index]));
+  await _scrollAndTap(tester, find.text(question.options[index]));
 
   // Nút nằm cuối danh sách, có thể chưa được ListView dựng: cuộn tới trước.
   final label = quiz.isLastQuestion ? 'Xem kết quả' : 'Câu tiếp theo';

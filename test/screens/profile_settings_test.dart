@@ -97,7 +97,7 @@ void main() {
       userProfileRepository: MockUserProfileRepository(),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('0 ngày'), findsOneWidget);
+    expect(find.text('0日'), findsOneWidget);
 
     await tester.tap(find.text('Học mới'));
     await tester.pumpAndSettle();
@@ -115,6 +115,6 @@ void main() {
     await tester.tap(find.text('Ôn tập'));
     await tester.pumpAndSettle();
 
-    expect(find.text('1 ngày'), findsOneWidget);
+    expect(find.text('1日'), findsOneWidget);
   });
 }

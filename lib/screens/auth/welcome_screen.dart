@@ -235,7 +235,7 @@ class _MascotStage extends StatelessWidget {
                 child: Icon(
                   Icons.auto_awesome,
                   size: 26,
-                  color: palette.lavenderBorder,
+                  color: palette.accentBorder,
                 ),
               ),
               Positioned(

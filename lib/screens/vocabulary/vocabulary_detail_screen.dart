@@ -133,9 +133,9 @@ class VocabularyDetailScreen extends GenericScreen {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: palette.lavenderSurface,
+            color: palette.accentSurface,
             borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-            border: Border.all(color: palette.lavenderBorder),
+            border: Border.all(color: palette.accentBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,14 +174,14 @@ class VocabularyDetailScreen extends GenericScreen {
                     label: 'Lần ôn',
                   ),
                 ),
-                VerticalDivider(color: palette.lavenderBorder),
+                VerticalDivider(color: palette.accentBorder),
                 Expanded(
                   child: _DetailStat(
                     value: '${progress.correctCount}/${progress.wrongCount}',
                     label: 'Nhớ / Quên',
                   ),
                 ),
-                VerticalDivider(color: palette.lavenderBorder),
+                VerticalDivider(color: palette.accentBorder),
                 Expanded(
                   child: _DetailStat(
                     value: _nextReviewLabel(progress),
