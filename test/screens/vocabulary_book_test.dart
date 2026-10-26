@@ -95,6 +95,8 @@ void main() {
     expect(find.text('ちち · chichi'), findsOneWidget);
     expect(find.text('Bố (của mình)'), findsOneWidget);
     expect(find.text('VÍ DỤ'), findsOneWidget);
+    // Nút nằm cuối trang: cuộn tới cho ListView dựng nó rồi mới kiểm tra.
+    await tester.scrollUntilVisible(find.text('Ôn từ này'), 200);
     expect(find.widgetWithText(ElevatedButton, 'Ôn từ này'), findsOneWidget);
   });
 }

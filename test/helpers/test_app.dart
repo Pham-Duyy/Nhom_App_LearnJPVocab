@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../fakes/fake_auth_service.dart';
+import '../fakes/fake_speaker.dart';
 
 /// Toàn bộ ứng dụng chạy trên dữ liệu mock và một người dùng ẩn danh giả,
 /// không cần Firebase.
@@ -20,6 +21,7 @@ Widget buildTestApp({
   FakeAuthService? authService,
   MockUserProfileRepository? userProfileRepository,
   MockProgressRepository? progressRepository,
+  FakeSpeaker? speaker,
 }) {
   return AppProviders(
     authService: authService ??
@@ -37,6 +39,7 @@ Widget buildTestApp({
           initialProfile: const UserProfile(displayName: 'Duy'),
         ),
     quizAttemptRepository: MockQuizAttemptRepository(),
+    speaker: speaker ?? FakeSpeaker(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }

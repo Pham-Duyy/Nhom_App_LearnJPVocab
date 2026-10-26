@@ -11,6 +11,10 @@ abstract class QuestionBuilder {
 
   String get instruction;
 
+  /// Đề bài là tiếng Nhật thì cho nghe phát âm; đề tiếng Việt thì không, vì
+  /// đọc to lên sẽ lộ đáp án.
+  bool get promptIsJapanese;
+
   /// Dạng câu hỏi này có hỏi được về [word] không (vd. từ không có kanji thì
   /// không hỏi được dạng Kanji → Nghĩa).
   bool canAsk(Vocabulary word) => true;
@@ -27,6 +31,9 @@ class KanaToMeaning extends QuestionBuilder {
   String get instruction => 'Chọn nghĩa đúng';
 
   @override
+  bool get promptIsJapanese => true;
+
+  @override
   String promptOf(Vocabulary word) => word.kana;
 
   @override
@@ -40,6 +47,9 @@ class MeaningToKana extends QuestionBuilder {
   String get instruction => 'Chọn cách viết tiếng Nhật';
 
   @override
+  bool get promptIsJapanese => false;
+
+  @override
   String promptOf(Vocabulary word) => word.meaning;
 
   @override
@@ -51,6 +61,9 @@ class KanjiToMeaning extends QuestionBuilder {
 
   @override
   String get instruction => 'Chữ Hán này nghĩa là gì?';
+
+  @override
+  bool get promptIsJapanese => true;
 
   @override
   bool canAsk(Vocabulary word) => word.kanji.isNotEmpty;
@@ -130,6 +143,7 @@ class QuizGenerator {
       explanation: _explain(word),
       order: order,
       vocabularyId: word.id,
+      pronunciation: builder.promptIsJapanese ? word.kana : null,
     );
   }
 

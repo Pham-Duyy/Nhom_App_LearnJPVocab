@@ -9,6 +9,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/memory_level_chip.dart';
+import '../../widgets/speak_button.dart';
 import '../common/generic_screen.dart';
 import '../flashcard/flashcard_screen.dart';
 
@@ -107,10 +108,18 @@ class VocabularyDetailScreen extends GenericScreen {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          '${word.kana} · ${word.romaji}',
-          textAlign: TextAlign.center,
-          style: palette.body.copyWith(fontSize: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                '${word.kana} · ${word.romaji}',
+                textAlign: TextAlign.center,
+                style: palette.body.copyWith(fontSize: 16),
+              ),
+            ),
+            SpeakButton(text: word.kana),
+          ],
         ),
         const SizedBox(height: 18),
         Text(
@@ -133,7 +142,19 @@ class VocabularyDetailScreen extends GenericScreen {
             children: [
               Text('VÍ DỤ', style: palette.sectionLabel),
               const SizedBox(height: 12),
-              Text(word.exampleJapanese, style: const TextStyle(fontSize: 18)),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      word.exampleJapanese,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  // Cả câu có ngữ cảnh nên giọng đọc đọc kanji đúng hơn khi
+                  // đứng riêng một từ.
+                  SpeakButton(text: word.exampleJapanese, size: 22),
+                ],
+              ),
               const SizedBox(height: 6),
               Text(word.exampleVietnamese, style: palette.body),
             ],

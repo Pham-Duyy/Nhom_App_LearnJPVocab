@@ -11,6 +11,7 @@ import '../../theme/app_styles.dart';
 import '../../widgets/animated_progress_bar.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/skeleton.dart';
+import '../../widgets/speak_button.dart';
 import '../../widgets/swipe_flashcard.dart';
 import '../common/generic_screen.dart';
 import 'learning_result_screen.dart';
@@ -339,23 +340,27 @@ class _JapaneseFace extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: palette.lavenderSurface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                word.jlptLevel,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: palette.primary,
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: palette.lavenderSurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  word.jlptLevel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: palette.primary,
+                  ),
                 ),
               ),
-            ),
+              const Spacer(),
+              SpeakButton(text: word.kana),
+            ],
           ),
           const Spacer(),
           if (hasKanji) ...[

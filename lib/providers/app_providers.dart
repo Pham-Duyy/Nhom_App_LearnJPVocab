@@ -14,6 +14,7 @@ import '../repositories/progress_repository.dart';
 import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/user_profile_repository.dart';
 import '../repositories/vocabulary_repository.dart';
+import '../services/speaker.dart';
 import 'lesson_provider.dart';
 import 'library_provider.dart';
 import 'main_navigation_provider.dart';
@@ -35,6 +36,7 @@ class AppProviders extends StatelessWidget {
     this.progressRepository,
     this.userProfileRepository,
     this.quizAttemptRepository,
+    this.speaker,
   }) : super(key: key);
 
   final Widget child;
@@ -44,6 +46,7 @@ class AppProviders extends StatelessWidget {
   final ProgressRepository? progressRepository;
   final UserProfileRepository? userProfileRepository;
   final QuizAttemptRepository? quizAttemptRepository;
+  final Speaker? speaker;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,10 @@ class AppProviders extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+        Provider<Speaker>(
+          create: (_) => speaker ?? TtsSpeaker(),
+          dispose: (_, speaker) => speaker.stop(),
+        ),
         ChangeNotifierProvider(
           // initialize() an toàn khi gọi ở đây vì chưa có widget nào lắng
           // nghe, nên notifyListeners() bên trong không chạm vào build nào.

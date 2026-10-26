@@ -15,6 +15,10 @@ class Question {
   /// Từ vựng mà câu hỏi kiểm tra; trả lời sai thì từ này được đưa về lịch ôn.
   final String? vocabularyId;
 
+  /// Cách đọc (kana) để nghe phát âm đề bài; null khi đề bài là tiếng Việt,
+  /// vì đọc to lên sẽ lộ đáp án.
+  final String? pronunciation;
+
   const Question({
     required this.id,
     required this.quizId,
@@ -25,6 +29,7 @@ class Question {
     required this.order,
     this.instruction,
     this.vocabularyId,
+    this.pronunciation,
   });
 
   String get correctAnswer => options[correctIndex];
@@ -44,6 +49,7 @@ class Question {
     int? order,
     String? instruction,
     String? vocabularyId,
+    String? pronunciation,
   }) {
     return Question(
       id: id ?? this.id,
@@ -55,6 +61,7 @@ class Question {
       order: order ?? this.order,
       instruction: instruction ?? this.instruction,
       vocabularyId: vocabularyId ?? this.vocabularyId,
+      pronunciation: pronunciation ?? this.pronunciation,
     );
   }
 
@@ -70,6 +77,7 @@ class Question {
         'order': order,
         'instruction': instruction,
         'vocabularyId': vocabularyId,
+        'pronunciation': pronunciation,
       };
 
   factory Question.fromMap(Map<String, dynamic> map) => Question(
@@ -82,6 +90,7 @@ class Question {
         order: map['order'] as int,
         instruction: map['instruction'] as String?,
         vocabularyId: map['vocabularyId'] as String?,
+        pronunciation: map['pronunciation'] as String?,
       );
 
   @override

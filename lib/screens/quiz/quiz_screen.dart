@@ -9,6 +9,7 @@ import '../../providers/quiz_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
+import '../../widgets/speak_button.dart';
 import '../common/generic_screen.dart';
 import 'quiz_result_screen.dart';
 
@@ -244,6 +245,10 @@ class _PromptCard extends StatelessWidget {
                 color: palette.primaryStrong,
               ),
             ),
+            if (question.pronunciation != null) ...[
+              const SizedBox(height: 4),
+              SpeakButton(text: question.pronunciation!),
+            ],
           ],
         ),
       ),
