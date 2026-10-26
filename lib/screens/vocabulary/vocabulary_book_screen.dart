@@ -239,8 +239,9 @@ class _VocabularyBookScreenState
             if (hasNoLearnedWords) ...[
               const SizedBox(height: 22),
               ElevatedButton.icon(
-                onPressed: () =>
-                    context.read<MainNavigationProvider>().selectTab(1),
+                onPressed: () => context
+                    .read<MainNavigationProvider>()
+                    .selectTab(MainNavigationProvider.learnTab),
                 icon: const Icon(Icons.import_contacts_outlined),
                 label: const Text('Học từ mới'),
                 style: ElevatedButton.styleFrom(

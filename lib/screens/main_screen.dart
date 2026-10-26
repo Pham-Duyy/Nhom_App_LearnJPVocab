@@ -4,12 +4,13 @@ import 'package:provider/provider.dart';
 import '../providers/main_navigation_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
+import 'exam/exam_setup_screen.dart';
 import 'home/review_home_page.dart';
 import 'lesson/category_screen.dart';
 import 'profile/profile_screen.dart';
 import 'vocabulary/vocabulary_book_screen.dart';
 
-/// Khung chính của ứng dụng: 4 tab chuyển bằng BottomNavigationBar.
+/// Khung chính của ứng dụng: 5 tab chuyển bằng BottomNavigationBar.
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -17,6 +18,7 @@ class MainScreen extends StatelessWidget {
   static const _pages = <Widget>[
     ReviewHomePage(),
     CategoryScreen(),
+    ExamSetupScreen(),
     VocabularyBookScreen(),
     ProfileScreen(),
   ];
@@ -24,6 +26,7 @@ class MainScreen extends StatelessWidget {
   static const _items = <BottomNavigationBarItem>[
     BottomNavigationBarItem(icon: _KanjiIcon('復'), label: 'Ôn tập'),
     BottomNavigationBarItem(icon: _KanjiIcon('学'), label: 'Học mới'),
+    BottomNavigationBarItem(icon: _KanjiIcon('試'), label: 'Thi thử'),
     BottomNavigationBarItem(icon: _KanjiIcon('辞'), label: 'Sổ từ'),
     BottomNavigationBarItem(icon: _KanjiIcon('私'), label: 'Cá nhân'),
   ];

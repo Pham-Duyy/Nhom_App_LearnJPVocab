@@ -1,9 +1,11 @@
 import 'package:chibakanji/models/category.dart';
 import 'package:chibakanji/models/lesson.dart';
 import 'package:chibakanji/models/progress.dart';
+import 'package:chibakanji/models/quiz_attempt.dart';
 import 'package:chibakanji/models/vocabulary.dart';
 import 'package:chibakanji/repositories/mock/mock_category_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/repositories/mock/mock_quiz_attempt_repository.dart';
 import 'package:chibakanji/repositories/mock/mock_vocabulary_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -57,5 +59,15 @@ class FlakyVocabularyRepository extends MockVocabularyRepository {
   Future<List<Vocabulary>> getByLesson(String lessonId) async {
     if (failure != null) throw failure!;
     return super.getByLesson(lessonId);
+  }
+}
+
+class FlakyQuizAttemptRepository extends MockQuizAttemptRepository {
+  Object? failure;
+
+  @override
+  Future<void> save(QuizAttempt item) async {
+    if (failure != null) throw failure!;
+    return super.save(item);
   }
 }

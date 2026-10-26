@@ -189,7 +189,9 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
             provider.getCountForLevel(4),
             provider.getCountForLevel(5),
           ],
-          onViewAll: () => context.read<MainNavigationProvider>().selectTab(2),
+          onViewAll: () => context
+              .read<MainNavigationProvider>()
+              .selectTab(MainNavigationProvider.wordsTab),
         ),
         const SizedBox(height: 20),
         _ActionTile(
@@ -197,6 +199,15 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           title: 'Quiz nhanh',
           subtitle: 'Kiểm tra ${provider.totalLearned} từ bạn đã học',
           onTap: () => openQuickQuiz(context),
+        ),
+        const SizedBox(height: 12),
+        _ActionTile(
+          kanji: '試',
+          title: 'Thi thử',
+          subtitle: 'Làm bài có giờ như đề JLPT',
+          onTap: () => context
+              .read<MainNavigationProvider>()
+              .selectTab(MainNavigationProvider.examTab),
         ),
         const SizedBox(height: 32),
         _buildDailyGoal(provider),
@@ -290,7 +301,7 @@ class _StudyReminder extends StatelessWidget {
   }
 }
 
-/// Một lối vào trên trang chủ (vd. Quiz nhanh): chữ Hán đại diện, tên
+/// Một lối vào trên trang chủ (Quiz nhanh, Thi thử): chữ Hán đại diện, tên
 /// và mô tả ngắn.
 class _ActionTile extends StatelessWidget {
   const _ActionTile({

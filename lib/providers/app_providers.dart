@@ -15,6 +15,7 @@ import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/user_profile_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../services/speaker.dart';
+import 'exam_provider.dart';
 import 'lesson_provider.dart';
 import 'library_provider.dart';
 import 'main_navigation_provider.dart';
@@ -52,6 +53,7 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     final categories = categoryRepository ?? FirestoreCategoryRepository();
     final vocabulary = vocabularyRepository ?? FirestoreVocabularyRepository();
+    final attempts = quizAttemptRepository ?? FirestoreQuizAttemptRepository();
 
     return MultiProvider(
       providers: [
@@ -88,13 +90,21 @@ class AppProviders extends StatelessWidget {
             final progress = context.read<ProgressProvider>();
             final profile = context.read<UserProfileProvider>();
             return QuizProvider(
-              quizAttemptRepository ?? FirestoreQuizAttemptRepository(),
+              attempts,
               vocabulary,
               onAnswer: (vocabularyId, isCorrect) => isCorrect
                   ? profile.recordStudyActivity()
                   : progress.markWrong(vocabularyId),
             );
           },
+        ),
+        ChangeNotifierProvider(
+          // Bài thi lưu vào cùng lịch sử với quiz: lưu xong thì tải lại để
+          // trang Lịch sử và Thành tích thấy lượt thi mới.
+          create: (context) => ExamProvider(
+            attempts,
+            onSaved: context.read<QuizProvider>().loadHistory,
+          ),
         ),
       ],
       child: child,
