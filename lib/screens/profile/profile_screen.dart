@@ -11,7 +11,6 @@ import '../../theme/app_colors.dart';
 import '../../services/welcome_store.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/animated_progress_bar.dart';
-import '../../widgets/tab_header.dart';
 import '../auth/welcome_screen.dart';
 import '../common/generic_screen.dart';
 import '../quiz/quiz_history_screen.dart';
@@ -147,13 +146,11 @@ class ProfileScreen extends GenericScreen {
     final progress = context.watch<ProgressProvider>();
     final profile = context.watch<UserProfileProvider>();
     final themeMode = profile.themeMode;
-    final streak = profile.streak;
     final preferences = profile.preferences;
     final email = context.watch<AuthController>().user?.email;
     final stats = watchLearningStats(context);
     final unlockedCount =
         Achievement.all.where((a) => a.isUnlocked(stats)).length;
-    final reviewedToday = progress.getReviewedTodayCount();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -163,83 +160,93 @@ class ProfileScreen extends GenericScreen {
         28,
       ),
       children: [
-        TabHeader(
-          label: 'TÀI KHOẢN',
-          title: 'Cá nhân',
-          trailing: TextButton.icon(
-            onPressed: () => _editDisplayName(context),
-            icon: const Icon(Icons.edit_outlined, size: 18),
-            label: const Text(
-              'Chỉnh sửa',
-              style: TextStyle(fontWeight: FontWeight.w600),
+        Row(
+          children: [
+            const Expanded(
+              child: Text('Cá nhân', style: AppTextStyles.pageTitle),
             ),
-          ),
+            TextButton.icon(
+              onPressed: () => _editDisplayName(context),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: const Text('Chỉnh sửa'),
+            ),
+          ],
         ),
-        const SizedBox(height: 24),
-        _ProfileHeader(name: profile.displayName, initial: profile.initial),
-        const SizedBox(height: 24),
-        _StatisticsRow(
+        const SizedBox(height: 20),
+        _ProfileCard(
+          name: profile.displayName,
+          initial: profile.initial,
           learned: progress.totalLearned,
-          streakDays: streak,
+          streakDays: profile.streak,
           favorites: progress.favoriteCount,
-        ),
-        const SizedBox(height: 18),
-        _DailyGoalCard(learned: reviewedToday, goal: profile.dailyGoal),
-        const SizedBox(height: 32),
-        Text('HỌC TẬP', style: palette.sectionLabel),
-        const SizedBox(height: 6),
-        _ProfileMenuItem(
-          icon: Icons.flag_outlined,
-          title: 'Mục tiêu mỗi ngày',
-          value: '${profile.dailyGoal} từ',
-          onTap: () => _pickDailyGoal(context),
-        ),
-        _ProfileMenuItem(
-          icon: Icons.workspace_premium_outlined,
-          title: 'Thành tích',
-          value: '$unlockedCount/${Achievement.all.length} huy hiệu',
-          onTap: () => _open(context, const AchievementsScreen()),
-        ),
-        _ProfileMenuItem(
-          icon: Icons.history_rounded,
-          title: 'Lịch sử quiz',
-          onTap: () => _open(context, const QuizHistoryScreen()),
-        ),
-        _ProfileMenuItem(
-          icon: Icons.notifications_none_rounded,
-          title: 'Nhắc học mỗi ngày',
-          value: preferences.dailyReminder ? 'Bật' : 'Tắt',
-          onTap: () => _toggleReminder(context),
-        ),
-        _ProfileMenuItem(
-          icon: Icons.tune_rounded,
-          title: 'Tùy chọn học',
-          value: preferences.cardFront == CardFront.japanese
-              ? 'Chữ Nhật trước'
-              : 'Nghĩa trước',
-          onTap: () => _open(context, const StudyPreferencesScreen()),
-          showDivider: false,
+          reviewedToday: progress.getReviewedTodayCount(),
+          dailyGoal: profile.dailyGoal,
         ),
         const SizedBox(height: 28),
-        Text('TÀI KHOẢN & HỖ TRỢ', style: palette.sectionLabel),
-        const SizedBox(height: 6),
-        _ProfileMenuItem(
-          icon: _themeIcons[themeMode]!,
-          title: 'Giao diện',
-          value: _themeLabels[themeMode],
-          onTap: () => _pickTheme(context),
+        _MenuGroup(
+          title: 'HỌC TẬP',
+          items: [
+            _ProfileMenuItem(
+              icon: Icons.flag_outlined,
+              title: 'Mục tiêu mỗi ngày',
+              value: '${profile.dailyGoal} từ',
+              onTap: () => _pickDailyGoal(context),
+            ),
+            _ProfileMenuItem(
+              icon: Icons.notifications_none_rounded,
+              title: 'Nhắc học mỗi ngày',
+              value: preferences.dailyReminder ? 'Bật' : 'Tắt',
+              onTap: () => _toggleReminder(context),
+            ),
+            _ProfileMenuItem(
+              icon: Icons.tune_rounded,
+              title: 'Tùy chọn học',
+              value: preferences.cardFront == CardFront.japanese
+                  ? 'Chữ Nhật trước'
+                  : 'Nghĩa trước',
+              onTap: () => _open(context, const StudyPreferencesScreen()),
+            ),
+          ],
         ),
-        _ProfileMenuItem(
-          icon: Icons.person_outline_rounded,
-          title: 'Tài khoản',
-          value: email ?? 'Khách',
-          onTap: () => _open(context, const AccountScreen()),
+        const SizedBox(height: 22),
+        _MenuGroup(
+          title: 'TIẾN ĐỘ',
+          items: [
+            _ProfileMenuItem(
+              icon: Icons.workspace_premium_outlined,
+              title: 'Thành tích',
+              value: '$unlockedCount/${Achievement.all.length} huy hiệu',
+              onTap: () => _open(context, const AchievementsScreen()),
+            ),
+            _ProfileMenuItem(
+              icon: Icons.history_rounded,
+              title: 'Lịch sử quiz',
+              onTap: () => _open(context, const QuizHistoryScreen()),
+            ),
+          ],
         ),
-        _ProfileMenuItem(
-          icon: Icons.help_outline_rounded,
-          title: 'Hướng dẫn sử dụng',
-          onTap: () => _open(context, const HelpScreen()),
-          showDivider: false,
+        const SizedBox(height: 22),
+        _MenuGroup(
+          title: 'ỨNG DỤNG',
+          items: [
+            _ProfileMenuItem(
+              icon: _themeIcons[themeMode]!,
+              title: 'Giao diện',
+              value: _themeLabels[themeMode],
+              onTap: () => _pickTheme(context),
+            ),
+            _ProfileMenuItem(
+              icon: Icons.person_outline_rounded,
+              title: 'Tài khoản',
+              value: email ?? 'Khách',
+              onTap: () => _open(context, const AccountScreen()),
+            ),
+            _ProfileMenuItem(
+              icon: Icons.help_outline_rounded,
+              title: 'Hướng dẫn sử dụng',
+              onTap: () => _open(context, const HelpScreen()),
+            ),
+          ],
         ),
         const SizedBox(height: 28),
         OutlinedButton.icon(
@@ -247,16 +254,15 @@ class ProfileScreen extends GenericScreen {
           icon: const Icon(Icons.logout_rounded, size: 20),
           label: const Text('Đăng xuất'),
           style: OutlinedButton.styleFrom(
-            minimumSize: const Size.fromHeight(60),
+            minimumSize: const Size.fromHeight(52),
             foregroundColor: palette.danger,
-            backgroundColor: palette.dangerSurface,
             side: BorderSide(color: palette.dangerBorder),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppRadius.card),
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         Center(
           child: Text(
             'ChibaKanji · Phiên bản 1.0.0',
@@ -368,224 +374,225 @@ class _EditNameDialogState extends State<_EditNameDialog> {
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.name, required this.initial});
-
-  final String name;
-  final String initial;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Row(
-      children: [
-        Container(
-          width: 76,
-          height: 76,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: palette.secondary,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: palette.card, width: 4),
-            boxShadow: [
-              BoxShadow(
-                color: palette.primary.withValues(alpha: 0.12),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Text(
-            initial,
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: palette.primary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 18),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Flexible(
-                    child: Text('Người học tiếng Nhật', style: palette.body),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: palette.accentSurface,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'N5',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: palette.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StatisticsRow extends StatelessWidget {
-  const _StatisticsRow({
+/// Thẻ hồ sơ: ảnh đại diện, tên, ba số liệu chính và mục tiêu hôm nay.
+class _ProfileCard extends StatelessWidget {
+  const _ProfileCard({
+    required this.name,
+    required this.initial,
     required this.learned,
     required this.streakDays,
     required this.favorites,
+    required this.reviewedToday,
+    required this.dailyGoal,
   });
 
+  final String name;
+  final String initial;
   final int learned;
   final int streakDays;
   final int favorites;
+  final int reviewedToday;
+  final int dailyGoal;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final goalDone = reviewedToday >= dailyGoal;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: palette.mutedSurface,
+        color: palette.card,
         borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        border: Border.all(color: palette.cardBorder),
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            Expanded(child: _Statistic(value: '$learned', label: 'Từ đã học')),
-            VerticalDivider(color: palette.accentBorder),
-            Expanded(
-              child: _Statistic(value: '$streakDays', label: 'Ngày liên tiếp'),
-            ),
-            VerticalDivider(color: palette.accentBorder),
-            Expanded(
-              child: _Statistic(value: '$favorites', label: 'Từ yêu thích'),
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: palette.primary,
+                child: Text(
+                  initial,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: palette.onPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Người học tiếng Nhật · N5',
+                      style: palette.body.copyWith(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _Statistic(
+                icon: Icons.menu_book_rounded,
+                color: palette.primary,
+                value: learned,
+                label: 'Từ đã học',
+              ),
+              _Statistic(
+                icon: Icons.local_fire_department_rounded,
+                color: palette.stamp,
+                value: streakDays,
+                label: 'Ngày liên tiếp',
+              ),
+              _Statistic(
+                icon: Icons.favorite_rounded,
+                color: palette.favorite,
+                value: favorites,
+                label: 'Từ yêu thích',
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Divider(height: 1, color: palette.divider),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Mục tiêu hôm nay',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              if (goalDone) ...[
+                Icon(
+                  Icons.check_circle_rounded,
+                  size: 18,
+                  color: palette.chartColors[2],
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                '$reviewedToday / $dailyGoal',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: palette.textSecondary,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          AnimatedProgressBar(
+            value: reviewedToday / dailyGoal,
+            color: goalDone ? palette.chartColors[2] : palette.primary,
+            backgroundColor: palette.progressTrack,
+          ),
+        ],
       ),
     );
   }
 }
 
 class _Statistic extends StatelessWidget {
-  const _Statistic({required this.value, required this.label});
+  const _Statistic({
+    required this.icon,
+    required this.color,
+    required this.value,
+    required this.label,
+  });
 
-  final String value;
+  final IconData icon;
+  final Color color;
+  final int value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13, color: context.palette.textSecondary),
-        ),
-      ],
+    final palette = context.palette;
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 20, color: color),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '$value',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: palette.textSecondary),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _DailyGoalCard extends StatelessWidget {
-  const _DailyGoalCard({required this.learned, required this.goal});
+/// Một nhóm mục cài đặt: nhãn nhỏ ở trên, các mục nằm chung một thẻ và
+/// ngăn nhau bằng đường kẻ mảnh.
+class _MenuGroup extends StatelessWidget {
+  const _MenuGroup({required this.title, required this.items});
 
-  final int learned;
-  final int goal;
+  final String title;
+  final List<_ProfileMenuItem> items;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final remaining = goal - learned;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
-      decoration: BoxDecoration(
-        color: palette.accentSurface,
-        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-        border: Border.all(color: palette.accentBorder),
-      ),
-      child: Column(
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(title, style: palette.sectionLabel),
+        ),
+        Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          color: palette.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+            side: BorderSide(color: palette.cardBorder),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Mục tiêu hôm nay',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      remaining > 0
-                          ? 'Còn $remaining từ để hoàn thành.'
-                          : 'Bạn đã hoàn thành mục tiêu hôm nay!',
-                      style: palette.body.copyWith(fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '$learned',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: palette.primary,
-                      ),
-                    ),
-                    TextSpan(
-                      text: ' / $goal',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: palette.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              for (final (index, item) in items.indexed) ...[
+                if (index > 0)
+                  Divider(height: 1, indent: 64, color: palette.divider),
+                item,
+              ],
             ],
           ),
-          const SizedBox(height: 16),
-          AnimatedProgressBar(
-            value: learned / goal,
-            color: palette.primarySoft,
-            backgroundColor: palette.card,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -596,66 +603,58 @@ class _ProfileMenuItem extends StatelessWidget {
     required this.title,
     this.value,
     required this.onTap,
-    this.showDivider = true,
   });
 
   final IconData icon;
   final String title;
   final String? value;
   final VoidCallback onTap;
-  final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: palette.mutedSurface,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(icon, size: 22, color: palette.label),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                if (value != null)
-                  Flexible(
-                    child: Text(
-                      value!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: palette.textSecondary,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 6),
-                Icon(Icons.chevron_right_rounded, color: palette.textMuted),
-              ],
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: palette.accentSurface,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 20, color: palette.primary),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (value != null)
+              Flexible(
+                child: Text(
+                  value!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: palette.textSecondary,
+                  ),
+                ),
+              ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, color: palette.textMuted),
+          ],
         ),
-        if (showDivider) const Divider(indent: 60),
-      ],
+      ),
     );
   }
 }
