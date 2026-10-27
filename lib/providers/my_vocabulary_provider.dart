@@ -7,11 +7,12 @@ import '../repositories/user_topic_repository.dart';
 import '../repositories/user_word_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../utils/app_error.dart';
+import 'latest_load_guard.dart';
 
 /// Kho từ của người học: chủ đề tự tạo và từ tự thêm. Các hàm thay đổi dữ
 /// liệu trả về thông báo lỗi (dữ liệu nhập sai hoặc lưu thất bại), null nếu
 /// thành công, để form hiện lỗi ngay tại chỗ.
-class MyVocabularyProvider extends ChangeNotifier {
+class MyVocabularyProvider extends ChangeNotifier with LatestLoadGuard {
   MyVocabularyProvider(
     this._topics,
     this._words,
@@ -71,6 +72,7 @@ class MyVocabularyProvider extends ChangeNotifier {
   }
 
   Future<void> load() async {
+    final isLatest = startLoad();
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -79,15 +81,19 @@ class MyVocabularyProvider extends ChangeNotifier {
         _topics.getAll(),
         _vocabulary.getAll(),
       ]);
+      if (!isLatest()) return;
       _topicList = results[0].cast<UserTopic>().toList()
         ..sort((a, b) => a.order.compareTo(b.order));
       _allWords = results[1].cast<Vocabulary>().toList();
     } catch (e, stack) {
+      if (!isLatest()) return;
       AppError.log('MyVocabularyProvider.load', e, stack);
       _errorMessage = AppError.message(e, action: 'tải kho từ');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (isLatest()) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 

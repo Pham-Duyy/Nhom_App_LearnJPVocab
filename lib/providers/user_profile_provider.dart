@@ -4,13 +4,14 @@ import '../models/study_preferences.dart';
 import '../models/user_profile.dart';
 import '../repositories/user_profile_repository.dart';
 import '../utils/app_error.dart';
+import 'latest_load_guard.dart';
 
 /// Quản lý hồ sơ và tùy chọn của người học: tên hiển thị, mục tiêu mỗi
 /// ngày, giao diện sáng/tối và chuỗi ngày học liên tiếp.
 ///
 /// Mọi thay đổi được áp dụng ngay trên giao diện rồi mới lưu; nếu lưu lỗi
 /// thì trả về giá trị cũ và đặt [errorMessage].
-class UserProfileProvider extends ChangeNotifier {
+class UserProfileProvider extends ChangeNotifier with LatestLoadGuard {
   UserProfileProvider(this._repository, {DateTime Function()? clock})
       : _clock = clock ?? DateTime.now;
 
@@ -19,14 +20,14 @@ class UserProfileProvider extends ChangeNotifier {
 
   UserProfile _profile = const UserProfile();
   bool _isLoading = false;
+  bool _hasLoaded = false;
   String? _errorMessage;
-
-  /// Tăng mỗi lần [load], để bỏ qua kết quả của một lần tải cũ hơn (vd. khi
-  /// đăng xuất rồi đăng nhập tài khoản khác lúc lần tải trước chưa xong).
-  int _loadGeneration = 0;
 
   UserProfile get profile => _profile;
   bool get isLoading => _isLoading;
+
+  /// Đã tải hồ sơ xong ít nhất một lần (kể cả khi lỗi thì dùng mặc định).
+  bool get hasLoaded => _hasLoaded;
   String? get errorMessage => _errorMessage;
 
   String get displayName => _profile.displayName;
@@ -41,22 +42,23 @@ class UserProfileProvider extends ChangeNotifier {
   bool get hasStudiedToday => _profile.hasStudiedOn(_clock());
 
   Future<void> load() async {
-    final generation = ++_loadGeneration;
+    final isLatest = startLoad();
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final loaded = await _repository.load();
-      if (generation != _loadGeneration) return;
+      if (!isLatest()) return;
       _profile = loaded ?? const UserProfile();
     } catch (e, stack) {
-      if (generation != _loadGeneration) return;
+      if (!isLatest()) return;
       AppError.log('UserProfileProvider.load', e, stack);
       _errorMessage = AppError.message(e, action: 'tải hồ sơ');
     } finally {
-      if (generation == _loadGeneration) {
+      if (isLatest()) {
         _isLoading = false;
+        _hasLoaded = true;
         notifyListeners();
       }
     }

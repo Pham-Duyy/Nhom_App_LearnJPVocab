@@ -6,11 +6,12 @@ import '../models/vocabulary.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../utils/app_error.dart';
+import 'latest_load_guard.dart';
 
 /// Toàn bộ nội dung học (chủ đề, bài học, từ vựng) đọc từ CSDL một lần sau
 /// khi đăng nhập, cho các màn hình cần xem nhiều bài cùng lúc: Sổ từ và
 /// tiến độ từng chủ đề.
-class LibraryProvider extends ChangeNotifier {
+class LibraryProvider extends ChangeNotifier with LatestLoadGuard {
   LibraryProvider(this._categories, this._vocabulary);
 
   final CategoryRepository _categories;
@@ -35,6 +36,7 @@ class LibraryProvider extends ChangeNotifier {
       };
 
   Future<void> load() async {
+    final isLatest = startLoad();
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -45,6 +47,7 @@ class LibraryProvider extends ChangeNotifier {
         _categories.getAllLessons(),
         _vocabulary.getAll(),
       ]);
+      if (!isLatest()) return;
       final categories = results[0].cast<Category>();
       final lessons = results[1].cast<Lesson>();
       final words = results[2].cast<Vocabulary>().toList();
@@ -68,11 +71,14 @@ class LibraryProvider extends ChangeNotifier {
           return byLesson != 0 ? byLesson : a.order.compareTo(b.order);
         });
     } catch (e, stack) {
+      if (!isLatest()) return;
       AppError.log('LibraryProvider.load', e, stack);
       _errorMessage = AppError.message(e, action: 'tải sổ từ');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (isLatest()) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 }

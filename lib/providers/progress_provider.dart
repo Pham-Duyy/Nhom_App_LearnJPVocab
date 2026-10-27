@@ -5,10 +5,11 @@ import 'package:flutter/foundation.dart';
 import '../models/progress.dart';
 import '../repositories/progress_repository.dart';
 import '../utils/app_error.dart';
+import 'latest_load_guard.dart';
 
 /// Quản lý tiến độ ghi nhớ của toàn bộ từ vựng: tổng số từ đã học, số từ
 /// đến hạn ôn tập và phân bố theo từng mức ghi nhớ (1-5).
-class ProgressProvider extends ChangeNotifier {
+class ProgressProvider extends ChangeNotifier with LatestLoadGuard {
   /// [onStudyActivity] được gọi sau mỗi lần trả lời một thẻ (đúng hoặc sai),
   /// để ghi nhận chuỗi ngày học mà provider này không cần biết đến hồ sơ.
   ProgressProvider(
@@ -53,18 +54,24 @@ class ProgressProvider extends ChangeNotifier {
       _progressList.where((p) => p.memoryLevel == level).length;
 
   Future<void> loadProgress() async {
+    final isLatest = startLoad();
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _progressList = await _repository.getAll();
+      final loaded = await _repository.getAll();
+      if (!isLatest()) return;
+      _progressList = loaded;
     } catch (e, stack) {
+      if (!isLatest()) return;
       AppError.log('ProgressProvider.loadProgress', e, stack);
       _errorMessage = AppError.message(e, action: 'tải tiến độ học');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (isLatest()) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 

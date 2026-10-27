@@ -10,6 +10,7 @@ import '../models/vocabulary.dart';
 import '../repositories/quiz_attempt_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../utils/app_error.dart';
+import 'latest_load_guard.dart';
 
 /// Báo kết quả của một câu ra ngoài (vd. đưa từ trả lời sai về lịch ôn).
 typedef QuizAnswerCallback = Future<void> Function(
@@ -19,7 +20,7 @@ typedef QuizAnswerCallback = Future<void> Function(
 
 /// Quản lý một lượt làm quiz (câu hiện tại, đáp án đã chọn, điểm) và lịch sử
 /// các lượt đã làm.
-class QuizProvider extends ChangeNotifier {
+class QuizProvider extends ChangeNotifier with LatestLoadGuard {
   QuizProvider(
     this._attempts,
     this._vocabulary, {
@@ -211,19 +212,24 @@ class QuizProvider extends ChangeNotifier {
 
   /// Tải lịch sử, lần làm mới nhất đứng đầu.
   Future<void> loadHistory() async {
+    final isLatest = startLoad();
     _isLoadingHistory = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _history = (await _attempts.getAll())
-        ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+      final loaded = await _attempts.getAll();
+      if (!isLatest()) return;
+      _history = loaded..sort((a, b) => b.startedAt.compareTo(a.startedAt));
     } catch (e, stack) {
+      if (!isLatest()) return;
       AppError.log('QuizProvider.loadHistory', e, stack);
       _errorMessage = AppError.message(e, action: 'tải lịch sử quiz');
     } finally {
-      _isLoadingHistory = false;
-      notifyListeners();
+      if (isLatest()) {
+        _isLoadingHistory = false;
+        notifyListeners();
+      }
     }
   }
 }
