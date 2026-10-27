@@ -103,6 +103,38 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> signOut() => _guard(_auth.signOut);
 
+  @override
+  Future<void> reauthenticate({String? password}) {
+    return _guard(() async {
+      final user = _signedInUser;
+      final providers = {for (final info in user.providerData) info.providerId};
+      final email = user.email;
+      if (providers.contains(AppAuthUser.passwordProvider) &&
+          password != null &&
+          email != null) {
+        await user.reauthenticateWithCredential(
+          fb.EmailAuthProvider.credential(email: email, password: password),
+        );
+      } else if (providers.contains(AppAuthUser.googleProvider)) {
+        final provider = fb.GoogleAuthProvider();
+        kIsWeb
+            ? await user.reauthenticateWithPopup(provider)
+            : await user.reauthenticateWithProvider(provider);
+      }
+    });
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) =>
+      _guard(() => _signedInUser.updatePassword(newPassword));
+
+  @override
+  Future<void> deleteAccount() => _guard(() => _signedInUser.delete());
+
+  fb.User get _signedInUser =>
+      _auth.currentUser ??
+      (throw const AuthException('user-not-found', 'Chưa đăng nhập'));
+
   AppAuthUser _userOf(fb.UserCredential credential) {
     final user = _mapUser(credential.user);
     if (user == null) {

@@ -87,6 +87,41 @@ void main() {
     expect(progress.memoryLevel, 1);
   });
 
+  testWidgets('US16: trả lời đúng thì từ lên một mức ghi nhớ', (tester) async {
+    await _openQuickQuiz(tester);
+    final question = _read<QuizProvider>(tester).currentQuestion!;
+    Progress progressOf() => _read<ProgressProvider>(tester)
+        .progressList
+        .firstWhere((Progress p) => p.vocabularyId == question.vocabularyId);
+    final before = progressOf();
+
+    await _scrollAndTap(
+      tester,
+      find.text(question.options[question.correctIndex]),
+    );
+
+    // Mức 5 là cao nhất nên giữ nguyên; số lần đúng thì luôn tăng.
+    final after = progressOf();
+    expect(
+        after.memoryLevel, before.memoryLevel < 5 ? before.memoryLevel + 1 : 5);
+    expect(after.correctCount, before.correctCount + 1);
+  });
+
+  testWidgets('trả lời sai thì ôn lại đúng các từ đó bằng flashcard', (
+    tester,
+  ) async {
+    await _openQuickQuiz(tester);
+    final total = _read<QuizProvider>(tester).questions.length;
+    for (var i = 0; i < total; i++) {
+      await _answer(tester, correct: i >= 2);
+    }
+
+    await _scrollAndTap(tester, find.text('Ôn lại 2 từ sai bằng flashcard'));
+
+    expect(find.text('Ôn lại từ sai'), findsOneWidget);
+    expect(find.text('Từ 1/2'), findsOneWidget);
+  });
+
   testWidgets('US16: bấm Back giữa chừng thì hỏi lại, chọn Làm tiếp thì ở lại',
       (
     tester,

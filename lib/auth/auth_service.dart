@@ -49,4 +49,16 @@ abstract class AuthService {
   Future<AppAuthUser> signInWithGoogle();
 
   Future<void> signOut();
+
+  /// Xác thực lại người đang đăng nhập trước thao tác nhạy cảm (đổi mật
+  /// khẩu, xóa tài khoản): tài khoản email cần [password], tài khoản Google
+  /// mở lại cửa sổ Google, tài khoản khách không cần gì.
+  /// Ném [AuthException] nếu thất bại (vd. sai mật khẩu).
+  Future<void> reauthenticate({String? password});
+
+  /// Đổi mật khẩu tài khoản email; gọi sau [reauthenticate].
+  Future<void> updatePassword(String newPassword);
+
+  /// Xóa hẳn tài khoản đang đăng nhập; gọi sau [reauthenticate].
+  Future<void> deleteAccount();
 }

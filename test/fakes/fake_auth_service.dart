@@ -167,6 +167,37 @@ class FakeAuthService implements AuthService {
 
   static String _normalize(String email) => email.trim().toLowerCase();
 
+  int deleteAccountCallCount = 0;
+
+  @override
+  Future<void> reauthenticate({String? password}) async {
+    final user = _currentUser;
+    if (user == null) throw const AuthException('user-not-found');
+    final email = user.email;
+    if (user.hasPassword && email != null) {
+      if (_accounts[email]?.password != password) {
+        throw const AuthException('invalid-credential');
+      }
+    }
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    final email = _currentUser?.email;
+    final account = email == null ? null : _accounts[email];
+    if (account == null) throw const AuthException('user-not-found');
+    if (newPassword.length < 6) throw const AuthException('weak-password');
+    _accounts[email!] = (password: newPassword, uid: account.uid);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    deleteAccountCallCount++;
+    final email = _currentUser?.email;
+    if (email != null) _accounts.remove(email);
+    emitUser(null);
+  }
+
   @override
   Future<void> signOut() async {
     signOutCallCount++;

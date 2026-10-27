@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import '../../models/question.dart';
 import '../../providers/main_navigation_provider.dart';
 import '../../providers/quiz_provider.dart';
+import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../common/generic_screen.dart';
+import '../flashcard/flashcard_screen.dart';
 import 'quiz_screen.dart';
 
 /// Điểm của lượt vừa làm và các câu trả lời sai để xem lại.
@@ -30,6 +32,34 @@ class QuizResultScreen extends GenericScreen {
     if (!context.read<QuizProvider>().restart()) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const QuizScreen()),
+    );
+  }
+
+  /// Học lại bằng flashcard đúng những từ vừa trả lời sai.
+  Future<void> _reviewWrong(
+    BuildContext context,
+    List<Question> wrong,
+  ) async {
+    final words = context.read<VocabularyProvider>();
+    await words.loadReviewWords([
+      for (final question in wrong)
+        if (question.vocabularyId != null) question.vocabularyId!,
+    ]);
+    if (!context.mounted) return;
+    final error = words.errorMessage;
+    if (error != null || words.words.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error ?? 'Không tìm thấy từ cần ôn lại.')),
+      );
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const FlashcardScreen(
+          title: 'Ôn lại từ sai',
+          completionTitle: 'Đã ôn lại các từ sai!',
+        ),
+      ),
     );
   }
 
@@ -79,6 +109,15 @@ class QuizResultScreen extends GenericScreen {
           Text('CẦN ÔN LẠI (${wrong.length})', style: palette.sectionLabel),
           const SizedBox(height: 8),
           for (final question in wrong) _WrongAnswerTile(question: question),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            onPressed: () => _reviewWrong(context, wrong),
+            icon: const Icon(Icons.style_outlined, size: 20),
+            label: Text('Ôn lại ${wrong.length} từ sai bằng flashcard'),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(54),
+            ),
+          ),
           const SizedBox(height: 20),
         ],
         ElevatedButton.icon(

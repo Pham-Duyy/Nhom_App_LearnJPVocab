@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_auth_service.dart';
+import '../fakes/fake_reminder_scheduler.dart';
 import '../helpers/test_app.dart';
 
 Future<void> _tap(WidgetTester tester, Finder finder) async {
@@ -101,6 +102,11 @@ void main() {
     testWidgets('tắt nhắc học ở Cá nhân thì lời nhắc biến mất', (tester) async {
       await _pumpApp(tester);
       await _openProfileItem(tester, 'Nhắc học mỗi ngày');
+      // Bảng cài đặt nhắc học: gạt công tắc tắt rồi đóng bảng.
+      await _tap(tester, find.byType(Switch));
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
       final reminderRow = find
           .ancestor(
               of: find.text('Nhắc học mỗi ngày'), matching: find.byType(Row))
@@ -175,7 +181,7 @@ void main() {
       await _openProfileItem(tester, 'Tài khoản');
 
       expect(find.text('Email và mật khẩu'), findsOneWidget);
-      await _tap(tester, find.text('Đặt lại mật khẩu'));
+      await _tap(tester, find.text('Quên mật khẩu? Gửi email đặt lại'));
 
       expect(auth.lastPasswordResetEmail, 'duy@gmail.com');
     });
@@ -214,5 +220,25 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets(
+      'bảng nhắc học: tắt thì hủy thông báo, bật lại thì xin quyền '
+      'và lập lịch lại', (tester) async {
+    final scheduler = FakeReminderScheduler();
+    await tester.pumpWidget(buildTestApp(reminderScheduler: scheduler));
+    await tester.pumpAndSettle();
+    expect(scheduler.scheduled, (StudyPreferences.defaultReminderHour, 0));
+
+    await _openProfileItem(tester, 'Nhắc học mỗi ngày');
+    expect(find.text('Giờ nhắc'), findsOneWidget);
+    expect(find.text('20:00'), findsOneWidget);
+
+    await _tap(tester, find.byType(Switch));
+    expect(scheduler.scheduled, isNull);
+
+    await _tap(tester, find.byType(Switch));
+    expect(scheduler.permissionRequests, 1);
+    expect(scheduler.scheduled, (StudyPreferences.defaultReminderHour, 0));
   });
 }

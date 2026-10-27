@@ -18,6 +18,7 @@ import '../quiz/quiz_history_screen.dart';
 import 'account_screen.dart';
 import 'achievements_screen.dart';
 import 'help_screen.dart';
+import 'reminder_settings.dart';
 import 'study_preferences_screen.dart';
 
 class ProfileScreen extends GenericScreen {
@@ -105,13 +106,23 @@ class ProfileScreen extends GenericScreen {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
-  Future<void> _toggleReminder(BuildContext context) async {
-    final profile = context.read<UserProfileProvider>();
-    final preferences = profile.preferences;
-    await profile.setPreferences(
-      preferences.copyWith(dailyReminder: !preferences.dailyReminder),
+  void _openReminder(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('NHẮC HỌC', style: sheetContext.palette.sectionLabel),
+              const ReminderSettings(),
+            ],
+          ),
+        ),
+      ),
     );
-    if (context.mounted) _showSaveError(context);
   }
 
   Future<void> _pickDailyGoal(BuildContext context) async {
@@ -195,8 +206,10 @@ class ProfileScreen extends GenericScreen {
             _ProfileMenuItem(
               icon: Icons.notifications_none_rounded,
               title: 'Nhắc học mỗi ngày',
-              value: preferences.dailyReminder ? 'Bật' : 'Tắt',
-              onTap: () => _toggleReminder(context),
+              value: preferences.dailyReminder
+                  ? 'Bật · ${preferences.reminderTimeLabel}'
+                  : 'Tắt',
+              onTap: () => _openReminder(context),
             ),
             _ProfileMenuItem(
               icon: Icons.tune_rounded,

@@ -89,6 +89,51 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  /// Đổi mật khẩu sau khi xác nhận mật khẩu hiện tại. Trả về thông báo lỗi,
+  /// hoặc null nếu đã đổi.
+  Future<String?> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _authService.reauthenticate(password: currentPassword);
+      await _authService.updatePassword(newPassword);
+      return null;
+    } catch (error) {
+      _logError('changePassword', error);
+      final code = _codeOf(error);
+      if (code == 'invalid-credential' || code == 'wrong-password') {
+        return 'Mật khẩu hiện tại không đúng.';
+      }
+      return _signInErrorMessage(error);
+    }
+  }
+
+  /// Xóa tài khoản: xác thực lại trước (sai mật khẩu thì dừng, chưa mất gì),
+  /// rồi [deleteData] xóa dữ liệu học, cuối cùng xóa tài khoản. Trả về thông
+  /// báo lỗi, hoặc null nếu đã xóa xong.
+  Future<String?> deleteAccount({
+    String? password,
+    required Future<void> Function() deleteData,
+  }) async {
+    try {
+      await _authService.reauthenticate(password: password);
+      await deleteData();
+      await _authService.deleteAccount();
+      return null;
+    } catch (error) {
+      _logError('deleteAccount', error);
+      if (error is! AuthException) {
+        return 'Không thể xóa dữ liệu học. Vui lòng kiểm tra mạng và thử lại.';
+      }
+      final code = error.code;
+      if (code == 'invalid-credential' || code == 'wrong-password') {
+        return 'Mật khẩu không đúng.';
+      }
+      return _signInErrorMessage(error);
+    }
+  }
+
   Future<String?> _runSignInAction(
     String name,
     Future<AppAuthUser> Function() action,
@@ -209,6 +254,9 @@ class AuthController extends ChangeNotifier {
             'Hãy đăng nhập bằng email và mật khẩu.';
       case 'unauthorized-domain':
         return 'Trang web này chưa được cấp phép đăng nhập trong Firebase.';
+      case 'requires-recent-login':
+        return 'Vì lý do bảo mật, hãy đăng xuất rồi đăng nhập lại '
+            'trước khi thực hiện thao tác này.';
       default:
         return _commonMessage(code) ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.';
     }

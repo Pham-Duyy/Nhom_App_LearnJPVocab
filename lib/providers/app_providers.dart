@@ -15,12 +15,16 @@ import '../repositories/firestore/firestore_user_profile_repository.dart';
 import '../repositories/firestore/firestore_vocabulary_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/quiz_attempt_repository.dart';
+import '../repositories/firestore/firestore_user_data_cleaner.dart';
+import '../repositories/user_data_cleaner.dart';
 import '../repositories/user_profile_repository.dart';
 import '../repositories/user_topic_repository.dart';
 import '../repositories/user_word_repository.dart';
 import '../repositories/vocabulary_repository.dart';
 import '../services/music_player.dart';
+import '../services/reminder_scheduler.dart';
 import '../services/speaker.dart';
+import 'daily_reminder.dart';
 import 'exam_provider.dart';
 import 'lesson_provider.dart';
 import 'library_provider.dart';
@@ -49,6 +53,8 @@ class AppProviders extends StatelessWidget {
     this.userWordRepository,
     this.speaker,
     this.musicPlayer,
+    this.userDataCleaner,
+    this.reminderScheduler,
   }) : super(key: key);
 
   final Widget child;
@@ -62,6 +68,8 @@ class AppProviders extends StatelessWidget {
   final UserWordRepository? userWordRepository;
   final Speaker? speaker;
   final MusicPlayer? musicPlayer;
+  final UserDataCleaner? userDataCleaner;
+  final ReminderScheduler? reminderScheduler;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +90,9 @@ class AppProviders extends StatelessWidget {
           create: (_) => speaker ?? TtsSpeaker(),
           dispose: (_, speaker) => speaker.stop(),
         ),
+        Provider<UserDataCleaner>(
+          create: (_) => userDataCleaner ?? FirestoreUserDataCleaner(),
+        ),
         ChangeNotifierProvider(
           create: (context) => SoundProvider(
             context.read<Speaker>(),
@@ -98,6 +109,14 @@ class AppProviders extends StatelessWidget {
             userProfileRepository ?? FirestoreUserProfileRepository(),
           ),
         ),
+        Provider<DailyReminder>(
+          lazy: false,
+          create: (context) => DailyReminder(
+            reminderScheduler ?? LocalReminderScheduler(),
+            context.read<UserProfileProvider>(),
+          ),
+          dispose: (_, reminder) => reminder.dispose(),
+        ),
         ChangeNotifierProvider(
           create: (_) => LessonProvider(categories),
         ),
@@ -113,14 +132,15 @@ class AppProviders extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
+          // Quiz cập nhật tiến độ như flashcard: đúng thì lên một mức ghi nhớ,
+          // sai thì về mức 1 và ôn lại sớm. Cả hai đều tính vào chuỗi ngày.
           create: (context) {
             final progress = context.read<ProgressProvider>();
-            final profile = context.read<UserProfileProvider>();
             return QuizProvider(
               attempts,
               vocabulary,
               onAnswer: (vocabularyId, isCorrect) => isCorrect
-                  ? profile.recordStudyActivity()
+                  ? progress.markCorrect(vocabularyId)
                   : progress.markWrong(vocabularyId),
             );
           },

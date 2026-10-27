@@ -8,6 +8,7 @@ import '../../theme/app_styles.dart';
 import '../../widgets/choice_segments.dart';
 import '../../widgets/error_view.dart';
 import '../common/generic_screen.dart';
+import 'reminder_settings.dart';
 
 /// Tùy chọn học: mặt trước của thẻ, romaji, số câu quiz, nhắc học. Mỗi thay
 /// đổi được lưu ngay vào hồ sơ trên Firestore.
@@ -77,16 +78,7 @@ class StudyPreferencesScreen extends GenericScreen {
         ),
         const SizedBox(height: 24),
         Text('NHẮC NHỞ', style: palette.sectionLabel),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Nhắc học mỗi ngày'),
-          subtitle: const Text(
-            'Hiện lời nhắc trên trang chủ khi hôm nay bạn chưa học.',
-          ),
-          value: preferences.dailyReminder,
-          onChanged: (value) =>
-              _save(context, preferences.copyWith(dailyReminder: value)),
-        ),
+        const ReminderSettings(),
       ],
     );
   }

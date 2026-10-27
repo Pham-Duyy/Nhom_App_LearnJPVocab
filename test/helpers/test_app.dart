@@ -17,7 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../fakes/fake_auth_service.dart';
 import '../fakes/fake_music_player.dart';
+import '../fakes/fake_reminder_scheduler.dart';
 import '../fakes/fake_speaker.dart';
+import '../fakes/fake_user_data_cleaner.dart';
 
 /// Toàn bộ ứng dụng chạy trên dữ liệu mock và một người dùng ẩn danh giả,
 /// không cần Firebase.
@@ -30,6 +32,8 @@ Widget buildTestApp({
   MockUserWordRepository? userWordRepository,
   FakeSpeaker? speaker,
   FakeMusicPlayer? musicPlayer,
+  FakeUserDataCleaner? userDataCleaner,
+  FakeReminderScheduler? reminderScheduler,
   bool soundEnabled = false,
 }) {
   // Bộ nhớ thiết bị giả (màn chào đã xem...), mới ở mỗi test. Âm thanh mặc
@@ -55,6 +59,8 @@ Widget buildTestApp({
     userWordRepository: userWordRepository ?? MockUserWordRepository(),
     speaker: speaker ?? FakeSpeaker(),
     musicPlayer: musicPlayer ?? FakeMusicPlayer(),
+    userDataCleaner: userDataCleaner ?? FakeUserDataCleaner(),
+    reminderScheduler: reminderScheduler ?? FakeReminderScheduler(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }
