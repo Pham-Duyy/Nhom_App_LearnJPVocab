@@ -148,6 +148,106 @@ const diagrams = <Diagram>[
   ),
 ];
 
+typedef Evidence = ({String file, String title, List<String> notes});
+
+/// Ảnh Firebase Console trong docs/firebase (chụp thủ công).
+const firebaseEvidence = <Evidence>[
+  (
+    file: 'fb-01-authentication',
+    title: 'Tài khoản trong Firebase Authentication',
+    notes: [
+      'Mỗi người dùng có một UID; tài khoản khách (anonymous) được tạo tự '
+          'động khi mở ứng dụng lần đầu, tài khoản email/Google khi đăng ký.',
+    ],
+  ),
+  (
+    file: 'fb-02-categories',
+    title: 'Cấu trúc Cloud Firestore và collection categories',
+    notes: [
+      'Bốn collection gốc: categories, lessons, vocabularies (nội dung học '
+          'dùng chung) và users (dữ liệu riêng của từng người).',
+      'Document cat_family là bản lưu của đối tượng Category qua toMap().',
+    ],
+  ),
+  (
+    file: 'fb-03-lessons',
+    title: 'Collection lessons: quan hệ bài học thuộc chủ đề',
+    notes: [
+      'Trường categoryId = "cat_family" nối bài học với chủ đề (quan hệ một '
+          'chủ đề có nhiều bài học); vocabularyCount = 5 là số từ của bài.',
+    ],
+  ),
+  (
+    file: 'fb-04-vocabularies',
+    title: 'Collection vocabularies: một từ vựng',
+    notes: [
+      'Các trường kanji, kana, romaji, meaning, câu ví dụ và lessonId tương '
+          'ứng đúng các thuộc tính của lớp Vocabulary (ORM).',
+    ],
+  ),
+  (
+    file: 'fb-05-ho-so-moi',
+    title: 'Hồ sơ của tài khoản mới, chưa học',
+    notes: [
+      'currentStreak = 0, lastStudyDate = null và chưa có collection con '
+          'progress: người dùng chưa học từ nào.',
+    ],
+  ),
+  (
+    file: 'fb-06-ho-so-da-hoc',
+    title: 'Hồ sơ của tài khoản đã học nhiều ngày',
+    notes: [
+      'So với tài khoản mới ở hình trên: khi học, ứng dụng cập nhật '
+          'lastStudyDate và chuỗi ngày '
+          '(longestStreak = 2), đồng thời tạo hai collection con progress và '
+          'quizAttempts dưới users/{uid}.',
+    ],
+  ),
+  (
+    file: 'fb-07-progress-truoc',
+    title: 'TRƯỚC khi học bài "Thành viên gia đình" (users/{uid}/progress)',
+    notes: [
+      'Mỗi từ đã học là một document. Bài "Thành viên gia đình" gồm 5 từ '
+          'v_family_1 đến v_family_5; lúc này ngay sau my_…_54 là v_family_6, '
+          'tức là chưa có từ nào của bài này.',
+      'Ví dụ một từ đã học: v_food_1 trả lời đúng lúc 16:38 ngày 27/10 nên '
+          'memoryLevel = 2 và nextReviewAt = 30/10, đúng 3 ngày theo khoảng ôn '
+          'của mức 2.',
+      'Các document my_… là từ người học tự import vào Kho từ của tôi.',
+    ],
+  ),
+  (
+    file: 'fb-08-progress-sau',
+    title: 'SAU khi học bằng flashcard: có thêm v_family_1 đến v_family_4',
+    notes: [
+      'Cùng tài khoản, 10 phút sau: học bài bằng flashcard (bấm "Đã nhớ") '
+          'thì ứng dụng tạo ngay các document v_family_1 đến v_family_4.',
+      'v_family_1: lastReviewedAt = 16:48 ngày 27/10, memoryLevel = 2, '
+          'correctCount = 1, isLearned = true, nextReviewAt = 30/10 (+3 ngày).',
+      'Hồ sơ bên trái: currentStreak = 2, lastStudyDate = 2026-10-27.',
+    ],
+  ),
+  (
+    file: 'fb-09-progress-len-muc-3',
+    title: 'Trả lời đúng thêm lần nữa trong Quiz nhanh: lên mức 3',
+    notes: [
+      'v_family_4 được trả lời đúng ở flashcard rồi đúng tiếp trong Quiz '
+          'nhanh (16:48:53): correctCount = 2, reviewCount = 2, memoryLevel = 3.',
+      'nextReviewAt = 03/11, tức 7 ngày sau: khoảng ôn giãn ra theo mức ghi '
+          'nhớ (1 → 3 → 7 → 14 → 30 ngày). Quiz cập nhật tiến độ giống như '
+          'flashcard.',
+    ],
+  ),
+  (
+    file: 'fb-10-quiz-attempts',
+    title: 'Lịch sử quiz và bài thi (users/{uid}/quizAttempts)',
+    notes: [
+      'Mỗi lượt làm là một document: quick-… (Quiz nhanh), lesson-… (quiz '
+          'theo bài) và exam-… (Thi thử), lưu điểm và các đáp án đã chọn.',
+    ],
+  ),
+];
+
 const screenGroups = <ScreenGroup>[
   (
     title: 'Khởi động và tài khoản',
@@ -276,6 +376,37 @@ void main() {
     }
     body.write(_screenTable(group.screens, captions));
   }
+  body.write(_sectionBreak(portrait));
+
+  body
+    ..write(_heading('PHẦN 3. MINH CHỨNG FIREBASE', 1))
+    ..write(_paragraph(
+      'Ảnh chụp Firebase Console của project csdlck dùng chung của nhóm: '
+      'tài khoản trong Firebase Authentication, cấu trúc Cloud Firestore và '
+      'dữ liệu được ứng dụng ghi lại khi người học học và làm quiz.',
+    ));
+  for (final (index, evidence) in firebaseEvidence.indexed) {
+    body
+      ..write(_heading('3.${index + 1}. ${evidence.title}', 2))
+      ..write(_image(File('docs/firebase/${evidence.file}.png'),
+          maxWidthCm: portrait.contentWidth, maxHeightCm: 11, center: true))
+      ..write(_caption('Hình 3.${index + 1}. ${evidence.title}'));
+    for (final note in evidence.notes) {
+      body.write(_bullet(note));
+    }
+  }
+  body
+    ..write(_heading(
+        '3.${firebaseEvidence.length + 1}. Security Rules (firestore.rules)',
+        2))
+    ..write(_paragraph(
+      'Nội dung học chỉ được đọc, không ai ghi được từ ứng dụng; dữ liệu cá '
+      'nhân dưới users/{userId} chỉ chính chủ (uid trùng userId) mới đọc và '
+      'ghi được.',
+    ));
+  for (final line in File('firestore.rules').readAsLinesSync()) {
+    body.write(_code(line));
+  }
   body.write(_sectionBreak(portrait, last: true));
 
   final archive = Archive();
@@ -331,6 +462,13 @@ String _paragraph(String text,
 
 String _heading(String text, int level) =>
     '<w:p><w:pPr><w:pStyle w:val="Heading$level"/></w:pPr>${_run(text)}</w:p>';
+
+/// Một dòng mã nguồn: font đơn cách, giữ nguyên khoảng trắng đầu dòng.
+String _code(String line) => '<w:p><w:pPr><w:spacing w:after="0" '
+    'w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr>'
+    '<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:cs="Consolas"/>'
+    '<w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>'
+    '<w:t xml:space="preserve">${_esc(line)}</w:t></w:r></w:p>';
 
 String _caption(String text) =>
     '<w:p><w:pPr><w:pStyle w:val="Caption"/></w:pPr>${_run(text)}</w:p>';
