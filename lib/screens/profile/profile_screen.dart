@@ -6,6 +6,7 @@ import '../../models/achievement.dart';
 import '../../models/study_preferences.dart';
 import '../../models/user_profile.dart';
 import '../../providers/progress_provider.dart';
+import '../../providers/sound_provider.dart';
 import '../../providers/user_profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../services/welcome_store.dart';
@@ -23,13 +24,11 @@ class ProfileScreen extends GenericScreen {
   const ProfileScreen({Key? key}) : super(key: key);
 
   static const _themeLabels = {
-    ThemeMode.system: 'Theo máy',
     ThemeMode.light: 'Sáng',
     ThemeMode.dark: 'Tối',
   };
 
   static const _themeIcons = {
-    ThemeMode.system: Icons.brightness_auto_outlined,
     ThemeMode.light: Icons.light_mode_outlined,
     ThemeMode.dark: Icons.dark_mode_outlined,
   };
@@ -92,7 +91,7 @@ class ProfileScreen extends GenericScreen {
     final mode = await _showOptionsSheet<ThemeMode>(
       context,
       title: 'GIAO DIỆN',
-      options: ThemeMode.values,
+      options: UserProfile.themeModeOptions,
       selected: profile.themeMode,
       labelOf: (mode) => _themeLabels[mode]!,
       iconOf: (mode) => _themeIcons[mode]!,
@@ -148,6 +147,7 @@ class ProfileScreen extends GenericScreen {
     final themeMode = profile.themeMode;
     final preferences = profile.preferences;
     final email = context.watch<AuthController>().user?.email;
+    final sound = context.watch<SoundProvider>();
     final stats = watchLearningStats(context);
     final unlockedCount =
         Achievement.all.where((a) => a.isUnlocked(stats)).length;
@@ -236,6 +236,17 @@ class ProfileScreen extends GenericScreen {
               onTap: () => _pickTheme(context),
             ),
             _ProfileMenuItem(
+              icon: sound.enabled
+                  ? Icons.volume_up_outlined
+                  : Icons.volume_off_outlined,
+              title: 'Âm thanh',
+              value: sound.enabled ? '${(sound.volume * 100).round()}%' : 'Tắt',
+              onTap: () => showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => const _SoundSheet(),
+              ),
+            ),
+            _ProfileMenuItem(
               icon: Icons.person_outline_rounded,
               title: 'Tài khoản',
               value: email ?? 'Khách',
@@ -270,6 +281,70 @@ class ProfileScreen extends GenericScreen {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Cài đặt âm thanh: bật/tắt nhạc nền và lời chào, kéo thanh để chỉnh âm
+/// lượng. Thay đổi có hiệu lực ngay khi kéo.
+class _SoundSheet extends StatelessWidget {
+  const _SoundSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final sound = context.watch<SoundProvider>();
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+              child: Text('ÂM THANH', style: palette.sectionLabel),
+            ),
+            SwitchListTile(
+              value: sound.enabled,
+              onChanged: sound.setEnabled,
+              title: const Text('Bật âm thanh'),
+              subtitle: const Text(
+                'Nhạc nền nhẹ nhàng và lời chào tiếng Nhật khi vào app',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              child: Text(
+                'Âm lượng · ${(sound.volume * 100).round()}%',
+                style: AppTextStyles.cardTitle,
+              ),
+            ),
+            Row(
+              children: [
+                Icon(Icons.volume_mute_rounded, color: palette.textMuted),
+                Expanded(
+                  child: Slider(
+                    value: sound.volume,
+                    divisions: 10,
+                    label: '${(sound.volume * 100).round()}%',
+                    onChanged: sound.enabled ? sound.setVolume : null,
+                  ),
+                ),
+                Icon(Icons.volume_up_rounded, color: palette.textMuted),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: sound.enabled ? sound.preview : null,
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                label: const Text('Nghe thử lời chào'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -639,7 +714,8 @@ class _ProfileMenuItem extends StatelessWidget {
               ),
             ),
             if (value != null)
-              Flexible(
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
                 child: Text(
                   value!,
                   maxLines: 1,

@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/sound_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/chibi_mascot.dart';
+import '../../widgets/japan_scenery.dart';
 import 'auth_screen.dart';
 
 /// Màn khởi động: chỉ có Chibi chuyển động ở giữa màn hình, sau [duration]
-/// thì tự sang màn đăng ký/đăng nhập. Chạm vào màn hình để vào ngay.
+/// thì tự sang màn đăng ký/đăng nhập. Mở ra thì có tiếng chuông và Chibi đọc
+/// tên app. Chạm vào màn hình để vào ngay.
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
@@ -33,6 +37,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
+    context.read<SoundProvider>().introduce();
     _timer = Timer(WelcomeScreen.duration, _openAuth);
   }
 
@@ -69,17 +74,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.palette.backgroundTinted,
-      body: Semantics(
-        button: true,
-        label: 'ChibaKanji. Chạm để bắt đầu',
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _openAuth,
-          child: Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: _MascotStage(animation: _float),
+      body: WashiBackground(
+        child: Semantics(
+          button: true,
+          label: 'ChibaKanji. Chạm để bắt đầu',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _openAuth,
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: _MascotStage(animation: _float),
+              ),
             ),
           ),
         ),

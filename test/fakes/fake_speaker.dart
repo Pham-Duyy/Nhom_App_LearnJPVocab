@@ -14,6 +14,12 @@ class FakeSpeaker implements Speaker {
     spoken.add(text);
   }
 
+  /// Âm lượng được đặt gần nhất.
+  double volume = 1;
+
   @override
   Future<void> stop() async {}
+
+  @override
+  Future<void> setVolume(double volume) async => this.volume = volume;
 }

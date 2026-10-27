@@ -122,6 +122,8 @@ void main() {
     await tester.tap(find.text('Cá nhân'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Đăng xuất'), 200);
+    await tester.ensureVisible(find.text('Đăng xuất'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Đăng xuất'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Đăng xuất').last);

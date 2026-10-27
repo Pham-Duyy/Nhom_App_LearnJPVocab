@@ -19,6 +19,7 @@ import '../repositories/user_profile_repository.dart';
 import '../repositories/user_topic_repository.dart';
 import '../repositories/user_word_repository.dart';
 import '../repositories/vocabulary_repository.dart';
+import '../services/music_player.dart';
 import '../services/speaker.dart';
 import 'exam_provider.dart';
 import 'lesson_provider.dart';
@@ -27,6 +28,7 @@ import 'main_navigation_provider.dart';
 import 'my_vocabulary_provider.dart';
 import 'progress_provider.dart';
 import 'quiz_provider.dart';
+import 'sound_provider.dart';
 import 'user_profile_provider.dart';
 import 'vocabulary_provider.dart';
 
@@ -46,6 +48,7 @@ class AppProviders extends StatelessWidget {
     this.userTopicRepository,
     this.userWordRepository,
     this.speaker,
+    this.musicPlayer,
   }) : super(key: key);
 
   final Widget child;
@@ -58,6 +61,7 @@ class AppProviders extends StatelessWidget {
   final UserTopicRepository? userTopicRepository;
   final UserWordRepository? userWordRepository;
   final Speaker? speaker;
+  final MusicPlayer? musicPlayer;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +81,12 @@ class AppProviders extends StatelessWidget {
         Provider<Speaker>(
           create: (_) => speaker ?? TtsSpeaker(),
           dispose: (_, speaker) => speaker.stop(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SoundProvider(
+            context.read<Speaker>(),
+            musicPlayer ?? AssetMusicPlayer(),
+          )..load(),
         ),
         ChangeNotifierProvider(
           create: (_) => AuthController(authService ?? FirebaseAuthService())

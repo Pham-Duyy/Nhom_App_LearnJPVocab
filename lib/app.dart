@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/sound_provider.dart';
 import 'providers/user_profile_provider.dart';
 import 'screens/auth/welcome_screen.dart';
 import 'screens/auth_gate.dart';
@@ -22,6 +23,12 @@ class ChibaKanjiApp extends StatelessWidget {
       darkTheme: _buildTheme(AppPalette.dark, Brightness.dark),
       themeMode: context.select<UserProfileProvider, ThemeMode>(
         (profile) => profile.themeMode,
+      ),
+      // Trình duyệt chỉ cho phát tiếng sau lần chạm đầu tiên vào trang.
+      builder: (context, child) => Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => context.read<SoundProvider>().userInteracted(),
+        child: child,
       ),
       home: showWelcome
           ? const WelcomeScreen()

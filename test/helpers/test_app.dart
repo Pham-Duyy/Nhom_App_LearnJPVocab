@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../fakes/fake_auth_service.dart';
+import '../fakes/fake_music_player.dart';
 import '../fakes/fake_speaker.dart';
 
 /// Toàn bộ ứng dụng chạy trên dữ liệu mock và một người dùng ẩn danh giả,
@@ -28,9 +29,12 @@ Widget buildTestApp({
   MockUserTopicRepository? userTopicRepository,
   MockUserWordRepository? userWordRepository,
   FakeSpeaker? speaker,
+  FakeMusicPlayer? musicPlayer,
+  bool soundEnabled = false,
 }) {
-  // Bộ nhớ thiết bị giả (màn chào đã xem...), trống ở mỗi test.
-  SharedPreferences.setMockInitialValues({});
+  // Bộ nhớ thiết bị giả (màn chào đã xem...), mới ở mỗi test. Âm thanh mặc
+  // định tắt để lời chào không lẫn vào những gì FakeSpeaker ghi lại.
+  SharedPreferences.setMockInitialValues({'sound_enabled': soundEnabled});
   return AppProviders(
     authService: authService ??
         FakeAuthService(
@@ -50,6 +54,7 @@ Widget buildTestApp({
     userTopicRepository: userTopicRepository ?? MockUserTopicRepository(),
     userWordRepository: userWordRepository ?? MockUserWordRepository(),
     speaker: speaker ?? FakeSpeaker(),
+    musicPlayer: musicPlayer ?? FakeMusicPlayer(),
     child: ChibaKanjiApp(showWelcome: showWelcome),
   );
 }

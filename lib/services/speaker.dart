@@ -9,6 +9,9 @@ abstract class Speaker {
   Future<void> speak(String text);
 
   Future<void> stop();
+
+  /// Âm lượng giọng đọc, từ 0 (im lặng) đến 1.
+  Future<void> setVolume(double volume);
 }
 
 /// Máy không có giọng đọc tiếng Nhật.
@@ -51,6 +54,9 @@ class TtsSpeaker implements Speaker {
     await stopped.future.timeout(_stopTimeout, onTimeout: () {});
     _isSpeaking = false;
   }
+
+  @override
+  Future<void> setVolume(double volume) => _tts.setVolume(volume);
 
   void _markStopped() {
     _isSpeaking = false;

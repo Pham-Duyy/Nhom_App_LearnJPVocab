@@ -101,7 +101,14 @@ void main() {
     testWidgets('tắt nhắc học ở Cá nhân thì lời nhắc biến mất', (tester) async {
       await _pumpApp(tester);
       await _openProfileItem(tester, 'Nhắc học mỗi ngày');
-      expect(find.text('Tắt'), findsOneWidget);
+      final reminderRow = find
+          .ancestor(
+              of: find.text('Nhắc học mỗi ngày'), matching: find.byType(Row))
+          .first;
+      expect(
+        find.descendant(of: reminderRow, matching: find.text('Tắt')),
+        findsOneWidget,
+      );
 
       await _tap(tester, find.text('Ôn tập'));
       expect(find.textContaining('Hôm nay bạn chưa học'), findsNothing);
@@ -192,10 +199,11 @@ void main() {
     await _pumpApp(tester);
     await _tap(tester, find.text('Cá nhân'));
 
+    // Theo thứ tự từ trên xuống để chỉ cần cuộn xuống.
     for (final title in [
+      'Tùy chọn học',
       'Thành tích',
       'Lịch sử quiz',
-      'Tùy chọn học',
       'Tài khoản',
       'Hướng dẫn sử dụng',
     ]) {
