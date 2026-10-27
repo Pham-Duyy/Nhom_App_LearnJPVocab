@@ -1,0 +1,126 @@
+classDiagram
+    direction TB
+
+    class Repository~T, ID~ {
+        <<interface>>
+        +getAll() Future~List~T~~
+        +getById(id) Future~T?~
+        +getByIds(ids) Future~List~T~~
+        +save(item) Future~void~
+        +delete(id) Future~void~
+    }
+    class ProgressRepository {
+        <<interface>>
+    }
+    class QuizAttemptRepository {
+        <<interface>>
+    }
+    class UserTopicRepository {
+        <<interface>>
+    }
+    class UserWordRepository {
+        <<interface>>
+    }
+    class VocabularyRepository {
+        <<interface>>
+        +getByLesson(lessonId) Future~List~Vocabulary~~
+        +search(keyword) Future~List~Vocabulary~~
+    }
+    class CategoryRepository {
+        <<interface>>
+        +getCategories() Future~List~Category~~
+        +getLessonsByCategory(categoryId) Future~List~Lesson~~
+        +getAllLessons() Future~List~Lesson~~
+    }
+    class UserProfileRepository {
+        <<interface>>
+        +load() Future~UserProfile?~
+        +save(profile) Future~void~
+    }
+    class UserDataCleaner {
+        <<interface>>
+        +deleteAll() Future~void~
+    }
+
+    class FirestoreRepository~T~ {
+        -path() String?
+        -fromMap(map) T
+        -toMap(item) Map
+        -idOf(item) String
+        +userCollection(name)$ String?
+    }
+    class InMemoryRepository~T~ {
+        -Map~String, T~ store
+    }
+    class CombinedRepository~T~ {
+        -Repository primary
+        -Repository secondary
+        -isSecondary(id) bool
+    }
+    class CombinedVocabularyRepository {
+        +getByLesson(lessonId) Future~List~Vocabulary~~
+        +search(keyword) Future~List~Vocabulary~~
+    }
+    class FirestoreProgressRepository {
+        collection users/uid/progress
+    }
+    class FirestoreQuizAttemptRepository {
+        collection users/uid/quizAttempts
+    }
+    class FirestoreUserTopicRepository {
+        collection users/uid/topics
+    }
+    class FirestoreUserWordRepository {
+        collection users/uid/words
+    }
+    class FirestoreVocabularyRepository {
+        collection vocabularies
+        +getByLesson(lessonId) Future~List~Vocabulary~~
+        +search(keyword) Future~List~Vocabulary~~
+    }
+    class FirestoreCategoryRepository {
+        collection categories, lessons
+        +getCategories() Future~List~Category~~
+        +getLessonsByCategory(categoryId) Future~List~Lesson~~
+        +getAllLessons() Future~List~Lesson~~
+    }
+    class FirestoreUserProfileRepository {
+        document users/uid
+        +load() Future~UserProfile?~
+        +save(profile) Future~void~
+    }
+    class FirestoreUserDataCleaner {
+        xóa users/uid và 4 collection con
+        +deleteAll() Future~void~
+    }
+
+    Repository <|-- ProgressRepository : T = Progress
+    Repository <|-- QuizAttemptRepository : T = QuizAttempt
+    Repository <|-- UserTopicRepository : T = UserTopic
+    Repository <|-- UserWordRepository : T = Vocabulary
+    Repository <|-- VocabularyRepository : T = Vocabulary
+
+    Repository <|.. FirestoreRepository
+    Repository <|.. InMemoryRepository
+    Repository <|.. CombinedRepository
+
+    FirestoreRepository <|-- FirestoreProgressRepository
+    FirestoreRepository <|-- FirestoreQuizAttemptRepository
+    FirestoreRepository <|-- FirestoreUserTopicRepository
+    FirestoreRepository <|-- FirestoreUserWordRepository
+    FirestoreRepository <|-- FirestoreVocabularyRepository
+    ProgressRepository <|.. FirestoreProgressRepository
+    QuizAttemptRepository <|.. FirestoreQuizAttemptRepository
+    UserTopicRepository <|.. FirestoreUserTopicRepository
+    UserWordRepository <|.. FirestoreUserWordRepository
+    VocabularyRepository <|.. FirestoreVocabularyRepository
+
+    CombinedRepository <|-- CombinedVocabularyRepository : T = Vocabulary
+    VocabularyRepository <|.. CombinedVocabularyRepository
+    CombinedVocabularyRepository o-- FirestoreVocabularyRepository : primary (từ chung)
+    CombinedVocabularyRepository o-- FirestoreUserWordRepository : secondary (từ tự thêm)
+
+    CategoryRepository <|.. FirestoreCategoryRepository
+    UserProfileRepository <|.. FirestoreUserProfileRepository
+    FirestoreUserProfileRepository *-- FirestoreRepository : users
+    UserDataCleaner <|.. FirestoreUserDataCleaner

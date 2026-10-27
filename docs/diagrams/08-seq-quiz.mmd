@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor U as Người dùng
+    participant QS as QuizScreen
+    participant QP as QuizProvider
+    participant QG as QuizGenerator
+    participant PP as ProgressProvider
+    participant RS as QuizResultScreen
+    participant FS as Cloud Firestore
+
+    U->>QS: Bấm "Quiz nhanh"
+    QS->>QP: startWithWordIds(id các từ đã học)
+    QP->>FS: VocabularyRepository.getByIds(ids)
+    FS-->>QP: List<Vocabulary>
+    QP->>QG: generate(words, maxQuestions)
+    alt Chưa đủ từ đã học
+        QG-->>QP: Danh sách rỗng
+        QP-->>U: "Hãy học ít nhất 4 từ để làm quiz"
+    else Đủ từ
+        QG-->>QP: Câu hỏi 4 dạng (có câu nghe)
+        loop Mỗi câu hỏi
+            U->>QS: Chọn một đáp án
+            QS->>QP: answer(optionIndex)
+            QP->>PP: onAnswer(vocabularyId, đúng/sai)
+            PP->>FS: markCorrect / markWrong rồi lưu Progress
+            QP-->>QS: Hiện đúng/sai và giải thích
+            U->>QS: "Câu tiếp theo" / "Xem kết quả"
+            QS->>QP: next()
+        end
+        QP->>QP: Tạo QuizAttempt (điểm, đáp án đã chọn)
+        QP->>FS: QuizAttemptRepository.save() vào users/{uid}/quizAttempts
+        QP-->>RS: result, wrongQuestions
+        RS-->>U: Điểm, danh sách từ sai
+        opt Ôn lại từ sai
+            U->>RS: "Ôn lại N từ sai bằng flashcard"
+            RS->>RS: VocabularyProvider.loadReviewWords(ids), mở FlashcardScreen
+        end
+    end

@@ -1,0 +1,44 @@
+sequenceDiagram
+    autonumber
+    actor U as Người dùng
+    participant CS as CategoryScreen
+    participant LP as LessonProvider
+    participant LS as LessonScreen
+    participant VP as VocabularyProvider
+    participant FC as FlashcardScreen
+    participant PP as ProgressProvider
+    participant PR as Progress
+    participant UP as UserProfileProvider
+    participant FS as Cloud Firestore
+
+    U->>CS: Chọn cấp độ và chủ đề
+    CS->>LP: selectCategory(category)
+    LP->>FS: getLessonsByCategory(category.id)
+    FS-->>LP: List<Lesson>
+    LP-->>LS: Danh sách bài học
+    U->>LS: Chọn bài học
+    LS->>VP: loadByLesson(lesson.id)
+    VP->>FS: getByLesson(lessonId)
+    FS-->>VP: List<Vocabulary>
+    LS->>FC: Mở flashcard
+    loop Mỗi thẻ cho đến hết bài
+        U->>FC: Lật thẻ, vuốt phải (Nhớ) hoặc trái (Chưa nhớ)
+        alt Nhớ
+            FC->>PP: markCorrect(vocabularyId)
+            PP->>PR: markCorrect(now): lên 1 mức
+        else Chưa nhớ
+            FC->>PP: markWrong(vocabularyId)
+            PP->>PR: markWrong(now): về mức 1
+        end
+        PP->>FS: save(progress) vào users/{uid}/progress
+        alt Lưu thất bại
+            FS-->>PP: Lỗi
+            PP-->>FC: Ném lỗi
+            FC-->>U: Giữ thẻ, báo "Không thể lưu tiến độ"
+        else Lưu thành công
+            PP-->>UP: onStudyActivity()
+            UP->>UP: recordStudyDay(now): cập nhật chuỗi ngày
+            FC->>VP: nextCard()
+        end
+    end
+    FC-->>U: Kết quả phiên học (số thẻ nhớ / chưa nhớ)

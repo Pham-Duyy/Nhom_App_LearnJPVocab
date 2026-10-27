@@ -1,0 +1,21 @@
+flowchart TD
+    A([Mở tab Thi thử]) --> B[Chọn phạm vi: cấp độ / Từ đã học / Tất cả<br/>chủ đề, số câu]
+    B --> C{Phạm vi đủ từ để ra đề?}
+    C -- Không --> B
+    C -- Có --> D[ExamProvider.start: tạo đề bằng QuizGenerator<br/>đặt thời gian theo số câu, chạy đồng hồ]
+    D --> E[Hiện câu hiện tại và thời gian còn lại]
+    E --> F{Người dùng làm gì?}
+    F -- Chọn đáp án --> G[select: lưu hoặc đổi đáp án] --> E
+    F -- Câu trước / câu sau / bảng câu --> H[goTo index] --> E
+    F -- Thoát giữa chừng --> X[cancel: dừng giờ, không lưu] --> Z([Kết thúc])
+    F -- Nộp bài --> S
+    E -. mỗi giây .-> T[tick: trừ 1 giây]
+    T --> U{Hết giờ?}
+    U -- Chưa --> E
+    U -- Rồi --> S[submit: chấm điểm<br/>câu chưa làm tính là sai]
+    S --> R[(Lưu QuizAttempt vào<br/>users/uid/quizAttempts)]
+    R --> P{Đạt từ 60%?}
+    P -- Có --> Q[Đóng dấu 合格]
+    P -- Không --> N[Đóng dấu 不合格]
+    Q --> Z
+    N --> Z

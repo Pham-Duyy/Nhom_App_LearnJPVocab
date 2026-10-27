@@ -1,0 +1,150 @@
+classDiagram
+    direction LR
+
+    class LatestLoadGuard {
+        <<mixin>>
+        -int loadGeneration
+        +startLoad() bool Function()
+    }
+
+    class AuthController {
+        <<ChangeNotifier>>
+        +AuthStatus status
+        +AppAuthUser? user
+        +initialize() Future~void~
+        +registerWithEmail(email, password) Future~String?~
+        +signInWithEmail(email, password) Future~String?~
+        +signInWithGoogle() Future~String?~
+        +changePassword(current, next) Future~String?~
+        +deleteAccount(password, deleteData) Future~String?~
+        +signOut() Future~void~
+    }
+    class AuthService {
+        <<interface>>
+        +signInAnonymously() Future~AppAuthUser~
+        +registerWithEmail(email, password) Future~AppAuthUser~
+        +signInWithGoogle() Future~AppAuthUser~
+        +reauthenticate(password) Future~void~
+        +deleteAccount() Future~void~
+    }
+    class FirebaseAuthService
+
+    class ProgressProvider {
+        <<ChangeNotifier>>
+        +List~Progress~ progressList
+        +totalLearned int
+        +loadProgress() Future~void~
+        +markCorrect(vocabularyId) Future~void~
+        +markWrong(vocabularyId) Future~void~
+        +getDueForReview(now) List~Progress~
+        +toggleFavorite(vocabularyId) Future~String?~
+    }
+    class QuizProvider {
+        <<ChangeNotifier>>
+        +List~Question~ questions
+        +QuizAttempt? result
+        +start(quizId, title, words) bool
+        +startWithWordIds(quizId, title, ids) Future~String?~
+        +answer(optionIndex)
+        +next() Future~void~
+        +loadHistory() Future~void~
+    }
+    class ExamProvider {
+        <<ChangeNotifier>>
+        +Duration remaining
+        +start(level, words, questionCount) bool
+        +select(optionIndex)
+        +tick()
+        +submit() Future~void~
+    }
+    class VocabularyProvider {
+        <<ChangeNotifier>>
+        +List~Vocabulary~ words
+        +loadByLesson(lessonId) Future~void~
+        +loadReviewWords(ids) Future~void~
+        +nextCard()
+    }
+    class LessonProvider {
+        <<ChangeNotifier>>
+        +List~Category~ categories
+        +List~Lesson~ lessons
+        +loadCategories() Future~void~
+        +selectCategory(category) Future~void~
+    }
+    class LibraryProvider {
+        <<ChangeNotifier>>
+        +List~Vocabulary~ words
+        +load() Future~void~
+    }
+    class MyVocabularyProvider {
+        <<ChangeNotifier>>
+        +List~UserTopic~ topics
+        +load() Future~void~
+        +createTopic(name) Future~String?~
+        +addWord(draft, topicId) Future~String?~
+        +importWords(drafts) Future
+    }
+    class UserProfileProvider {
+        <<ChangeNotifier>>
+        +UserProfile profile
+        +load() Future~void~
+        +recordStudyActivity() Future~void~
+        +setPreferences(preferences) Future~void~
+        +setThemeMode(mode) Future~void~
+    }
+    class SoundProvider {
+        <<ChangeNotifier>>
+        +bool enabled
+        +double volume
+        +introduce() Future~void~
+        +welcome() Future~void~
+        +setVolume(volume) Future~void~
+    }
+    class DailyReminder {
+        +requestPermission() Future~bool~
+        -sync()
+    }
+    class QuizGenerator {
+        +generate(words, quizId, maxQuestions) List~Question~
+    }
+    class Speaker {
+        <<interface>>
+        +speak(text) Future~void~
+    }
+    class MusicPlayer {
+        <<interface>>
+        +play(volume) Future~void~
+    }
+    class ReminderScheduler {
+        <<interface>>
+        +scheduleDaily(hour, minute) Future~void~
+        +cancel() Future~void~
+    }
+
+    LatestLoadGuard <|.. ProgressProvider
+    LatestLoadGuard <|.. QuizProvider
+    LatestLoadGuard <|.. LibraryProvider
+    LatestLoadGuard <|.. MyVocabularyProvider
+    LatestLoadGuard <|.. UserProfileProvider
+
+    AuthController --> AuthService
+    AuthService <|.. FirebaseAuthService
+    ProgressProvider --> ProgressRepository
+    ProgressProvider ..> UserProfileProvider : onStudyActivity
+    QuizProvider --> QuizAttemptRepository
+    QuizProvider --> VocabularyRepository
+    QuizProvider --> QuizGenerator
+    QuizProvider ..> ProgressProvider : onAnswer
+    ExamProvider --> QuizAttemptRepository
+    ExamProvider --> QuizGenerator
+    VocabularyProvider --> VocabularyRepository
+    LessonProvider --> CategoryRepository
+    LibraryProvider --> CategoryRepository
+    LibraryProvider --> VocabularyRepository
+    MyVocabularyProvider --> UserTopicRepository
+    MyVocabularyProvider --> UserWordRepository
+    UserProfileProvider --> UserProfileRepository
+    SoundProvider --> Speaker
+    SoundProvider --> MusicPlayer
+    DailyReminder --> ReminderScheduler
+    DailyReminder --> UserProfileProvider

@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Bản Word tổng hợp sơ đồ và ảnh màn hình: tạo lại bằng tool/make_report_docx.dart
+docs/*.docx

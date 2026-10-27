@@ -17,10 +17,12 @@
 Các chức năng khác:
 
 - **Flashcard:** lật thẻ, vuốt hoặc bấm Nhớ/Chưa nhớ, nghe phát âm, xem kết quả phiên học.
-- **Quiz:** 4 dạng câu hỏi (kana → nghĩa, nghĩa → kana, kanji → nghĩa, nghe → từ), giải thích đáp án, lưu lịch sử.
+- **Quiz:** 4 dạng câu hỏi (kana → nghĩa, nghĩa → kana, kanji → nghĩa, nghe → từ), giải thích đáp án, lưu lịch sử; đúng thì từ lên mức ghi nhớ, sai thì về mức 1; ôn lại ngay các từ sai bằng flashcard.
 - **Ôn tập ngắt quãng:** 5 mức ghi nhớ, lịch ôn 1/3/7/14/30 ngày.
 - **Kho từ của tôi:** tự tạo chủ đề, thêm từ, import từ file Excel, CSV, PDF hoặc dán danh sách; từ tự thêm học được như từ có sẵn.
-- **Tài khoản:** dùng thử không cần đăng ký (khách), đăng ký/đăng nhập bằng email hoặc Google; tài khoản khách được liên kết nên không mất tiến độ.
+- **Tài khoản:** dùng thử không cần đăng ký (khách), đăng ký/đăng nhập bằng email hoặc Google; tài khoản khách được liên kết nên không mất tiến độ; đổi mật khẩu; xóa tài khoản kèm toàn bộ dữ liệu học.
+- **Nhắc học:** thông báo mỗi ngày vào giờ tự chọn (Android/iOS) và lời nhắc trên trang chủ.
+- **Âm thanh:** lời giới thiệu và lời chào tiếng Nhật theo giờ, nhạc nền chuông gió; bật/tắt và chỉnh âm lượng.
 - **Nội dung:** 150 từ N5 (9 chủ đề) và 60 từ chuyên ngành (Chế biến thực phẩm, Xây dựng, Điều dưỡng).
 
 ## Công nghệ
@@ -29,7 +31,7 @@ Các chức năng khác:
 - Provider để quản lý trạng thái
 - Repository tổng quát `Repository<T, ID>` với các bản Firestore, bộ nhớ (test) và `CombinedRepository<T>`
 - Firebase Authentication và Cloud Firestore
-- `flutter_tts` (phát âm), `shared_preferences` (ghi nhớ trên thiết bị)
+- `flutter_tts` (phát âm), `audioplayers` (nhạc nền), `flutter_local_notifications` (nhắc học), `shared_preferences` (ghi nhớ trên thiết bị)
 - Flutter Test: hơn 300 test, xem [test/README.md](test/README.md)
 
 ## Cấu trúc thư mục
@@ -43,6 +45,7 @@ Các chức năng khác:
 | [`lib/widgets`](lib/widgets) | Widget dùng chung |
 | [`lib/data`](lib/data) | Dữ liệu mẫu, bộ tạo câu hỏi quiz, đọc file import, nạp dữ liệu |
 | [`test`](test) | Unit test và widget test |
+| [`docs`](docs) | Sơ đồ thiết kế ([xem](docs/so-do-thiet-ke.md)), ảnh màn hình ([`docs/screenshots`](docs/screenshots)) và bản Word tổng hợp |
 
 ## Chạy dự án
 
@@ -94,7 +97,9 @@ Chạy bình thường (không có cờ) thì app không ghi gì vào nội dung
 - [x] Kho từ của tôi và import từ vựng
 - [x] Từ vựng chuyên ngành
 - [x] CI chạy analyze và test
-- [ ] Thông báo nhắc học theo lịch (hiện nhắc ngay trên trang chủ)
+- [x] Thông báo nhắc học theo lịch (Android/iOS; web chỉ nhắc trên trang chủ)
+- [x] Đổi mật khẩu, xóa tài khoản và dữ liệu
+- [x] Âm thanh: lời chào tiếng Nhật, nhạc nền, chỉnh âm lượng
 - [ ] Nội dung N4, N3
 
 ---

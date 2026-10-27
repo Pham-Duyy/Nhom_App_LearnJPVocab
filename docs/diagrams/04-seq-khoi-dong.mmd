@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor U as Người dùng
+    participant M as main()
+    participant FB as Firebase
+    participant WS as WelcomeStore
+    participant AC as AuthController
+    participant AS as FirebaseAuthService
+    participant AG as AuthGate
+    participant P as Các Provider
+    participant FS as Cloud Firestore
+
+    U->>M: Mở ứng dụng
+    M->>FB: Firebase.initializeApp()
+    alt Khởi tạo lỗi (mất mạng, sai cấu hình)
+        M-->>U: Màn hình lỗi khởi động
+    end
+    M->>WS: hasSeen()
+    WS-->>M: đã qua màn chào chưa
+    M->>AC: initialize()
+    AC->>AS: currentUser
+    alt Chưa đăng nhập
+        AC->>AS: signInAnonymously()
+        AS->>FB: Tạo tài khoản khách
+        FB-->>AS: uid mới
+    end
+    AS-->>AC: AppAuthUser
+    AC->>AC: status = authenticated
+    AC-->>AG: notifyListeners()
+    AG->>P: _loadUserDataFor(uid)
+    par Tải song song
+        P->>FS: LessonProvider.loadCategories()
+        P->>FS: UserProfileProvider.load()
+        P->>FS: ProgressProvider.loadProgress()
+        P->>FS: QuizProvider.loadHistory()
+    end
+    FS-->>P: Dữ liệu của đúng uid
+    P-->>U: Trang chủ: số từ đến hạn, biểu đồ ghi nhớ
