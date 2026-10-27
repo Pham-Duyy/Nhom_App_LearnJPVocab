@@ -174,8 +174,8 @@ Chạy bình thường (không có cờ) thì app không ghi gì vào nội dung
 
 | Thành viên | MSSV | Công việc |
 |---|---|---|
-| Phạm Khương Duy | … | Kiến trúc dữ liệu, Provider, Firebase, học, quiz, thi thử, kho từ, giao diện, âm thanh, kiểm thử |
-| Nguyễn Vũ Trường Sơn | … | Hỗ trợ phát triển, flashcard lật thẻ, tài liệu báo cáo |
+| Phạm Khương Duy | 23010743 | Kiến trúc dữ liệu, Provider, Firebase, học, quiz, thi thử, kho từ, giao diện, âm thanh, kiểm thử |
+| Nguyễn Vũ Trường Sơn |24100468 | Hỗ trợ phát triển, flashcard lật thẻ, tài liệu báo cáo |
 
 > Nhóm điền mã số sinh viên và phần đóng góp chi tiết của từng thành viên trước khi nộp bài.
 
@@ -196,4 +196,3 @@ Chạy bình thường (không có cờ) thì app không ghi gì vào nội dung
 
 ---
 
-Đồ án môn Lập trình thiết bị di động — Trường Đại học Phenikaa.
