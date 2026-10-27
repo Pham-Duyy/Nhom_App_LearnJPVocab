@@ -13,6 +13,9 @@ class UserProfile {
   static const dailyGoalOptions = [5, 10, 15, 20];
   static const defaultDailyGoal = 10;
 
+  /// Chỉ có giao diện Sáng (mặc định) và Tối, không theo máy.
+  static const themeModeOptions = [ThemeMode.light, ThemeMode.dark];
+
   final String displayName;
   final int dailyGoal;
   final ThemeMode themeMode;
@@ -31,7 +34,7 @@ class UserProfile {
   const UserProfile({
     this.displayName = defaultDisplayName,
     this.dailyGoal = defaultDailyGoal,
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.light,
     this.currentStreak = 0,
     this.lastStudyDate,
     this.longestStreak = 0,
@@ -132,9 +135,10 @@ class UserProfile {
           : defaultDisplayName,
       dailyGoal:
           dailyGoalOptions.contains(goal) ? goal as int : defaultDailyGoal,
-      themeMode: ThemeMode.values.firstWhere(
+      // Hồ sơ cũ lưu "system" thì chuyển về Sáng.
+      themeMode: themeModeOptions.firstWhere(
         (mode) => mode.name == map['themeMode'],
-        orElse: () => ThemeMode.system,
+        orElse: () => ThemeMode.light,
       ),
       currentStreak: currentStreak,
       lastStudyDate: lastDate is String ? DateTime.tryParse(lastDate) : null,

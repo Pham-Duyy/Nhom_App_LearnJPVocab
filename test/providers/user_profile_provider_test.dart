@@ -127,7 +127,7 @@ void main() {
       final repository = MockUserProfileRepository();
       final provider = UserProfileProvider(repository);
 
-      await provider.setThemeMode(ThemeMode.system);
+      await provider.setThemeMode(ThemeMode.light);
       await provider.updateDisplayName(UserProfile.defaultDisplayName);
 
       expect(repository.saveCount, 0);
@@ -139,7 +139,7 @@ void main() {
 
       await provider.setThemeMode(ThemeMode.dark);
 
-      expect(provider.themeMode, ThemeMode.system);
+      expect(provider.themeMode, ThemeMode.light);
       expect(provider.errorMessage, isNotNull);
 
       provider.clearError();
