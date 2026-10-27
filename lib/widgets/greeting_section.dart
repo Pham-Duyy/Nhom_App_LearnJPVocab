@@ -3,24 +3,15 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
 
-/// Lời chào ở đầu trang chủ: câu chào tiếng Nhật theo giờ trong ngày, rồi
-/// "Chào [name]!".
+/// Lời chào ở đầu trang chủ: "Chào [name]!" cỡ lớn và một câu [message]
+/// ngắn. Câu chào tiếng Nhật được đọc thành tiếng (SoundProvider), không
+/// hiện chữ.
 class GreetingSection extends StatelessWidget {
-  const GreetingSection({Key? key, required this.name, this.now})
+  const GreetingSection({Key? key, required this.name, this.message})
       : super(key: key);
 
   final String name;
-
-  /// Thời điểm để chọn câu chào; mặc định là bây giờ (test truyền giờ cố
-  /// định).
-  final DateTime? now;
-
-  /// おはよう trước 11 giờ, こんにちは tới 18 giờ, sau đó こんばんは.
-  static String japaneseGreeting(DateTime time) {
-    if (time.hour < 11) return 'おはよう';
-    if (time.hour < 18) return 'こんにちは';
-    return 'こんばんは';
-  }
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +20,16 @@ class GreetingSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          japaneseGreeting(now ?? DateTime.now()),
-          style: AppTextStyles.japaneseDisplay.copyWith(
-            fontSize: 16,
-            letterSpacing: 2,
-            color: palette.stamp,
+          'Chào $name!',
+          style: AppTextStyles.pageTitle.copyWith(
+            fontSize: 28,
+            color: palette.primaryStrong,
           ),
         ),
-        const SizedBox(height: 4),
-        Text('Chào $name!', style: AppTextStyles.pageTitle),
+        if (message != null) ...[
+          const SizedBox(height: 4),
+          Text(message!, style: palette.body.copyWith(fontSize: 14)),
+        ],
       ],
     );
   }

@@ -8,6 +8,8 @@ import '../../providers/vocabulary_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
+import '../../widgets/chibi_mascot.dart';
+import '../../widgets/japan_scenery.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/greeting_section.dart';
 import '../../widgets/memory_card.dart';
@@ -79,29 +81,22 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
     final progressProvider = context.watch<ProgressProvider>();
     final profile = context.watch<UserProfileProvider>();
 
+    final dueCount = progressProvider.isLoading
+        ? 0
+        : progressProvider.getDueForReview().length;
+
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.page,
-        16,
-        AppSpacing.page,
-        28,
-      ),
+      padding: const EdgeInsets.only(bottom: 28),
       children: [
-        Row(
-          children: [
-            const Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: BrandLogo(size: 30),
-              ),
-            ),
-            StreakChip(days: profile.streak),
-          ],
+        _HomeHeader(
+          name: profile.displayName,
+          streak: profile.streak,
+          dueCount: dueCount,
         ),
-        const SizedBox(height: 20),
-        GreetingSection(name: profile.displayName),
-        const SizedBox(height: 22),
-        _buildProgressSection(progressProvider),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+          child: _buildProgressSection(progressProvider),
+        ),
       ],
     );
   }
@@ -136,8 +131,13 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (showReminder) ...[
-          _StudyReminder(streak: profile.streak),
-          const SizedBox(height: 16),
+          _StudyReminder(
+            streak: profile.streak,
+            onTap: () => context
+                .read<MainNavigationProvider>()
+                .selectTab(MainNavigationProvider.learnTab),
+          ),
+          const SizedBox(height: 12),
         ],
         ReviewCard(
           dueCount: dueCount,
@@ -147,7 +147,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
           dailyGoal: profile.dailyGoal,
           onReview: () => _startReview(provider),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 12),
         MemoryCard(
           totalLearned: provider.totalLearned,
           levelCounts: [
@@ -161,7 +161,7 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
               .read<MainNavigationProvider>()
               .selectTab(MainNavigationProvider.wordsTab),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 12),
         _ActionTile(
           kanji: '問',
           title: 'Quiz nhanh',
@@ -173,37 +173,153 @@ class _ReviewHomePageState extends GenericScreenState<ReviewHomePage> {
   }
 }
 
-/// Lời nhắc khi hôm nay chưa học (tắt được trong Tùy chọn học).
-class _StudyReminder extends StatelessWidget {
-  const _StudyReminder({required this.streak});
+/// Đầu trang chủ tràn hết chiều ngang: tranh hoa anh đào và núi Phú Sĩ,
+/// logo, dấu chuỗi ngày, lời chào và Chibi (ngủ khi đã hết từ cần ôn).
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader({
+    required this.name,
+    required this.streak,
+    required this.dueCount,
+  });
 
+  final String name;
   final int streak;
+  final int dueCount;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: palette.accentSurface,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: palette.accentBorder),
-      ),
-      child: Row(
+    final resting = dueCount == 0;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 196),
+      child: Stack(
         children: [
-          Icon(Icons.notifications_active_outlined, color: palette.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              streak > 0
-                  ? 'Hôm nay bạn chưa học. Ôn vài thẻ để giữ chuỗi '
-                      '$streak ngày nhé!'
-                  : 'Hôm nay bạn chưa học. Chỉ cần vài thẻ là bắt đầu '
-                      'một chuỗi ngày mới!',
-              style: palette.body,
+          const Positioned.fill(child: HomeScenery()),
+          Positioned(
+            right: 8,
+            bottom: 4,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                // Đệm ngồi zabuton màu chàm, nằm sau Chibi.
+                Container(
+                  width: 92,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: palette.primary.withValues(alpha: 0.85),
+                    borderRadius: const BorderRadius.all(
+                      Radius.elliptical(46, 11),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: ChibiMascot(
+                    size: 96,
+                    mood: resting ? ChibiMood.sleepy : ChibiMood.happy,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.page,
+              10,
+              AppSpacing.page,
+              8,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: BrandLogo(size: 34),
+                      ),
+                    ),
+                    StreakChip(days: streak),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                FractionallySizedBox(
+                  widthFactor: 0.7,
+                  child: GreetingSection(
+                    name: name,
+                    message: resting
+                        ? 'Hết từ cần ôn rồi, Chibi đi ngủ một chút.'
+                        : 'Có $dueCount từ đang chờ, ôn cùng Chibi nhé!',
+                  ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Lời nhắc khi hôm nay chưa học (tắt được trong Tùy chọn học); chạm để
+/// sang Học mới.
+class _StudyReminder extends StatelessWidget {
+  const _StudyReminder({required this.streak, required this.onTap});
+
+  final int streak;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: palette.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        side: BorderSide(color: palette.accentBorder),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: palette.accentSurface,
+                  child: Icon(
+                    Icons.notifications_active_outlined,
+                    size: 20,
+                    color: palette.primary,
+                  ),
+                ),
+                VerticalDivider(
+                  width: 24,
+                  indent: 4,
+                  endIndent: 4,
+                  color: palette.accentBorder,
+                ),
+                Expanded(
+                  child: Text(
+                    streak > 0
+                        ? 'Hôm nay bạn chưa học. Ôn vài thẻ để giữ chuỗi '
+                            '$streak ngày nhé!'
+                        : 'Hôm nay bạn chưa học. Chỉ cần vài thẻ là bắt đầu '
+                            'một chuỗi ngày mới!',
+                    style: palette.body.copyWith(fontSize: 13),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: palette.textMuted),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

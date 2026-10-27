@@ -10,6 +10,7 @@ import '../../theme/app_colors.dart';
 import '../../services/welcome_store.dart';
 import '../../theme/app_styles.dart';
 import '../../widgets/brand_logo.dart';
+import '../../widgets/japan_scenery.dart';
 import '../common/generic_screen.dart';
 import '../auth_gate.dart';
 import '../main_screen.dart';
@@ -169,132 +170,134 @@ class _AuthScreenState extends GenericScreenState<AuthScreen> {
   Widget buildBody(BuildContext context) {
     final palette = context.palette;
     return Scaffold(
-      backgroundColor: palette.background,
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
-            children: [
-              // Mở từ màn khởi động thì không có màn nào phía sau để quay lại.
-              SizedBox(
-                height: 48,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Navigator.of(context).canPop()
-                      ? IconButton(
-                          tooltip: 'Quay lại',
-                          onPressed: () => Navigator.of(context).maybePop(),
-                          icon: const Icon(Icons.arrow_back_rounded),
-                        )
-                      : null,
-                ),
-              ),
-              const Center(child: BrandLogo(size: 34)),
-              const SizedBox(height: 36),
-              Text(
-                _isRegister ? 'Tạo tài khoản' : 'Đăng nhập',
-                style: AppTextStyles.pageTitle.copyWith(fontSize: 28),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _isRegister
-                    ? 'Lưu tiến độ học trên mọi thiết bị.'
-                    : 'Chào mừng bạn quay lại.',
-                style: palette.body.copyWith(fontSize: 15),
-              ),
-              const SizedBox(height: 28),
-              ..._buildFields(),
-              if (!_isRegister)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: _isSubmitting ? null : _resetPassword,
-                    child: const Text('Quên mật khẩu?'),
+      body: WashiBackground(
+        child: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
+              children: [
+                // Mở từ màn khởi động thì không có màn nào phía sau để quay lại.
+                SizedBox(
+                  height: 48,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Navigator.of(context).canPop()
+                        ? IconButton(
+                            tooltip: 'Quay lại',
+                            onPressed: () => Navigator.of(context).maybePop(),
+                            icon: const Icon(Icons.arrow_back_rounded),
+                          )
+                        : null,
                   ),
                 ),
-              if (_formError != null) ...[
-                const SizedBox(height: 8),
-                _FormErrorBanner(message: _formError!),
-              ],
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null : _submit,
-                child: _isSubmitting
-                    ? SizedBox.square(
-                        dimension: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: palette.onPrimary,
-                          semanticsLabel: 'Đang xử lý',
-                        ),
-                      )
-                    : Text(_isRegister ? 'Tạo tài khoản' : 'Đăng nhập'),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Expanded(child: Divider()),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('hoặc', style: TextStyle(color: palette.label)),
+                const Center(child: BrandLogo(size: 34)),
+                const SizedBox(height: 36),
+                Text(
+                  _isRegister ? 'Tạo tài khoản' : 'Đăng nhập',
+                  style: AppTextStyles.pageTitle.copyWith(fontSize: 28),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _isRegister
+                      ? 'Lưu tiến độ học trên mọi thiết bị.'
+                      : 'Chào mừng bạn quay lại.',
+                  style: palette.body.copyWith(fontSize: 15),
+                ),
+                const SizedBox(height: 28),
+                ..._buildFields(),
+                if (!_isRegister)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _isSubmitting ? null : _resetPassword,
+                      child: const Text('Quên mật khẩu?'),
+                    ),
                   ),
-                  const Expanded(child: Divider()),
+                if (_formError != null) ...[
+                  const SizedBox(height: 8),
+                  _FormErrorBanner(message: _formError!),
                 ],
-              ),
-              const SizedBox(height: 20),
-              OutlinedButton(
-                onPressed: _isSubmitting ? null : _signInWithGoogle,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: palette.textPrimary,
-                  side: BorderSide(color: palette.cardBorder),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submit,
+                  child: _isSubmitting
+                      ? SizedBox.square(
+                          dimension: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: palette.onPrimary,
+                            semanticsLabel: 'Đang xử lý',
+                          ),
+                        )
+                      : Text(_isRegister ? 'Tạo tài khoản' : 'Đăng nhập'),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
+                const SizedBox(height: 20),
+                Row(
                   children: [
-                    Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF4285F4),
-                      ),
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child:
+                          Text('hoặc', style: TextStyle(color: palette.label)),
                     ),
-                    SizedBox(width: 12),
-                    Flexible(
-                      child: Text(
-                        'Tiếp tục với Google',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    const Expanded(child: Divider()),
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => _switchMode(!_isRegister),
-                child: Text.rich(
-                  TextSpan(
-                    text: _isRegister
-                        ? 'Bạn đã có tài khoản? '
-                        : 'Chưa có tài khoản? ',
-                    style: TextStyle(
-                      color: palette.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                const SizedBox(height: 20),
+                OutlinedButton(
+                  onPressed: _isSubmitting ? null : _signInWithGoogle,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: palette.textPrimary,
+                    side: BorderSide(color: palette.cardBorder),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextSpan(
-                        text: _isRegister ? 'Đăng nhập' : 'Đăng ký',
+                      Text(
+                        'G',
                         style: TextStyle(
-                          color: palette.primaryStrong,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF4285F4),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          'Tiếp tục với Google',
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => _switchMode(!_isRegister),
+                  child: Text.rich(
+                    TextSpan(
+                      text: _isRegister
+                          ? 'Bạn đã có tài khoản? '
+                          : 'Chưa có tài khoản? ',
+                      style: TextStyle(
+                        color: palette.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: _isRegister ? 'Đăng nhập' : 'Đăng ký',
+                          style: TextStyle(
+                            color: palette.primaryStrong,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

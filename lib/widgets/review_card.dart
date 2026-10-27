@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
-import 'seigaiha_pattern.dart';
+import 'japan_scenery.dart';
+import 'section_heading.dart';
 
-/// Thẻ ôn tập hôm nay trên nền chàm: số từ đến hạn, tiến độ mục tiêu ngày
-/// và nút bắt đầu. Chỉ nhận dữ liệu qua constructor, không tự đọc Provider,
-/// để widget dễ test và tái sử dụng.
+/// Thẻ ôn tập hôm nay: tranh cổng torii bên phải, số từ đến hạn, tiến độ
+/// mục tiêu ngày và nút bắt đầu. Chỉ nhận dữ liệu qua constructor, không tự
+/// đọc Provider, để widget dễ test và tái sử dụng.
 class ReviewCard extends StatelessWidget {
   const ReviewCard({
     Key? key,
@@ -31,111 +32,107 @@ class ReviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final onCard = palette.onPrimary;
     final hasDueWords = dueCount > 0;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.cardLarge),
-      child: ColoredBox(
-        color: palette.primary,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: SeigaihaPattern(color: onCard.withValues(alpha: 0.07)),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '今日の復習 · ÔN TẬP HÔM NAY',
-                    style: palette.sectionLabel.copyWith(
-                      color: onCard.withValues(alpha: 0.75),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [palette.card, palette.accentSurface],
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.cardLarge),
+        border: Border.all(color: palette.accentBorder),
+        boxShadow: [
+          BoxShadow(
+            color: palette.primary.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          const Positioned(
+            top: 10,
+            right: 0,
+            width: 130,
+            height: 112,
+            child: ToriiScene(),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeading(
+                  icon: Icons.auto_stories_outlined,
+                  label: 'ÔN TẬP HÔM NAY',
+                ),
+                const SizedBox(height: 10),
+                FractionallySizedBox(
+                  widthFactor: 0.64,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              hasDueWords
-                                  ? 'Đến giờ ôn tập'
-                                  : 'Bạn đã ôn xong hôm nay!',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: onCard,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              hasDueWords
-                                  ? '$dueCount từ đến hạn · '
-                                      'Khoảng $estimatedMinutes phút'
-                                  : 'Quay lại vào ngày mai nhé.',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: onCard.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
+                      Text(
+                        hasDueWords
+                            ? 'Đến giờ ôn tập'
+                            : 'Bạn đã ôn xong hôm nay!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          height: 1.2,
+                          fontWeight: FontWeight.w800,
+                          color: palette.primaryStrong,
                         ),
                       ),
-                      if (hasDueWords)
-                        Text(
-                          '$dueCount',
-                          style: AppTextStyles.japaneseDisplay.copyWith(
-                            fontSize: 52,
-                            height: 1,
-                            color: onCard,
-                          ),
-                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        hasDueWords
+                            ? '$dueCount từ đến hạn · '
+                                'Khoảng $estimatedMinutes phút'
+                            : 'Quay lại vào ngày mai nhé.',
+                        style: palette.body,
+                      ),
                     ],
                   ),
-                  if (dailyGoal > 0) ...[
-                    const SizedBox(height: 18),
-                    _DailyGoalBar(
-                      reviewed: reviewedToday,
-                      goal: dailyGoal,
-                      color: onCard,
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  ElevatedButton(
-                    onPressed: hasDueWords && !isLoading ? onReview : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: onCard,
-                      foregroundColor: palette.primary,
-                      disabledBackgroundColor: onCard.withValues(alpha: 0.18),
-                      disabledForegroundColor: onCard.withValues(alpha: 0.7),
-                    ),
-                    child: isLoading
-                        ? SizedBox.square(
-                            dimension: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: palette.primary,
-                            ),
-                          )
-                        : const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.play_arrow_rounded),
-                              SizedBox(width: 8),
-                              Text('Bắt đầu ôn tập'),
-                            ],
-                          ),
-                  ),
+                ),
+                if (dailyGoal > 0) ...[
+                  const SizedBox(height: 12),
+                  _DailyGoalBar(reviewed: reviewedToday, goal: dailyGoal),
                 ],
-              ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: hasDueWords && !isLoading ? onReview : null,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    shape: const StadiumBorder(),
+                  ),
+                  child: isLoading
+                      ? SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: palette.onPrimary,
+                          ),
+                        )
+                      : const Row(
+                          children: [
+                            Icon(Icons.play_arrow_rounded),
+                            Expanded(
+                              child: Text(
+                                'Bắt đầu ôn tập',
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_rounded, size: 20),
+                          ],
+                        ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -143,18 +140,14 @@ class ReviewCard extends StatelessWidget {
 
 /// Thanh mảnh "6 / 20 từ" cho mục tiêu hôm nay.
 class _DailyGoalBar extends StatelessWidget {
-  const _DailyGoalBar({
-    required this.reviewed,
-    required this.goal,
-    required this.color,
-  });
+  const _DailyGoalBar({required this.reviewed, required this.goal});
 
   final int reviewed;
   final int goal;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final label = '$reviewed / $goal từ';
     return Row(
       children: [
@@ -164,8 +157,8 @@ class _DailyGoalBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: (reviewed / goal).clamp(0, 1).toDouble(),
               minHeight: 5,
-              color: color,
-              backgroundColor: color.withValues(alpha: 0.2),
+              color: palette.primary,
+              backgroundColor: palette.progressTrack,
             ),
           ),
         ),
@@ -176,7 +169,7 @@ class _DailyGoalBar extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: color,
+            color: palette.textSecondary,
           ),
         ),
       ],

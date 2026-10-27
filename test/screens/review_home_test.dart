@@ -22,6 +22,8 @@ void main() {
     (tester) async {
       await pumpTestApp(tester);
 
+      await tester.ensureVisible(find.text('Bắt đầu ôn tập'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Bắt đầu ôn tập'));
       await tester.pumpAndSettle();
 

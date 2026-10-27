@@ -10,6 +10,7 @@ import '../providers/progress_provider.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/user_profile_provider.dart';
 import '../widgets/error_view.dart';
+import '../widgets/japan_scenery.dart';
 
 /// Chỉ hiển thị [child] khi đã có người dùng (ẩn danh). Mỗi khi uid đổi,
 /// tải lại chủ đề, hồ sơ và tiến độ của đúng người dùng đó.
@@ -37,15 +38,19 @@ class _AuthGateState extends State<AuthGate> {
     if (auth.status == AuthStatus.failure ||
         auth.status == AuthStatus.unauthenticated) {
       return Scaffold(
-        body: ErrorView(
-          message: auth.errorMessage ?? 'Bạn đã đăng xuất.',
-          onRetry: auth.isInitializing ? null : auth.retry,
+        body: WashiBackground(
+          child: ErrorView(
+            message: auth.errorMessage ?? 'Bạn đã đăng xuất.',
+            onRetry: auth.isInitializing ? null : auth.retry,
+          ),
         ),
       );
     }
 
     return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+      body: WashiBackground(
+        child: Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 

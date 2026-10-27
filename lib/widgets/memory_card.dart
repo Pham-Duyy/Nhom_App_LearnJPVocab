@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
+import 'section_heading.dart';
 
 /// Tổng số từ đã học và biểu đồ cột theo 3 giai đoạn ghi nhớ: Mới học (mức
 /// 1), Đang nhớ (mức 2) và Đã nhớ (mức 3 trở lên). Chỉ nhận dữ liệu qua
@@ -14,7 +15,7 @@ class MemoryCard extends StatelessWidget {
     this.onViewAll,
   }) : super(key: key);
 
-  static const _chartHeight = 110.0;
+  static const _chartHeight = 76.0;
 
   final int totalLearned;
 
@@ -43,42 +44,50 @@ class MemoryCard extends StatelessWidget {
     final maxCount = stages.fold<int>(1, (max, s) => s.$2 > max ? s.$2 : max);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: BoxDecoration(
         color: palette.card,
         borderRadius: BorderRadius.circular(AppRadius.cardLarge),
         border: Border.all(color: palette.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: palette.primary.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('GHI NHỚ', style: palette.sectionLabel),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$totalLearned từ vựng',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+                child: SectionHeading(
+                  icon: Icons.bar_chart_rounded,
+                  label: 'TIẾN ĐỘ GHI NHỚ',
+                  color: palette.chartColors[1],
                 ),
               ),
               if (onViewAll != null)
-                TextButton(
+                TextButton.icon(
                   onPressed: onViewAll,
-                  child: const Text('Xem tất cả ›'),
+                  iconAlignment: IconAlignment.end,
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  label: const Text('Xem tất cả'),
                 ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 2),
+          Text(
+            '$totalLearned từ vựng',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: palette.primaryStrong,
+            ),
+          ),
+          const SizedBox(height: 6),
           // Cột: số ở trên, cột đứng trên đường nền, tên ở dưới.
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -96,7 +105,7 @@ class MemoryCard extends StatelessWidget {
             ],
           ),
           Divider(height: 1, thickness: 1, color: palette.divider),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Row(
             children: [
               for (final (label, _) in stages)
@@ -150,7 +159,7 @@ class MemoryBar extends StatelessWidget {
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Container(
             width: 44,
             height: maxHeight,

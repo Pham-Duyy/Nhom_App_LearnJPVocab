@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/japan_scenery.dart';
+
 mixin GenericLayout {
   String getTitle(BuildContext context);
 
@@ -8,15 +10,21 @@ mixin GenericLayout {
 
   bool get showBackButton => true;
 
+  /// Màn có AppBar tự dựng Scaffold trên nền washi chung; màn không có AppBar
+  /// là một tab và nằm trong Scaffold của MainScreen.
   Widget buildLayout(BuildContext context) {
     if (!showAppBar) return buildBody(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: showBackButton,
-        title: Text(getTitle(context)),
+    return WashiBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          automaticallyImplyLeading: showBackButton,
+          backgroundColor: Colors.transparent,
+          title: Text(getTitle(context)),
+        ),
+        body: buildBody(context),
       ),
-      body: buildBody(context),
     );
   }
 }

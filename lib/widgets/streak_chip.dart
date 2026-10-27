@@ -13,7 +13,7 @@ class StreakChip extends StatelessWidget {
     return Semantics(
       label: '$days ngày học liên tiếp',
       excludeSemantics: true,
-      child: HankoStamp(text: '$days日', caption: 'liên tiếp', size: 50),
+      child: HankoStamp(text: '$days日', caption: 'liên tiếp', size: 60),
     );
   }
 }
