@@ -254,6 +254,10 @@ class AuthController extends ChangeNotifier {
             'Hãy đăng nhập bằng email và mật khẩu.';
       case 'unauthorized-domain':
         return 'Trang web này chưa được cấp phép đăng nhập trong Firebase.';
+      case 'invalid-cert-hash':
+      case 'google-config-error':
+        return 'Đăng nhập Google trên Android chưa được cấu hình đủ '
+            '(mã SHA hoặc file google-services.json). Hãy dùng email tạm thời.';
       case 'requires-recent-login':
         return 'Vì lý do bảo mật, hãy đăng xuất rồi đăng nhập lại '
             'trước khi thực hiện thao tác này.';

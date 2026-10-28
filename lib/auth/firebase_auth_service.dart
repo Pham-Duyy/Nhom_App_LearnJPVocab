@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'app_auth_user.dart';
 import 'auth_service.dart';
@@ -73,35 +75,90 @@ class FirebaseAuthService implements AuthService {
     return _guard(() => _auth.sendPasswordResetEmail(email: email.trim()));
   }
 
+  /// Android chọn tài khoản Google bằng màn hình của hệ điều hành. Cách mở
+  /// trình duyệt (signInWithProvider) hay mất phiên giữa chừng trên một số
+  /// máy ("missing initial state"); web vẫn dùng cửa sổ bật lên.
+  bool get _nativeGoogle =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  Future<void>? _googleReady;
+
+  /// Mở màn chọn tài khoản Google của Android, trả về credential cho Firebase.
+  Future<fb.AuthCredential> _googleCredential() async {
+    final google = GoogleSignIn.instance;
+    await (_googleReady ??= google.initialize());
+    try {
+      final account = await google.authenticate();
+      return fb.GoogleAuthProvider.credential(
+        idToken: account.authentication.idToken,
+      );
+    } on GoogleSignInException catch (e) {
+      throw AuthException(
+        switch (e.code) {
+          GoogleSignInExceptionCode.canceled ||
+          GoogleSignInExceptionCode.interrupted =>
+            'web-context-canceled',
+          GoogleSignInExceptionCode.clientConfigurationError ||
+          GoogleSignInExceptionCode.providerConfigurationError =>
+            'google-config-error',
+          _ => 'unknown-error',
+        },
+        e.description,
+      );
+    }
+  }
+
   @override
   Future<AppAuthUser> signInWithGoogle() {
     return _guard(() async {
       final provider = fb.GoogleAuthProvider()
         ..setCustomParameters({'prompt': 'select_account'});
-
       final current = _auth.currentUser;
-      if (current == null || !current.isAnonymous) {
-        return _userOf(kIsWeb
-            ? await _auth.signInWithPopup(provider)
-            : await _auth.signInWithProvider(provider));
+      final isGuest = current != null && current.isAnonymous;
+
+      if (!_nativeGoogle) {
+        if (!isGuest) {
+          return _userOf(kIsWeb
+              ? await _auth.signInWithPopup(provider)
+              : await _auth.signInWithProvider(provider));
+        }
+        return _linkOrSwitch(() => kIsWeb
+            ? current.linkWithPopup(provider)
+            : current.linkWithProvider(provider));
       }
 
-      try {
-        return _userOf(kIsWeb
-            ? await current.linkWithPopup(provider)
-            : await current.linkWithProvider(provider));
-      } on fb.FirebaseAuthException catch (e) {
-        final credential = e.credential;
-        if (e.code != 'credential-already-in-use' || credential == null) {
-          rethrow;
-        }
+      final credential = await _googleCredential();
+      if (!isGuest) {
         return _userOf(await _auth.signInWithCredential(credential));
       }
+      return _linkOrSwitch(() => current.linkWithCredential(credential));
     });
   }
 
+  /// Gắn Google vào tài khoản khách để giữ tiến độ; nếu tài khoản Google đó
+  /// đã dùng trong app trước đây thì đăng nhập vào tài khoản cũ.
+  Future<AppAuthUser> _linkOrSwitch(
+    Future<fb.UserCredential> Function() link,
+  ) async {
+    try {
+      return _userOf(await link());
+    } on fb.FirebaseAuthException catch (e) {
+      final credential = e.credential;
+      if (e.code != 'credential-already-in-use' || credential == null) {
+        rethrow;
+      }
+      return _userOf(await _auth.signInWithCredential(credential));
+    }
+  }
+
+  /// Đăng xuất cả Google trên Android để lần sau được chọn lại tài khoản.
   @override
-  Future<void> signOut() => _guard(_auth.signOut);
+  Future<void> signOut() => _guard(() async {
+        if (_nativeGoogle && _googleReady != null) {
+          await GoogleSignIn.instance.signOut();
+        }
+        await _auth.signOut();
+      });
 
   @override
   Future<void> reauthenticate({String? password}) {
@@ -117,9 +174,13 @@ class FirebaseAuthService implements AuthService {
         );
       } else if (providers.contains(AppAuthUser.googleProvider)) {
         final provider = fb.GoogleAuthProvider();
-        kIsWeb
-            ? await user.reauthenticateWithPopup(provider)
-            : await user.reauthenticateWithProvider(provider);
+        if (_nativeGoogle) {
+          await user.reauthenticateWithCredential(await _googleCredential());
+        } else if (kIsWeb) {
+          await user.reauthenticateWithPopup(provider);
+        } else {
+          await user.reauthenticateWithProvider(provider);
+        }
       }
     });
   }

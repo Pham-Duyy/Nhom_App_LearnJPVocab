@@ -12,7 +12,20 @@
           "package_name": "com.phamduy.chibakanji"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1054912720031-t78b42nf00avut64nhpfa0fv4vn4flsq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.phamduy.chibakanji",
+            "certificate_hash": "755d56bd987d582df39d088cc136ea29d0dcfd49"
+          }
+        },
+        {
+          "client_id": "1054912720031-rqus17u1lskl54s3b990pfm1bpp42trb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyArt4fHqpKtFvfFbRgc5I4jzvCo8cJi-zc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1054912720031-rqus17u1lskl54s3b990pfm1bpp42trb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
