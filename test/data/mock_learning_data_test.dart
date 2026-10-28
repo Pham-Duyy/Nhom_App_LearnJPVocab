@@ -39,13 +39,17 @@ void main() {
     const lessons = MockLearningData.lessons;
     final words = MockLearningData.vocabulary;
 
-    test('9 chủ đề N5 và 3 chủ đề ngành: 24 bài, 210 từ', () {
+    test(
+        '9 chủ đề N5, 3 chủ đề ngành, 3 chủ đề N4, 3 chủ đề N3: 36 bài, 330 từ',
+        () {
       final industry =
           categories.where((c) => c.jlptLevel == Category.industryLevel).length;
       expect(industry, 3);
-      expect(categories, hasLength(12));
-      expect(lessons, hasLength(24));
-      expect(words, hasLength(210));
+      expect(categories.where((c) => c.jlptLevel == 'N4'), hasLength(3));
+      expect(categories.where((c) => c.jlptLevel == 'N3'), hasLength(3));
+      expect(categories, hasLength(18));
+      expect(lessons, hasLength(36));
+      expect(words, hasLength(330));
     });
 
     test('id không trùng, mỗi bài và mỗi từ đều thuộc về một mục có thật', () {

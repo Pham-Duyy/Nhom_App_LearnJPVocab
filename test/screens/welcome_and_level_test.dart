@@ -90,7 +90,7 @@ void main() {
       expect(find.text('Chào hỏi và giao tiếp'), findsNothing);
     });
 
-    testWidgets('chọn cấp chưa có nội dung thì báo đang biên soạn', (
+    testWidgets('chọn N4 và N3 thì hiện đúng chủ đề của từng cấp', (
       tester,
     ) async {
       await pumpTestApp(tester);
@@ -99,13 +99,15 @@ void main() {
 
       await tester.tap(find.text('N4'));
       await tester.pumpAndSettle();
-
-      expect(find.text('0 chủ đề'), findsOneWidget);
+      expect(find.text('3 chủ đề'), findsOneWidget);
+      expect(find.text('Công việc và công ty'), findsOneWidget);
       expect(find.text('Chào hỏi và giao tiếp'), findsNothing);
-      expect(
-        find.text('Chủ đề ở cấp độ này đang được biên soạn.'),
-        findsOneWidget,
-      );
+
+      await tester.tap(find.text('N3'));
+      await tester.pumpAndSettle();
+      expect(find.text('3 chủ đề'), findsOneWidget);
+      expect(find.text('Xã hội và tin tức'), findsOneWidget);
+      expect(find.text('Công việc và công ty'), findsNothing);
     });
   });
 

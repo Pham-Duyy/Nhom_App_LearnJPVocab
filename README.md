@@ -48,7 +48,7 @@ Toàn bộ 29 màn hình nằm trong [`docs/screenshots`](docs/screenshots).
 | Tab | Chức năng |
 |---|---|
 | **Ôn tập** | Lời chào theo giờ, số từ đến hạn ôn, mục tiêu hôm nay, chuỗi ngày học (dấu triện 日), biểu đồ tiến độ ghi nhớ, Quiz nhanh |
-| **Học mới** | Chọn cấp độ (N5, N4, N3, Ngành, Của tôi; N4 và N3 đang bổ sung nội dung), chủ đề, bài học rồi học bằng flashcard |
+| **Học mới** | Chọn cấp độ (N5, N4, N3, Ngành, Của tôi), chủ đề, bài học rồi học bằng flashcard |
 | **Thi thử** | Chọn phạm vi (cấp độ, chủ đề, từ đã học), số câu; làm bài có đồng hồ, nộp bài mới chấm, đóng dấu 合格 / 不合格 |
 | **Sổ từ** | Tìm, lọc (tất cả, đến hạn, yêu thích), xem chi tiết từ, nghe phát âm; vào **Kho từ của tôi** |
 | **Cá nhân** | Hồ sơ, mục tiêu, nhắc học, tùy chọn học, thành tích, lịch sử quiz, giao diện sáng/tối, âm thanh, tài khoản |
@@ -67,7 +67,7 @@ Toàn bộ 29 màn hình nằm trong [`docs/screenshots`](docs/screenshots).
 - **Nhắc học:** thông báo mỗi ngày vào giờ tự chọn (Android/iOS) và lời nhắc trên trang chủ khi hôm nay chưa học.
 - **Âm thanh:** lời giới thiệu ở màn khởi động, lời chào tiếng Nhật theo buổi (おはようございます / こんにちは / こんばんは), nhạc nền chuông gió; bật/tắt và chỉnh âm lượng.
 - **Giao diện:** sáng (mặc định) và tối.
-- **Nội dung:** 150 từ N5 (9 chủ đề) và 60 từ chuyên ngành (Chế biến thực phẩm, Xây dựng, Điều dưỡng).
+- **Nội dung:** 330 từ gồm 150 từ N5 (9 chủ đề), 60 từ N4 và 60 từ N3 (mỗi cấp 3 chủ đề), 60 từ chuyên ngành (Chế biến thực phẩm, Xây dựng, Điều dưỡng).
 
 ## Kiến trúc
 
@@ -192,7 +192,7 @@ Chạy bình thường (không có cờ) thì app không ghi gì vào nội dung
 - [x] Thông báo nhắc học theo giờ (Android/iOS; web chỉ nhắc trên trang chủ)
 - [x] Đổi mật khẩu, xóa tài khoản và dữ liệu
 - [x] CI chạy format, analyze và test
-- [ ] Nội dung N4, N3
+- [x] Nội dung N4, N3 (60 từ mỗi cấp)
 
 ---
 

@@ -7,8 +7,8 @@ import '../../models/vocabulary.dart';
 /// (kanji, kana, romaji, nghĩa, câu ví dụ, nghĩa câu ví dụ).
 typedef _WordRow = (String, String, String, String, String, String);
 
-/// Dữ liệu N5 mẫu: nguồn để nạp lên Firestore (xem FirestoreSeeder) và dữ
-/// liệu cho test.
+/// Dữ liệu mẫu N5, N4, N3 và từ vựng ngành: nguồn để nạp lên Firestore (xem
+/// FirestoreSeeder) và dữ liệu cho test.
 class MockLearningData {
   MockLearningData._();
 
@@ -87,6 +87,48 @@ class MockLearningData {
       description: 'Chăm sóc người cao tuổi, sức khỏe và ghi chép hằng ngày.',
       jlptLevel: Category.industryLevel,
       order: 12,
+    ),
+    Category(
+      id: 'cat_n4_work',
+      name: 'Công việc và công ty',
+      description: 'Đi làm, lương thưởng, họp hành và liên lạc trong công ty.',
+      jlptLevel: 'N4',
+      order: 13,
+    ),
+    Category(
+      id: 'cat_n4_health',
+      name: 'Sức khỏe và cơ thể',
+      description: 'Các bộ phận cơ thể và từ vựng khi đi khám bệnh.',
+      jlptLevel: 'N4',
+      order: 14,
+    ),
+    Category(
+      id: 'cat_n4_travel',
+      name: 'Du lịch và giao thông',
+      description: 'Đặt chỗ, tham quan và đi lại trên đường.',
+      jlptLevel: 'N4',
+      order: 15,
+    ),
+    Category(
+      id: 'cat_n3_society',
+      name: 'Xã hội và tin tức',
+      description: 'Tin tức thời sự, môi trường và thiên tai.',
+      jlptLevel: 'N3',
+      order: 16,
+    ),
+    Category(
+      id: 'cat_n3_feelings',
+      name: 'Cảm xúc và tính cách',
+      description: 'Diễn tả cảm xúc và nhận xét tính cách con người.',
+      jlptLevel: 'N3',
+      order: 17,
+    ),
+    Category(
+      id: 'cat_n3_life',
+      name: 'Đời sống và thủ tục',
+      description: 'Giấy tờ hành chính, thuê nhà và sống cùng hàng xóm.',
+      jlptLevel: 'N3',
+      order: 18,
     ),
   ];
 
@@ -304,6 +346,114 @@ class MockLearningData {
       title: 'Sức khỏe và ghi chép',
       description: 'Thân nhiệt, huyết áp, thuốc và báo cáo.',
       jlptLevel: Category.industryLevel,
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_work_1',
+      categoryId: 'cat_n4_work',
+      title: 'Nơi làm việc',
+      description: 'Lương, làm thêm giờ, đi công tác và giờ giấc.',
+      jlptLevel: 'N4',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_work_2',
+      categoryId: 'cat_n4_work',
+      title: 'Họp và liên lạc',
+      description: 'Cuộc họp, báo cáo, xin ý kiến và hồi âm.',
+      jlptLevel: 'N4',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_health_1',
+      categoryId: 'cat_n4_health',
+      title: 'Cơ thể',
+      description: 'Tên các bộ phận cơ thể thường gặp.',
+      jlptLevel: 'N4',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_health_2',
+      categoryId: 'cat_n4_health',
+      title: 'Ở bệnh viện',
+      description: 'Triệu chứng, khám bệnh, nhập viện và xuất viện.',
+      jlptLevel: 'N4',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_travel_1',
+      categoryId: 'cat_n4_travel',
+      title: 'Chuẩn bị chuyến đi',
+      description: 'Đặt chỗ, nơi ở, tham quan và quà lưu niệm.',
+      jlptLevel: 'N4',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n4_travel_2',
+      categoryId: 'cat_n4_travel',
+      title: 'Trên đường',
+      description: 'Đèn giao thông, tắc đường, lái xe và đổi tàu.',
+      jlptLevel: 'N4',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_society_1',
+      categoryId: 'cat_n3_society',
+      title: 'Tin tức',
+      description: 'Chính trị, kinh tế, bài báo và số liệu.',
+      jlptLevel: 'N3',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_society_2',
+      categoryId: 'cat_n3_society',
+      title: 'Môi trường và thiên tai',
+      description: 'Bảo vệ môi trường, tiết kiệm và phòng thiên tai.',
+      jlptLevel: 'N3',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_feelings_1',
+      categoryId: 'cat_n3_feelings',
+      title: 'Cảm xúc',
+      description: 'Vui, buồn, lo lắng, ngạc nhiên và hồi hộp.',
+      jlptLevel: 'N3',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_feelings_2',
+      categoryId: 'cat_n3_feelings',
+      title: 'Tính cách',
+      description: 'Nhận xét tính cách tốt và chưa tốt của con người.',
+      jlptLevel: 'N3',
+      order: 2,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_life_1',
+      categoryId: 'cat_n3_life',
+      title: 'Thủ tục hành chính',
+      description: 'Đăng ký, nộp giấy tờ, gia hạn visa và đóng thuế.',
+      jlptLevel: 'N3',
+      order: 1,
+      vocabularyCount: 10,
+    ),
+    Lesson(
+      id: 'les_n3_life_2',
+      categoryId: 'cat_n3_life',
+      title: 'Nhà ở và hàng xóm',
+      description: 'Thuê nhà, hợp đồng, sửa chữa và phép lịch sự với hàng xóm.',
+      jlptLevel: 'N3',
       order: 2,
       vocabularyCount: 10,
     ),
@@ -1707,6 +1857,964 @@ class MockLearningData {
             'Hôm nay tình trạng của bác thế nào?'
           ),
         ]),
+    // ------------------------------------------------------------------ N4
+    ..._lessonWords('n4_work', 'les_n4_work_1', 1, level: 'N4', const [
+      (
+        '残業',
+        'ざんぎょう',
+        'zangyou',
+        'Làm thêm giờ',
+        '今日は二時間残業しました。',
+        'Hôm nay tôi làm thêm hai tiếng.'
+      ),
+      (
+        '給料',
+        'きゅうりょう',
+        'kyuuryou',
+        'Tiền lương',
+        '給料は毎月二十五日にもらいます。',
+        'Tôi nhận lương vào ngày 25 hằng tháng.'
+      ),
+      (
+        '社長',
+        'しゃちょう',
+        'shachou',
+        'Giám đốc',
+        '社長は今、出張中です。',
+        'Giám đốc hiện đang đi công tác.'
+      ),
+      (
+        '出張',
+        'しゅっちょう',
+        'shucchou',
+        'Đi công tác',
+        '来週、大阪へ出張します。',
+        'Tuần sau tôi đi công tác Osaka.'
+      ),
+      (
+        '受付',
+        'うけつけ',
+        'uketsuke',
+        'Quầy lễ tân',
+        '受付で名前を書いてください。',
+        'Hãy ghi tên ở quầy lễ tân.'
+      ),
+      (
+        '書類',
+        'しょるい',
+        'shorui',
+        'Giấy tờ, tài liệu',
+        'この書類にサインしてください。',
+        'Hãy ký vào giấy tờ này.'
+      ),
+      (
+        '予定',
+        'よてい',
+        'yotei',
+        'Dự định, lịch trình',
+        '明日の予定を教えてください。',
+        'Hãy cho tôi biết lịch trình ngày mai.'
+      ),
+      (
+        '遅刻',
+        'ちこく',
+        'chikoku',
+        'Đến muộn',
+        '電車が遅れて、遅刻しました。',
+        'Tàu bị trễ nên tôi đến muộn.'
+      ),
+      (
+        '昼休み',
+        'ひるやすみ',
+        'hiruyasumi',
+        'Giờ nghỉ trưa',
+        '昼休みに同僚とお弁当を食べます。',
+        'Giờ nghỉ trưa tôi ăn cơm hộp với đồng nghiệp.'
+      ),
+      (
+        '経験',
+        'けいけん',
+        'keiken',
+        'Kinh nghiệm',
+        '日本で働いた経験があります。',
+        'Tôi có kinh nghiệm làm việc ở Nhật.'
+      ),
+    ]),
+    ..._lessonWords('n4_work', 'les_n4_work_2', 11, level: 'N4', const [
+      (
+        '会議',
+        'かいぎ',
+        'kaigi',
+        'Cuộc họp',
+        '三時から会議があります。',
+        'Từ 3 giờ có cuộc họp.'
+      ),
+      (
+        '連絡',
+        'れんらく',
+        'renraku',
+        'Liên lạc',
+        '遅れるときは連絡してください。',
+        'Khi đến muộn hãy liên lạc nhé.'
+      ),
+      (
+        '相談',
+        'そうだん',
+        'soudan',
+        'Bàn bạc, xin ý kiến',
+        '困ったことを先輩に相談しました。',
+        'Tôi đã hỏi ý kiến tiền bối về chuyện khó khăn.'
+      ),
+      (
+        '説明',
+        'せつめい',
+        'setsumei',
+        'Giải thích',
+        'もう一度説明してください。',
+        'Xin hãy giải thích lại một lần nữa.'
+      ),
+      (
+        '準備',
+        'じゅんび',
+        'junbi',
+        'Chuẩn bị',
+        '会議の準備はできましたか。',
+        'Đã chuẩn bị xong cho cuộc họp chưa?'
+      ),
+      (
+        '断る',
+        'ことわる',
+        'kotowaru',
+        'Từ chối',
+        '忙しかったので、誘いを断りました。',
+        'Vì bận nên tôi đã từ chối lời mời.'
+      ),
+      (
+        '意見',
+        'いけん',
+        'iken',
+        'Ý kiến',
+        'あなたの意見を聞かせてください。',
+        'Hãy cho tôi nghe ý kiến của bạn.'
+      ),
+      (
+        '約束',
+        'やくそく',
+        'yakusoku',
+        'Lời hứa, cuộc hẹn',
+        '約束の時間を守りましょう。',
+        'Hãy giữ đúng giờ hẹn.'
+      ),
+      (
+        '返事',
+        'へんじ',
+        'henji',
+        'Trả lời, hồi âm',
+        'メールの返事を書きます。',
+        'Tôi viết thư trả lời email.'
+      ),
+      (
+        '伝える',
+        'つたえる',
+        'tsutaeru',
+        'Truyền đạt, nhắn lại',
+        '田中さんによろしく伝えてください。',
+        'Cho tôi gửi lời hỏi thăm anh Tanaka.'
+      ),
+    ]),
+    ..._lessonWords('n4_health', 'les_n4_health_1', 1, level: 'N4', const [
+      (
+        '首',
+        'くび',
+        'kubi',
+        'Cổ',
+        '長い時間パソコンを使うと、首が痛くなります。',
+        'Dùng máy tính lâu thì bị đau cổ.'
+      ),
+      (
+        '肩',
+        'かた',
+        'kata',
+        'Vai',
+        '重い荷物を持って、肩が痛いです。',
+        'Mang đồ nặng nên tôi bị đau vai.'
+      ),
+      ('背中', 'せなか', 'senaka', 'Lưng', '背中がかゆいです。', 'Lưng tôi bị ngứa.'),
+      (
+        '腕',
+        'うで',
+        'ude',
+        'Cánh tay',
+        'テニスで腕をけがしました。',
+        'Tôi bị thương ở cánh tay khi chơi tennis.'
+      ),
+      (
+        '指',
+        'ゆび',
+        'yubi',
+        'Ngón tay',
+        'ナイフで指を切りました。',
+        'Tôi bị dao cứa vào ngón tay.'
+      ),
+      (
+        '歯',
+        'は',
+        'ha',
+        'Răng',
+        '毎日三回歯をみがきます。',
+        'Mỗi ngày tôi đánh răng ba lần.'
+      ),
+      (
+        '喉',
+        'のど',
+        'nodo',
+        'Họng',
+        '喉が痛くて、声が出ません。',
+        'Họng đau nên tôi không nói ra tiếng.'
+      ),
+      (
+        '胸',
+        'むね',
+        'mune',
+        'Ngực',
+        '走ったあと、胸が苦しくなりました。',
+        'Chạy xong tôi thấy tức ngực.'
+      ),
+      (
+        '心',
+        'こころ',
+        'kokoro',
+        'Tấm lòng, trái tim',
+        '心から感謝しています。',
+        'Tôi xin cảm ơn từ tận đáy lòng.'
+      ),
+      (
+        '骨',
+        'ほね',
+        'hone',
+        'Xương',
+        '転んで足の骨が折れました。',
+        'Tôi bị ngã và gãy xương chân.'
+      ),
+    ]),
+    ..._lessonWords('n4_health', 'les_n4_health_2', 11, level: 'N4', const [
+      (
+        '頭痛',
+        'ずつう',
+        'zutsuu',
+        'Đau đầu',
+        '頭痛がするので、薬を飲みました。',
+        'Vì đau đầu nên tôi đã uống thuốc.'
+      ),
+      (
+        '吐き気',
+        'はきけ',
+        'hakike',
+        'Buồn nôn',
+        '朝から吐き気がします。',
+        'Từ sáng tôi thấy buồn nôn.'
+      ),
+      (
+        '注射',
+        'ちゅうしゃ',
+        'chuusha',
+        'Tiêm',
+        '病院で注射をしてもらいました。',
+        'Tôi được tiêm ở bệnh viện.'
+      ),
+      ('咳', 'せき', 'seki', 'Ho', '夜になると咳が出ます。', 'Cứ đến tối là tôi bị ho.'),
+      (
+        '入院',
+        'にゅういん',
+        'nyuuin',
+        'Nhập viện',
+        '祖父は一週間入院しました。',
+        'Ông tôi đã nhập viện một tuần.'
+      ),
+      (
+        '退院',
+        'たいいん',
+        'taiin',
+        'Xuất viện',
+        '明日、退院できます。',
+        'Ngày mai tôi có thể xuất viện.'
+      ),
+      (
+        '歯医者',
+        'はいしゃ',
+        'haisha',
+        'Nha sĩ',
+        '歯が痛いので、歯医者に行きます。',
+        'Vì đau răng nên tôi đi nha sĩ.'
+      ),
+      (
+        '診察',
+        'しんさつ',
+        'shinsatsu',
+        'Khám bệnh',
+        '診察は九時からです。',
+        'Giờ khám bệnh bắt đầu từ 9 giờ.'
+      ),
+      (
+        '保険証',
+        'ほけんしょう',
+        'hokenshou',
+        'Thẻ bảo hiểm y tế',
+        '病院へ行くとき、保険証を忘れないでください。',
+        'Khi đi bệnh viện đừng quên thẻ bảo hiểm.'
+      ),
+      (
+        '治る',
+        'なおる',
+        'naoru',
+        'Khỏi bệnh',
+        '薬を飲んだら、すぐ治りました。',
+        'Uống thuốc xong là tôi khỏi ngay.'
+      ),
+    ]),
+    ..._lessonWords('n4_travel', 'les_n4_travel_1', 1, level: 'N4', const [
+      (
+        '予約',
+        'よやく',
+        'yoyaku',
+        'Đặt chỗ, đặt trước',
+        'ホテルを予約しました。',
+        'Tôi đã đặt phòng khách sạn.'
+      ),
+      (
+        '観光',
+        'かんこう',
+        'kankou',
+        'Tham quan, du lịch',
+        '京都で観光しました。',
+        'Tôi đã đi tham quan ở Kyoto.'
+      ),
+      (
+        '案内',
+        'あんない',
+        'annai',
+        'Hướng dẫn, dẫn đường',
+        '町を案内してあげます。',
+        'Tôi sẽ dẫn bạn đi tham quan thị trấn.'
+      ),
+      (
+        'お土産',
+        'おみやげ',
+        'omiyage',
+        'Quà lưu niệm',
+        '家族にお土産を買いました。',
+        'Tôi đã mua quà lưu niệm cho gia đình.'
+      ),
+      (
+        '旅館',
+        'りょかん',
+        'ryokan',
+        'Nhà trọ kiểu Nhật',
+        '温泉のある旅館に泊まりました。',
+        'Tôi đã trọ ở lữ quán có suối nước nóng.'
+      ),
+      (
+        '泊まる',
+        'とまる',
+        'tomaru',
+        'Trọ lại, ngủ lại',
+        '今夜は友だちの家に泊まります。',
+        'Tối nay tôi ngủ lại nhà bạn.'
+      ),
+      (
+        '景色',
+        'けしき',
+        'keshiki',
+        'Phong cảnh',
+        '山の上から見た景色はきれいでした。',
+        'Phong cảnh nhìn từ trên núi rất đẹp.'
+      ),
+      (
+        '計画',
+        'けいかく',
+        'keikaku',
+        'Kế hoạch',
+        '夏休みの計画を立てました。',
+        'Tôi đã lên kế hoạch cho kỳ nghỉ hè.'
+      ),
+      (
+        '出発',
+        'しゅっぱつ',
+        'shuppatsu',
+        'Xuất phát',
+        '朝七時に出発します。',
+        'Chúng tôi xuất phát lúc 7 giờ sáng.'
+      ),
+      (
+        '到着',
+        'とうちゃく',
+        'touchaku',
+        'Đến nơi',
+        '飛行機は十時に到着します。',
+        'Máy bay hạ cánh lúc 10 giờ.'
+      ),
+    ]),
+    ..._lessonWords('n4_travel', 'les_n4_travel_2', 11, level: 'N4', const [
+      (
+        '交差点',
+        'こうさてん',
+        'kousaten',
+        'Ngã tư',
+        '次の交差点を右に曲がってください。',
+        'Hãy rẽ phải ở ngã tư tiếp theo.'
+      ),
+      (
+        '信号',
+        'しんごう',
+        'shingou',
+        'Đèn giao thông',
+        '信号が青になったら、渡ります。',
+        'Khi đèn chuyển xanh thì sang đường.'
+      ),
+      (
+        '渋滞',
+        'じゅうたい',
+        'juutai',
+        'Tắc đường',
+        '朝は道がとても渋滞します。',
+        'Buổi sáng đường rất tắc.'
+      ),
+      (
+        '事故',
+        'じこ',
+        'jiko',
+        'Tai nạn',
+        '駅の前で事故がありました。',
+        'Đã có tai nạn trước nhà ga.'
+      ),
+      (
+        '乗り換える',
+        'のりかえる',
+        'norikaeru',
+        'Đổi tàu, chuyển xe',
+        '新宿で電車を乗り換えます。',
+        'Tôi đổi tàu ở Shinjuku.'
+      ),
+      ('運転', 'うんてん', 'unten', 'Lái xe', '父は運転が上手です。', 'Bố tôi lái xe giỏi.'),
+      (
+        '駐車場',
+        'ちゅうしゃじょう',
+        'chuushajou',
+        'Bãi đỗ xe',
+        '駐車場はどこですか。',
+        'Bãi đỗ xe ở đâu ạ?'
+      ),
+      (
+        '急行',
+        'きゅうこう',
+        'kyuukou',
+        'Tàu tốc hành',
+        '急行は小さい駅に止まりません。',
+        'Tàu tốc hành không dừng ở ga nhỏ.'
+      ),
+      (
+        '間に合う',
+        'まにあう',
+        'maniau',
+        'Kịp giờ',
+        '走ったので、電車に間に合いました。',
+        'Nhờ chạy nên tôi đã kịp tàu.'
+      ),
+      (
+        '道路',
+        'どうろ',
+        'douro',
+        'Đường bộ, con đường',
+        '道路を渡るときは気をつけてください。',
+        'Khi sang đường hãy cẩn thận.'
+      ),
+    ]),
+    // ------------------------------------------------------------------ N3
+    ..._lessonWords('n3_society', 'les_n3_society_1', 1, level: 'N3', const [
+      (
+        '政治',
+        'せいじ',
+        'seiji',
+        'Chính trị',
+        '政治に興味がありますか。',
+        'Bạn có quan tâm đến chính trị không?'
+      ),
+      (
+        '経済',
+        'けいざい',
+        'keizai',
+        'Kinh tế',
+        '日本の経済について調べています。',
+        'Tôi đang tìm hiểu về kinh tế Nhật Bản.'
+      ),
+      ('選挙', 'せんきょ', 'senkyo', 'Bầu cử', '来月、選挙があります。', 'Tháng sau có bầu cử.'),
+      (
+        '記事',
+        'きじ',
+        'kiji',
+        'Bài báo',
+        '新聞の記事を読みました。',
+        'Tôi đã đọc bài báo trên tờ báo.'
+      ),
+      (
+        '情報',
+        'じょうほう',
+        'jouhou',
+        'Thông tin',
+        'インターネットで情報を集めます。',
+        'Tôi thu thập thông tin trên mạng.'
+      ),
+      (
+        '事件',
+        'じけん',
+        'jiken',
+        'Vụ việc, vụ án',
+        '昨日、近くで事件が起きました。',
+        'Hôm qua có một vụ việc xảy ra gần đây.'
+      ),
+      (
+        '増える',
+        'ふえる',
+        'fueru',
+        'Tăng lên',
+        '外国人の観光客が増えています。',
+        'Khách du lịch nước ngoài đang tăng lên.'
+      ),
+      (
+        '減る',
+        'へる',
+        'heru',
+        'Giảm đi',
+        '子どもの数が減っています。',
+        'Số trẻ em đang giảm đi.'
+      ),
+      (
+        '原因',
+        'げんいん',
+        'gen\'in',
+        'Nguyên nhân',
+        '事故の原因はまだ分かりません。',
+        'Vẫn chưa rõ nguyên nhân vụ tai nạn.'
+      ),
+      (
+        '結果',
+        'けっか',
+        'kekka',
+        'Kết quả',
+        '試験の結果はいつ分かりますか。',
+        'Khi nào thì biết kết quả thi?'
+      ),
+    ]),
+    ..._lessonWords('n3_society', 'les_n3_society_2', 11, level: 'N3', const [
+      (
+        '環境',
+        'かんきょう',
+        'kankyou',
+        'Môi trường',
+        '環境を守ることは大切です。',
+        'Bảo vệ môi trường là điều quan trọng.'
+      ),
+      (
+        '資源',
+        'しげん',
+        'shigen',
+        'Tài nguyên',
+        '資源を大切に使いましょう。',
+        'Hãy sử dụng tài nguyên một cách tiết kiệm.'
+      ),
+      (
+        '温暖化',
+        'おんだんか',
+        'ondanka',
+        'Sự nóng lên toàn cầu',
+        '地球温暖化が問題になっています。',
+        'Sự nóng lên toàn cầu đang trở thành vấn đề.'
+      ),
+      (
+        '汚染',
+        'おせん',
+        'osen',
+        'Ô nhiễm',
+        '川の汚染が進んでいます。',
+        'Tình trạng ô nhiễm sông ngày càng nặng.'
+      ),
+      (
+        '節約',
+        'せつやく',
+        'setsuyaku',
+        'Tiết kiệm',
+        '毎月、電気を節約しています。',
+        'Tháng nào tôi cũng tiết kiệm điện.'
+      ),
+      (
+        '分別',
+        'ぶんべつ',
+        'bunbetsu',
+        'Phân loại rác',
+        'ごみは分別して出してください。',
+        'Hãy phân loại rác rồi mới bỏ.'
+      ),
+      (
+        '再利用',
+        'さいりよう',
+        'sairiyou',
+        'Tái sử dụng',
+        '使った紙を再利用しています。',
+        'Tôi đang tái sử dụng giấy đã dùng.'
+      ),
+      (
+        '地震',
+        'じしん',
+        'jishin',
+        'Động đất',
+        '日本は地震が多い国です。',
+        'Nhật Bản là nước có nhiều động đất.'
+      ),
+      (
+        '災害',
+        'さいがい',
+        'saigai',
+        'Thiên tai',
+        '災害に備えて、水を買っておきます。',
+        'Tôi mua sẵn nước để phòng thiên tai.'
+      ),
+      (
+        '被害',
+        'ひがい',
+        'higai',
+        'Thiệt hại',
+        '台風で大きな被害が出ました。',
+        'Cơn bão đã gây thiệt hại lớn.'
+      ),
+    ]),
+    ..._lessonWords('n3_feelings', 'les_n3_feelings_1', 1, level: 'N3', const [
+      (
+        '嬉しい',
+        'うれしい',
+        'ureshii',
+        'Vui mừng',
+        '試験に合格して、とても嬉しいです。',
+        'Thi đỗ rồi nên tôi rất vui.'
+      ),
+      (
+        '寂しい',
+        'さびしい',
+        'sabishii',
+        'Cô đơn',
+        '家族と離れて、寂しいです。',
+        'Xa gia đình nên tôi thấy cô đơn.'
+      ),
+      (
+        '恥ずかしい',
+        'はずかしい',
+        'hazukashii',
+        'Xấu hổ, ngại ngùng',
+        '人の前で話すのは恥ずかしいです。',
+        'Nói trước nhiều người thật ngại.'
+      ),
+      (
+        '悔しい',
+        'くやしい',
+        'kuyashii',
+        'Tiếc nuối, cay cú',
+        '試合に負けて、悔しいです。',
+        'Thua trận nên tôi thấy cay cú.'
+      ),
+      (
+        '心配',
+        'しんぱい',
+        'shinpai',
+        'Lo lắng',
+        '母はいつも私のことを心配しています。',
+        'Mẹ lúc nào cũng lo lắng cho tôi.'
+      ),
+      (
+        '安心',
+        'あんしん',
+        'anshin',
+        'Yên tâm',
+        '無事に着いて、安心しました。',
+        'Đến nơi bình an nên tôi yên tâm.'
+      ),
+      (
+        '驚く',
+        'おどろく',
+        'odoroku',
+        'Ngạc nhiên',
+        'そのニュースを聞いて、驚きました。',
+        'Nghe tin đó tôi rất ngạc nhiên.'
+      ),
+      (
+        '怒る',
+        'おこる',
+        'okoru',
+        'Tức giận',
+        '約束を破ると、父は怒ります。',
+        'Thất hứa là bố sẽ giận.'
+      ),
+      (
+        '感動',
+        'かんどう',
+        'kandou',
+        'Cảm động',
+        'その映画にとても感動しました。',
+        'Tôi rất cảm động với bộ phim đó.'
+      ),
+      (
+        '緊張',
+        'きんちょう',
+        'kinchou',
+        'Căng thẳng, hồi hộp',
+        '面接でとても緊張しました。',
+        'Tôi đã rất hồi hộp khi phỏng vấn.'
+      ),
+    ]),
+    ..._lessonWords('n3_feelings', 'les_n3_feelings_2', 11, level: 'N3', const [
+      (
+        '真面目',
+        'まじめ',
+        'majime',
+        'Nghiêm túc, chăm chỉ',
+        '彼はとても真面目な学生です。',
+        'Cậu ấy là sinh viên rất chăm chỉ.'
+      ),
+      (
+        '素直',
+        'すなお',
+        'sunao',
+        'Ngoan, thật thà',
+        '弟は素直な子です。',
+        'Em trai tôi là đứa trẻ ngoan.'
+      ),
+      (
+        '正直',
+        'しょうじき',
+        'shoujiki',
+        'Thành thật',
+        '正直に話してください。',
+        'Hãy nói thật đi.'
+      ),
+      (
+        '我慢',
+        'がまん',
+        'gaman',
+        'Chịu đựng, nhẫn nại',
+        '痛いけれど、我慢します。',
+        'Đau nhưng tôi sẽ chịu đựng.'
+      ),
+      (
+        '性格',
+        'せいかく',
+        'seikaku',
+        'Tính cách',
+        '姉は明るい性格です。',
+        'Chị tôi có tính cách vui vẻ.'
+      ),
+      (
+        '積極的',
+        'せっきょくてき',
+        'sekkyokuteki',
+        'Tích cực, chủ động',
+        '授業で積極的に質問します。',
+        'Tôi chủ động đặt câu hỏi trong giờ học.'
+      ),
+      (
+        '頑固',
+        'がんこ',
+        'ganko',
+        'Bướng bỉnh, cứng đầu',
+        '祖父は頑固な人です。',
+        'Ông tôi là người cứng đầu.'
+      ),
+      (
+        'わがまま',
+        'わがまま',
+        'wagamama',
+        'Ích kỷ, hay đòi hỏi',
+        '子どものわがままに困っています。',
+        'Tôi khổ vì con hay đòi hỏi.'
+      ),
+      (
+        '丁寧',
+        'ていねい',
+        'teinei',
+        'Lịch sự, chu đáo',
+        '店員さんは丁寧に説明してくれました。',
+        'Nhân viên giải thích rất chu đáo.'
+      ),
+      (
+        '意地悪',
+        'いじわる',
+        'ijiwaru',
+        'Xấu tính, hay bắt nạt',
+        '意地悪なことを言わないでください。',
+        'Đừng nói những lời xấu tính như vậy.'
+      ),
+    ]),
+    ..._lessonWords('n3_life', 'les_n3_life_1', 1, level: 'N3', const [
+      (
+        '手続き',
+        'てつづき',
+        'tetsuzuki',
+        'Thủ tục',
+        '市役所で引っ越しの手続きをしました。',
+        'Tôi đã làm thủ tục chuyển nhà ở tòa thị chính.'
+      ),
+      (
+        '申し込む',
+        'もうしこむ',
+        'moushikomu',
+        'Đăng ký',
+        '日本語の講座に申し込みました。',
+        'Tôi đã đăng ký khóa học tiếng Nhật.'
+      ),
+      (
+        '提出',
+        'ていしゅつ',
+        'teishutsu',
+        'Nộp (giấy tờ, bài)',
+        '金曜日までにレポートを提出してください。',
+        'Hãy nộp báo cáo trước thứ Sáu.'
+      ),
+      (
+        '記入',
+        'きにゅう',
+        'kinyuu',
+        'Điền vào (mẫu đơn)',
+        'この用紙に住所を記入してください。',
+        'Hãy điền địa chỉ vào tờ đơn này.'
+      ),
+      (
+        '印鑑',
+        'いんかん',
+        'inkan',
+        'Con dấu cá nhân',
+        '銀行で口座を作るとき、印鑑が必要です。',
+        'Khi mở tài khoản ngân hàng cần có con dấu.'
+      ),
+      (
+        '在留カード',
+        'ざいりゅうカード',
+        'zairyuu kaado',
+        'Thẻ cư trú',
+        '在留カードはいつも持っていてください。',
+        'Hãy luôn mang theo thẻ cư trú.'
+      ),
+      (
+        '期限',
+        'きげん',
+        'kigen',
+        'Thời hạn',
+        'ビザの期限が来月切れます。',
+        'Visa của tôi hết hạn vào tháng sau.'
+      ),
+      (
+        '更新',
+        'こうしん',
+        'koushin',
+        'Gia hạn, cập nhật',
+        '入管でビザを更新しました。',
+        'Tôi đã gia hạn visa ở cục xuất nhập cảnh.'
+      ),
+      (
+        '窓口',
+        'まどぐち',
+        'madoguchi',
+        'Quầy tiếp nhận',
+        '二番の窓口へどうぞ。',
+        'Mời anh chị đến quầy số 2.'
+      ),
+      (
+        '税金',
+        'ぜいきん',
+        'zeikin',
+        'Tiền thuế',
+        '毎年、税金を払います。',
+        'Hằng năm tôi đều đóng thuế.'
+      ),
+    ]),
+    ..._lessonWords('n3_life', 'les_n3_life_2', 11, level: 'N3', const [
+      (
+        '家賃',
+        'やちん',
+        'yachin',
+        'Tiền thuê nhà',
+        'このアパートの家賃は五万円です。',
+        'Tiền thuê căn hộ này là 50.000 yên.'
+      ),
+      (
+        '大家',
+        'おおや',
+        'ooya',
+        'Chủ nhà (cho thuê)',
+        '大家さんに鍵を返しました。',
+        'Tôi đã trả chìa khóa cho chủ nhà.'
+      ),
+      (
+        '近所',
+        'きんじょ',
+        'kinjo',
+        'Khu lân cận, hàng xóm',
+        '近所に大きいスーパーがあります。',
+        'Gần nhà tôi có một siêu thị lớn.'
+      ),
+      (
+        '引っ越し',
+        'ひっこし',
+        'hikkoshi',
+        'Chuyển nhà',
+        '来週、引っ越しをします。',
+        'Tuần sau tôi chuyển nhà.'
+      ),
+      (
+        '契約',
+        'けいやく',
+        'keiyaku',
+        'Hợp đồng',
+        'アパートの契約をしました。',
+        'Tôi đã ký hợp đồng thuê căn hộ.'
+      ),
+      (
+        '騒音',
+        'そうおん',
+        'souon',
+        'Tiếng ồn',
+        '夜の騒音に困っています。',
+        'Tôi khổ vì tiếng ồn ban đêm.'
+      ),
+      (
+        '迷惑',
+        'めいわく',
+        'meiwaku',
+        'Phiền hà, làm phiền',
+        '近所の人に迷惑をかけないようにしましょう。',
+        'Hãy cố gắng đừng làm phiền hàng xóm.'
+      ),
+      (
+        '管理人',
+        'かんりにん',
+        'kanrinin',
+        'Người quản lý tòa nhà',
+        '故障したら、管理人に連絡してください。',
+        'Nếu có gì hỏng hãy liên lạc người quản lý.'
+      ),
+      (
+        '修理',
+        'しゅうり',
+        'shuuri',
+        'Sửa chữa',
+        'エアコンの修理を頼みました。',
+        'Tôi đã nhờ người sửa điều hòa.'
+      ),
+      (
+        '回覧板',
+        'かいらんばん',
+        'kairanban',
+        'Bảng tin chuyền tay',
+        '回覧板を隣の家に回します。',
+        'Tôi chuyền bảng tin sang nhà bên cạnh.'
+      ),
+    ]),
   ];
 
   /// Sinh từ vựng cho một bài từ danh sách dòng gọn. Id nối tiếp theo chủ đề
