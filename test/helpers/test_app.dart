@@ -25,6 +25,7 @@ import '../fakes/fake_user_data_cleaner.dart';
 /// không cần Firebase.
 Widget buildTestApp({
   bool showWelcome = false,
+  bool signedIn = false,
   FakeAuthService? authService,
   MockUserProfileRepository? userProfileRepository,
   MockProgressRepository? progressRepository,
@@ -61,7 +62,7 @@ Widget buildTestApp({
     musicPlayer: musicPlayer ?? FakeMusicPlayer(),
     userDataCleaner: userDataCleaner ?? FakeUserDataCleaner(),
     reminderScheduler: reminderScheduler ?? FakeReminderScheduler(),
-    child: ChibaKanjiApp(showWelcome: showWelcome),
+    child: ChibaKanjiApp(showWelcome: showWelcome, signedIn: signedIn),
   );
 }
 

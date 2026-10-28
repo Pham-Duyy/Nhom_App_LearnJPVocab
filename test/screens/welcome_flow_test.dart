@@ -65,4 +65,17 @@ void main() {
     expect(find.text('Mật khẩu xác nhận chưa khớp.'), findsOneWidget);
     expect(find.text('Chào Lan!'), findsNothing);
   });
+
+  testWidgets(
+      'đã đăng nhập từ trước: mở app vẫn có màn khởi động, '
+      'sau đó vào thẳng trang chủ', (tester) async {
+    await tester.pumpWidget(buildTestApp(showWelcome: true, signedIn: true));
+    await tester.pump();
+    expect(find.text('Chào Duy!'), findsNothing);
+
+    await passSplash(tester);
+
+    expect(find.text('Chào Duy!'), findsOneWidget);
+    expect(find.text('Tạo tài khoản'), findsNothing);
+  });
 }

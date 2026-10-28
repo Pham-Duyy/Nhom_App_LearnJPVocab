@@ -25,8 +25,10 @@ Future<void> main() async {
     return;
   }
   if (_seedContent) await _seedMissingContent();
-  final seenWelcome = await WelcomeStore.hasSeen();
-  runApp(AppProviders(child: ChibaKanjiApp(showWelcome: !seenWelcome)));
+  // Màn khởi động hiện mỗi lần mở app; đã đăng nhập từ trước thì sau đó vào
+  // thẳng trang chủ thay vì màn đăng nhập.
+  final signedIn = await WelcomeStore.hasSeen();
+  runApp(AppProviders(child: ChibaKanjiApp(signedIn: signedIn)));
 }
 
 /// Lưới an toàn cuối cùng: lỗi không được nơi nào bắt (khi dựng giao diện,

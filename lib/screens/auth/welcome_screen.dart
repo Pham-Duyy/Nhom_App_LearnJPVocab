@@ -7,15 +7,20 @@ import '../../providers/sound_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/chibi_mascot.dart';
 import '../../widgets/japan_scenery.dart';
+import '../auth_gate.dart';
+import '../main_screen.dart';
 import 'auth_screen.dart';
 
-/// Màn khởi động: chỉ có Chibi chuyển động ở giữa màn hình, sau [duration]
-/// thì tự sang màn đăng ký/đăng nhập. Mở ra thì có tiếng chuông và Chibi đọc
-/// tên app. Chạm vào màn hình để vào ngay.
+/// Màn khởi động, hiện mỗi lần mở app: Chibi chuyển động ở giữa màn hình,
+/// tiếng chuông và Chibi đọc tên app. Sau [duration] (hoặc khi chạm vào màn
+/// hình) thì vào trang chủ nếu đã đăng nhập từ trước ([signedIn]), không thì
+/// sang màn đăng ký/đăng nhập.
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({Key? key, this.signedIn = false}) : super(key: key);
 
   static const duration = Duration(seconds: 7);
+
+  final bool signedIn;
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -66,7 +71,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _opened = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => const AuthScreen(startWithRegister: true),
+        builder: (_) => widget.signedIn
+            ? const AuthGate(child: MainScreen())
+            : const AuthScreen(startWithRegister: true),
       ),
     );
   }

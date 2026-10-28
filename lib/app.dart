@@ -10,9 +10,20 @@ import 'theme/app_colors.dart';
 import 'theme/app_styles.dart';
 
 class ChibaKanjiApp extends StatelessWidget {
-  const ChibaKanjiApp({Key? key, this.showWelcome = true}) : super(key: key);
+  const ChibaKanjiApp({
+    Key? key,
+    this.showWelcome = true,
+    this.signedIn = false,
+  }) : super(key: key);
 
+  /// Hiện màn khởi động trước (app thật luôn hiện; test có thể bỏ qua).
   final bool showWelcome;
+
+  /// Đã đăng nhập từ lần trước: màn khởi động xong thì vào thẳng trang chủ.
+  final bool signedIn;
+
+  /// Mức phóng chữ lớn nhất theo cài đặt cỡ chữ của máy.
+  static const maxTextScale = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +36,19 @@ class ChibaKanjiApp extends StatelessWidget {
         (profile) => profile.themeMode,
       ),
       // Trình duyệt chỉ cho phát tiếng sau lần chạm đầu tiên vào trang.
+      // Giao diện được canh theo đúng cỡ chữ thiết kế: máy để chữ hệ thống
+      // lớn (vd. 145%) thì chữ trong app không phóng thêm để bố cục không vỡ
+      // dòng; để chữ nhỏ hơn mặc định thì vẫn thu nhỏ theo.
       builder: (context, child) => Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => context.read<SoundProvider>().userInteracted(),
-        child: child,
+        child: MediaQuery.withClampedTextScaling(
+          maxScaleFactor: maxTextScale,
+          child: child!,
+        ),
       ),
       home: showWelcome
-          ? const WelcomeScreen()
+          ? WelcomeScreen(signedIn: signedIn)
           : const AuthGate(child: MainScreen()),
     );
   }
