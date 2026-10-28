@@ -24,7 +24,11 @@ Future<void> main() async {
     runApp(const _StartupErrorApp());
     return;
   }
-  if (_seedContent) await _seedMissingContent();
+  if (_seedContent) {
+    // Chế độ quản trị chạy một lần: nạp xong thì chỉ hiện kết quả.
+    runApp(_SeedResultApp(await _seedMissingContent()));
+    return;
+  }
   // Màn khởi động hiện mỗi lần mở app; đã đăng nhập từ trước thì sau đó vào
   // thẳng trang chủ thay vì màn đăng nhập.
   final signedIn = await WelcomeStore.hasSeen();
@@ -65,20 +69,60 @@ Future<bool> _initFirebase() async {
   }
 }
 
-/// Chỉ ở bản debug: đẩy nội dung mẫu còn thiếu lên Firestore. Đăng nhập ẩn
-/// danh trước vì rules yêu cầu đăng nhập (AuthController sau đó dùng lại
-/// đúng người dùng này). Có timeout vì khi mất mạng, Firestore chờ kết nối
-/// vô thời hạn.
-Future<void> _seedMissingContent() async {
+/// Đẩy nội dung mẫu còn thiếu lên Firestore, trả về câu báo kết quả. Đăng
+/// nhập ẩn danh trước vì rules yêu cầu đăng nhập. Có timeout vì khi mất
+/// mạng, Firestore chờ kết nối vô thời hạn.
+Future<String> _seedMissingContent() async {
   try {
     final auth = FirebaseAuth.instance;
     if (auth.currentUser == null) await auth.signInAnonymously();
     final added = await FirestoreSeeder()
         .seedMissing()
-        .timeout(const Duration(seconds: 10));
-    if (added > 0) debugPrint('Đã nạp $added document mẫu lên Firestore.');
+        .timeout(const Duration(seconds: 60));
+    return added > 0
+        ? 'Đã nạp $added document mẫu lên Firestore.'
+        : 'Firestore đã có đủ nội dung, không cần nạp thêm.';
   } catch (e) {
-    debugPrint('Không nạp được dữ liệu mẫu: $e');
+    return 'Không nạp được dữ liệu mẫu: $e';
+  }
+}
+
+/// Màn kết quả của chế độ nạp dữ liệu. In lại kết quả sau vài giây vì trên
+/// web, dòng in ra trước khi công cụ debug kết nối xong sẽ bị mất.
+class _SeedResultApp extends StatefulWidget {
+  const _SeedResultApp(this.message);
+
+  final String message;
+
+  @override
+  State<_SeedResultApp> createState() => _SeedResultAppState();
+}
+
+class _SeedResultAppState extends State<_SeedResultApp> {
+  @override
+  void initState() {
+    super.initState();
+    for (final seconds in [1, 5, 15]) {
+      Future.delayed(
+        Duration(seconds: seconds),
+        () => debugPrint('[SEED] ${widget.message}'),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(widget.message, textAlign: TextAlign.center),
+          ),
+        ),
+      ),
+    );
   }
 }
 
