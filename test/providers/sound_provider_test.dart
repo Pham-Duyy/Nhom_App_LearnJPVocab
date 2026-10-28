@@ -121,4 +121,38 @@ void main() {
     expect(music.introCount, 0);
     expect(speaker.spoken, isEmpty);
   });
+
+  group('trình duyệt chặn phát tiếng trước lần chạm đầu tiên', () {
+    SoundProvider browser() {
+      SharedPreferences.setMockInitialValues({});
+      speaker = FakeSpeaker();
+      music = FakeMusicPlayer();
+      return SoundProvider(speaker, music, requireInteraction: true);
+    }
+
+    test('chạm vào màn khởi động thì phát lời giới thiệu đang chờ', () async {
+      final sound = browser();
+
+      await sound.introduce();
+      expect(speaker.spoken, isEmpty);
+
+      sound.userInteracted();
+      await pumpEventQueue();
+      expect(speaker.spoken, [SoundProvider.introText]);
+    });
+
+    test(
+        'rời màn khởi động mà chưa chạm thì bỏ lời giới thiệu, lần chạm '
+        'đầu ở trang chủ chỉ phát lời chào', () async {
+      final sound = browser();
+
+      await sound.introduce();
+      sound.cancelIntro();
+      await sound.welcome();
+      sound.userInteracted();
+      await pumpEventQueue();
+
+      expect(speaker.spoken, [SoundProvider.greetingFor(DateTime.now())]);
+    });
+  });
 }

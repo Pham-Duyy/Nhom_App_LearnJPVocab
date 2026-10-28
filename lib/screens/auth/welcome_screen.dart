@@ -69,6 +69,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void _openAuth() {
     if (_opened || !mounted) return;
     _opened = true;
+    context.read<SoundProvider>().cancelIntro();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => widget.signedIn

@@ -9,7 +9,10 @@ import '../utils/app_error.dart';
 /// Bật/tắt và âm lượng lưu trên thiết bị (SharedPreferences), vì đây là
 /// cài đặt của từng máy chứ không theo tài khoản.
 class SoundProvider extends ChangeNotifier {
-  SoundProvider(this._speaker, this._music);
+  /// [requireInteraction]: chờ lần chạm đầu tiên mới được phát tiếng (web);
+  /// test truyền vào để giả lập trình duyệt.
+  SoundProvider(this._speaker, this._music, {bool? requireInteraction})
+      : _userInteracted = !(requireInteraction ?? kIsWeb);
 
   static const _enabledKey = 'sound_enabled';
   static const _volumeKey = 'sound_volume';
@@ -31,7 +34,7 @@ class SoundProvider extends ChangeNotifier {
 
   /// Trình duyệt chặn phát âm thanh khi người dùng chưa chạm vào trang lần
   /// nào; lời chào phải chờ tới lần chạm đầu tiên.
-  bool _userInteracted = !kIsWeb;
+  bool _userInteracted;
   bool _introPending = false;
   bool _welcomePending = false;
 
@@ -98,6 +101,10 @@ class SoundProvider extends ChangeNotifier {
     }
     await _startMusic();
   }
+
+  /// Rời màn khởi động: lời giới thiệu chưa kịp phát (web chưa được chạm)
+  /// thì bỏ luôn, để không đè lên lời chào ở trang chủ.
+  void cancelIntro() => _introPending = false;
 
   /// Gọi ở lần chạm đầu tiên vào trang để phát lời giới thiệu hoặc lời chào
   /// đang chờ (web).
