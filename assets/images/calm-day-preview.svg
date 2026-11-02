@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Ngày nhẹ nhàng — Flutter demo</title>
+  <desc id="desc">Giao diện ứng dụng theo dõi các việc nhỏ trong ngày.</desc>
+  <rect width="1200" height="720" fill="#f8faf7"/>
+  <rect x="0" y="0" width="1200" height="76" fill="#ffffff"/>
+  <circle cx="116" cy="144" r="30" fill="#ddece3"/>
+  <path d="M104 143c8 0 15-6 15-15 8 1 14 7 14 15 0 8-7 15-15 15-7 0-13-5-14-11-2 0-4-2-4-4Z" fill="#35614c"/>
+  <text x="164" y="137" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#1b2520">Ngày nhẹ nhàng</text>
+  <text x="164" y="170" font-family="Arial, sans-serif" font-size="17" fill="#617069">Chậm lại một chút, bạn nhé.</text>
+  <rect x="86" y="225" width="1028" height="165" rx="28" fill="#35614c"/>
+  <text x="120" y="272" font-family="Arial, sans-serif" font-size="16" fill="#d9e8df">Tiến độ hôm nay</text>
+  <text x="120" y="320" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">3/3 việc đã hoàn thành</text>
+  <rect x="120" y="344" width="960" height="11" rx="6" fill="#d7f1d7"/>
+  <text x="86" y="448" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#1b2520">Việc nhỏ cho hôm nay</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="86" y="474" width="1028" height="64" rx="16" fill="#ffffff"/>
+    <rect x="112" y="495" width="22" height="22" rx="4" fill="#35614c"/>
+    <path d="M117 506l5 5 9-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="158" y="503" font-size="17" font-weight="700" fill="#27322c">Uống một ly nước</text>
+    <text x="158" y="524" font-size="14" fill="#617069">Bắt đầu ngày mới thật chậm rãi</text>
+    <rect x="86" y="550" width="1028" height="64" rx="16" fill="#ffffff"/>
+    <rect x="112" y="571" width="22" height="22" rx="4" fill="#35614c"/>
+    <path d="M117 582l5 5 9-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="158" y="579" font-size="17" font-weight="700" fill="#27322c">Hoàn thành một việc quan trọng</text>
+    <text x="158" y="600" font-size="14" fill="#617069">Chỉ cần một bước nhỏ</text>
+    <rect x="86" y="626" width="1028" height="64" rx="16" fill="#ffffff"/>
+    <rect x="112" y="647" width="22" height="22" rx="4" fill="#35614c"/>
+    <path d="M117 658l5 5 9-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="158" y="655" font-size="17" font-weight="700" fill="#27322c">Dành 10 phút cho bản thân</text>
+    <text x="158" y="676" font-size="14" fill="#617069">Đi bộ, đọc sách hoặc hít thở sâu</text>
+  </g>
+</svg>

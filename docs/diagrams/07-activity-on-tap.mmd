@@ -1,0 +1,13 @@
+flowchart TD
+    A([Người học trả lời một thẻ hoặc một câu quiz]) --> B{Trả lời đúng?}
+    B -- Đúng --> C[markCorrect: memoryLevel + 1, tối đa 5<br/>correctCount + 1, isLearned = true]
+    B -- Sai --> D[markWrong: memoryLevel = 1<br/>wrongCount + 1]
+    C --> E[Tra khoảng ôn theo mức mới<br/>1→1 ngày · 2→3 · 3→7 · 4→14 · 5→30]
+    D --> E
+    E --> F[nextReviewAt = bây giờ + khoảng ôn<br/>lastReviewedAt = bây giờ]
+    F --> G[(Lưu Progress lên<br/>users/uid/progress)]
+    G --> H{Lưu thành công?}
+    H -- Không --> I[Giữ thẻ hiện tại, báo lỗi,<br/>người học thử lại]
+    I --> A
+    H -- Có --> J[recordStudyDay: hôm nay đã tính thì giữ nguyên,<br/>hôm qua có học thì chuỗi + 1, bỏ lỡ thì về 1]
+    J --> K([Trang chủ: từ có nextReviewAt ≤ hôm nay<br/>được đếm là đến hạn ôn])

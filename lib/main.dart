@@ -1,0 +1,147 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+import 'app.dart';
+import 'data/firestore_seeder.dart';
+import 'firebase_options.dart';
+import 'providers/app_providers.dart';
+import 'services/welcome_store.dart';
+import 'utils/app_error.dart';
+import 'widgets/error_view.dart';
+
+/// Chỉ nạp nội dung mẫu lên Firestore khi chạy với
+/// `--dart-define=SEED_CONTENT=true`, vì Rules chặn app ghi vào nội dung học
+/// (xem README, mục "Nạp nội dung lên Firestore").
+const _seedContent = bool.fromEnvironment('SEED_CONTENT');
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  _catchUnexpectedErrors();
+
+  if (!await _initFirebase()) {
+    runApp(const _StartupErrorApp());
+    return;
+  }
+  if (_seedContent) {
+    // Chế độ quản trị chạy một lần: nạp xong thì chỉ hiện kết quả.
+    runApp(_SeedResultApp(await _seedMissingContent()));
+    return;
+  }
+  // Màn khởi động hiện mỗi lần mở app; đã đăng nhập từ trước thì sau đó vào
+  // thẳng trang chủ thay vì màn đăng nhập.
+  final signedIn = await WelcomeStore.hasSeen();
+  runApp(AppProviders(child: ChibaKanjiApp(signedIn: signedIn)));
+}
+
+/// Lưới an toàn cuối cùng: lỗi không được nơi nào bắt (khi dựng giao diện,
+/// hoặc trong một Future không ai chờ) được ghi log thay vì âm thầm làm hỏng
+/// app. Lỗi dự đoán được đã được từng provider tự xử lý trước đó.
+void _catchUnexpectedErrors() {
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AppError.log('FlutterError', details.exception, details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppError.log('Uncaught', error, stack);
+    return true;
+  };
+  if (kReleaseMode) {
+    ErrorWidget.builder = (_) => const Center(
+          child: Text(
+            'Đã có lỗi khi hiển thị phần này.',
+            textDirection: TextDirection.ltr,
+          ),
+        );
+  }
+}
+
+Future<bool> _initFirebase() async {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    return true;
+  } catch (e, stack) {
+    AppError.log('Firebase.initializeApp', e, stack);
+    return false;
+  }
+}
+
+/// Đẩy nội dung mẫu còn thiếu lên Firestore, trả về câu báo kết quả. Đăng
+/// nhập ẩn danh trước vì rules yêu cầu đăng nhập. Có timeout vì khi mất
+/// mạng, Firestore chờ kết nối vô thời hạn.
+Future<String> _seedMissingContent() async {
+  try {
+    final auth = FirebaseAuth.instance;
+    if (auth.currentUser == null) await auth.signInAnonymously();
+    final added = await FirestoreSeeder()
+        .seedMissing()
+        .timeout(const Duration(seconds: 60));
+    return added > 0
+        ? 'Đã nạp $added document mẫu lên Firestore.'
+        : 'Firestore đã có đủ nội dung, không cần nạp thêm.';
+  } catch (e) {
+    return 'Không nạp được dữ liệu mẫu: $e';
+  }
+}
+
+/// Màn kết quả của chế độ nạp dữ liệu. In lại kết quả sau vài giây vì trên
+/// web, dòng in ra trước khi công cụ debug kết nối xong sẽ bị mất.
+class _SeedResultApp extends StatefulWidget {
+  const _SeedResultApp(this.message);
+
+  final String message;
+
+  @override
+  State<_SeedResultApp> createState() => _SeedResultAppState();
+}
+
+class _SeedResultAppState extends State<_SeedResultApp> {
+  @override
+  void initState() {
+    super.initState();
+    for (final seconds in [1, 5, 15]) {
+      Future.delayed(
+        Duration(seconds: seconds),
+        () => debugPrint('[SEED] ${widget.message}'),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(widget.message, textAlign: TextAlign.center),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Hiện khi Firebase không khởi động được, thay vì để app chạy tiếp rồi lỗi
+/// ở lần đầu đọc dữ liệu.
+class _StartupErrorApp extends StatelessWidget {
+  const _StartupErrorApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: ErrorView(
+          message: 'Không thể khởi động ứng dụng. '
+              'Hãy kiểm tra kết nối mạng rồi thử lại.',
+          onRetry: main,
+        ),
+      ),
+    );
+  }
+}

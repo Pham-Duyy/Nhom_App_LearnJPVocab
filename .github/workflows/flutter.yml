@@ -1,0 +1,34 @@
+# Mỗi lần push hoặc mở pull request vào main: kiểm tra code và chạy toàn bộ
+# test. Không cần Firebase vì test dùng repository giả trong bộ nhớ.
+name: Flutter CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.8
+          channel: stable
+          cache: true
+
+      - name: Cài package
+        run: flutter pub get
+
+      - name: Kiểm tra định dạng code
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Phân tích code
+        run: flutter analyze
+
+      - name: Chạy test
+        run: flutter test

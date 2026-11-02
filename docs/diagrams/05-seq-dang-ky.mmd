@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor U as Người dùng
+    participant S as AuthScreen
+    participant V as AuthValidators
+    participant AC as AuthController
+    participant AS as FirebaseAuthService
+    participant FA as Firebase Auth
+    participant UP as UserProfileProvider
+
+    U->>S: Nhập tên, email, mật khẩu, bấm "Tạo tài khoản"
+    S->>V: Form.validate()
+    alt Dữ liệu không hợp lệ
+        V-->>S: Thông báo lỗi dưới từng ô
+        S-->>U: Sửa lại form
+    else Hợp lệ
+        S->>AC: registerWithEmail(email, password)
+        AC->>AS: registerWithEmail(email, password)
+        alt Đang là tài khoản khách
+            AS->>FA: linkWithCredential()
+            Note over AS,FA: Giữ nguyên uid nên không mất tiến độ đã học
+        else Chưa đăng nhập
+            AS->>FA: createUserWithEmailAndPassword()
+        end
+        alt Firebase báo lỗi (email đã dùng, mật khẩu yếu, mất mạng)
+            FA-->>AS: FirebaseAuthException
+            AS-->>AC: AuthException(code)
+            AC-->>S: Câu báo lỗi tiếng Việt
+            S-->>U: Hiện lỗi trên form
+        else Thành công
+            FA-->>AS: UserCredential
+            AS-->>AC: AppAuthUser
+            AC-->>S: null (không lỗi)
+            S->>UP: load() rồi updateDisplayName(tên)
+            S->>S: WelcomeStore.setSeen(true)
+            S-->>U: Vào trang chủ, nghe lời chào tiếng Nhật
+        end
+    end

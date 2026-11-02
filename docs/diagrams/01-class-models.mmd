@@ -1,0 +1,130 @@
+classDiagram
+    direction TB
+
+    class GenericEntity~ID~ {
+        <<abstract>>
+        +ID id
+        +String name
+        +String description
+        +getId() ID
+        +getName() String
+        +matches(keyword) bool
+        +toMap()* Map
+    }
+    class LearningContent {
+        <<abstract>>
+        +int order
+        +bool isPublished
+    }
+    class Category {
+        +String jlptLevel
+        +String? imageUrl
+        +toMap() Map
+        +fromMap(map)$ Category
+    }
+    class Lesson {
+        +String categoryId
+        +String jlptLevel
+        +int vocabularyCount
+        +toMap() Map
+        +fromMap(map)$ Lesson
+    }
+    class Vocabulary {
+        +String lessonId
+        +String kanji
+        +String kana
+        +String romaji
+        +String exampleJapanese
+        +String exampleVietnamese
+        +String jlptLevel
+        +meaning String
+        +isPersonal bool
+        +matches(keyword) bool
+        +toMap() Map
+        +fromMap(map)$ Vocabulary
+    }
+    class UserTopic {
+        +List~String~ wordIds
+        +DateTime createdAt
+        +wordCount int
+        +contains(vocabularyId) bool
+        +validateName(name)$ String?
+    }
+    class Progress {
+        +String vocabularyId
+        +int memoryLevel
+        +int correctCount
+        +int wrongCount
+        +bool isLearned
+        +bool isFavorite
+        +DateTime? lastReviewedAt
+        +DateTime? nextReviewAt
+        +markCorrect(now) Progress
+        +markWrong(now) Progress
+        +isDueForReview(now) bool
+        +toMap() Map
+        +fromMap(map)$ Progress
+    }
+    class Question {
+        +String prompt
+        +List~String~ options
+        +int correctIndex
+        +String? vocabularyId
+        +bool isListening
+        +correctAnswer String
+        +isCorrect(index) bool
+    }
+    class QuizAttempt {
+        +String id
+        +String quizId
+        +int totalQuestions
+        +int correctCount
+        +Map selectedAnswers
+        +DateTime startedAt
+        +DateTime? completedAt
+        +scorePercent double
+        +toMap() Map
+        +fromMap(map)$ QuizAttempt
+    }
+    class UserProfile {
+        +String displayName
+        +int dailyGoal
+        +ThemeMode themeMode
+        +int currentStreak
+        +int longestStreak
+        +DateTime? lastStudyDate
+        +streakOn(now) int
+        +recordStudyDay(now) UserProfile
+        +hasStudiedOn(now) bool
+        +validateDisplayName(name)$ String?
+        +toMap() Map
+        +fromMap(map)$ UserProfile
+    }
+    class StudyPreferences {
+        +CardFront cardFront
+        +bool showRomaji
+        +int quizLength
+        +bool dailyReminder
+        +int reminderHour
+        +int reminderMinute
+    }
+    class CardFront {
+        <<enumeration>>
+        japanese
+        meaning
+    }
+
+    GenericEntity <|-- LearningContent
+    LearningContent <|-- Category
+    LearningContent <|-- Lesson
+    LearningContent <|-- Vocabulary
+    LearningContent <|-- UserTopic
+
+    Category "1" o-- "*" Lesson : categoryId
+    Lesson "1" o-- "*" Vocabulary : lessonId
+    UserTopic "*" o-- "*" Vocabulary : wordIds
+    Progress "0..1" --> "1" Vocabulary : vocabularyId
+    Question "*" --> "0..1" Vocabulary : vocabularyId
+    QuizAttempt "1" --> "*" Question : selectedAnswers
+    UserProfile *-- "1" StudyPreferences
+    StudyPreferences --> CardFront

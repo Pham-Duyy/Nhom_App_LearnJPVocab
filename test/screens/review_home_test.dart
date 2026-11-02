@@ -1,0 +1,99 @@
+import 'package:chibakanji/models/progress.dart';
+import 'package:chibakanji/repositories/mock/mock_progress_repository.dart';
+import 'package:chibakanji/widgets/memory_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../helpers/test_app.dart';
+
+void main() {
+  testWidgets('US12: trang chủ hiển thị đúng thống kê từ ProgressProvider', (
+    tester,
+  ) async {
+    await pumpTestApp(tester);
+
+    expect(find.text('9 từ vựng'), findsOneWidget);
+    expect(find.text('3 từ đến hạn · Khoảng 2 phút'), findsOneWidget);
+
+    final bars = tester.widgetList<MemoryBar>(find.byType(MemoryBar)).toList();
+    expect(bars.map((item) => item.count).toList(), [3, 3, 3]);
+  });
+
+  testWidgets(
+    'US11: nhấn Bắt đầu ôn tập chỉ mở đúng 3 từ đến hạn, học xong due count về 0',
+    (tester) async {
+      await pumpTestApp(tester);
+
+      await tester.ensureVisible(find.text('Bắt đầu ôn tập'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Bắt đầu ôn tập'));
+      await tester.pumpAndSettle();
+
+      // Đúng 3 từ đến hạn được đưa vào phiên, không phải 9 từ đã học hay
+      // toàn bộ 30 từ mẫu — được đảm bảo bởi getDueForReview() + getByIds().
+      expect(find.text('Từ 1/3'), findsOneWidget);
+
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.text('Đã nhớ'));
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('Kết quả buổi học'), findsOneWidget);
+      expect(find.text('Hoàn thành phiên ôn tập!'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Về trang chủ'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Về trang chủ'));
+      await tester.pumpAndSettle();
+
+      // markCorrect() đẩy lịch ôn của cả 3 từ ra tương lai, và 6 từ còn lại
+      // vốn đã không đến hạn từ đầu, nên due count phải về đúng 0.
+      expect(find.text('Bạn đã ôn xong hôm nay!'), findsOneWidget);
+      expect(find.text('Quay lại vào ngày mai nhé.'), findsOneWidget);
+
+      // Khi đã hết từ cần ôn nhưng chưa đủ mục tiêu 10 từ, nút chuyển thành
+      // "Bắt đầu học mới", sáng màu và chạm vào chuyển sang tab Học mới.
+      final button = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Bắt đầu học mới'),
+      );
+      expect(button.onPressed, isNotNull);
+
+      await tester.tap(find.text('Bắt đầu học mới'));
+      await tester.pumpAndSettle();
+      expect(find.text('Chủ đề ở cấp độ này đang được biên soạn.'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'khi đã học đủ mục tiêu 10 từ trong ngày thì nút tự xám đi và không bấm được nữa',
+    (tester) async {
+      final now = DateTime.now();
+      final fullProgress = List.generate(
+        10,
+        (i) => Progress(
+          vocabularyId: 'word_$i',
+          memoryLevel: 2,
+          correctCount: 1,
+          reviewCount: 1,
+          isLearned: true,
+          lastReviewedAt: now,
+          nextReviewAt: now.add(const Duration(days: 3)),
+        ),
+      );
+
+      await tester.pumpWidget(
+        buildTestApp(
+          progressRepository: MockProgressRepository(
+            initialProgress: fullProgress,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Đã hoàn thành hôm nay'),
+      );
+      expect(button.onPressed, isNull);
+    },
+  );
+}
