@@ -7,7 +7,7 @@ còn đăng nhập dùng `FakeAuthService`.
 ## Cách chạy
 
 ```bash
-flutter test                 # chạy toàn bộ 359 test
+flutter test                 # chạy toàn bộ test
 flutter test --coverage      # kèm độ phủ, kết quả ở coverage/lcov.info
 flutter test --plain-name US16   # chỉ chạy test của một user story
 ```
