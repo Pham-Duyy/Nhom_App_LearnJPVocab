@@ -17,7 +17,7 @@ import '../common/generic_screen.dart';
 import '../my_vocabulary/my_vocabulary_screen.dart';
 import 'vocabulary_detail_screen.dart';
 
-enum _WordFilter { all, due, favorite }
+enum _WordFilter { all, favorite }
 
 class VocabularyBookScreen extends StatefulWidget {
   const VocabularyBookScreen({Key? key}) : super(key: key);
@@ -145,7 +145,7 @@ class _VocabularyBookScreenState
           ),
         ),
         const SizedBox(height: 16),
-        _buildFilters(palette, progressProvider.getDueForReview().length),
+        _buildFilters(palette),
         const SizedBox(height: 8),
         Expanded(
           child: progressProvider.isLoading ||
@@ -187,10 +187,9 @@ class _VocabularyBookScreenState
     );
   }
 
-  Widget _buildFilters(AppPalette palette, int dueCount) {
+  Widget _buildFilters(AppPalette palette) {
     final labels = {
       _WordFilter.all: 'Tất cả',
-      _WordFilter.due: 'Đến hạn · $dueCount',
       _WordFilter.favorite: 'Yêu thích',
     };
     return SizedBox(
@@ -281,8 +280,6 @@ class _VocabularyBookScreenState
     switch (_filter) {
       case _WordFilter.all:
         return true;
-      case _WordFilter.due:
-        return progress.isDueForReview();
       case _WordFilter.favorite:
         return progress.isFavorite;
     }
